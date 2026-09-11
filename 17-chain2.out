@@ -1,0 +1,29 @@
+### 30B-A3B 2x(TP=4)
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=4 extra=[--data-parallel-size 2] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+ready after 13 min
+(Worker_DP1_TP3 pid=544567) INFO 09-10 20:27:57 [hpu_model_runner.py:6233] Warmup finished in 712 secs, allocated 16.93 GiB of device memory
+(Worker_DP1_TP2 pid=544565) INFO 09-10 20:27:57 [hpu_model_runner.py:6233] Warmup finished in 711 secs, allocated 16.91 GiB of device memory
+=== chat-10: 40 req, 10 users, 1024 in / 512 out ===
+| chat-10 | 10 | 1024 / 512 | 17.6 | 17.2 | 0.3 / 1.9 | 159.07 | 488.67 |
+=== chat-16: 48 req, 16 users, 1024 in / 512 out ===
+| chat-16 | 16 | 1024 / 512 | 17.2 | 16.4 | 0.3 / 2.4 | 248.26 | 751.26 |
+=== agentic-10-32k: 20 req, 10 users, 32768 in / 1024 out ===
+| agentic-10-32k | 10 | 32768 / 1024 | 0.0 | 0.0 | 0.0 / 0.0 | FAIL: WARNING 09-10 20:32:52 [interface.py:368] Failed to import from vllm._C: ModuleN |  |
+=== mixed-16: 48 req, 16 users, 8192 in / 768 out ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ZeroDivisionError: float division by zero
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ZeroDivisionError: float division by zero
+| mixed-16 | 16 | 8192 / 768 |  |  | 0.0 / 0.0 | 0.00 | 0.00 |
+=== longctx-4-100k: 4 req, 4 users, 100000 in / 512 out ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ZeroDivisionError: float division by zero
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ZeroDivisionError: float division by zero
+| longctx-4-100k | 4 | 100000 / 512 |  |  | 0.0 / 0.0 | 0.00 | 0.00 |
+=== done -> /home/gaudi2/setup/office10-Qwen_Qwen3-30B-A3B-Instruct-2507-tp4-dataparall-ctx131072-mem0.7.md (server still up on :8000) ===

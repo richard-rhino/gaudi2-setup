@@ -1,0 +1,3 @@
+=== google/gemma-4-31b-it  TP=1 cards=2  (log: /home/gaudi2/setup/bench-google_gemma-4-31b-it-tp1.log) ===
+| google/gemma-4-31b-it | 2 (1) | fail | fail | - | Error: 'head_dim' is a per-layer attribute and may vary across layers. Access it via th |
+exit=0

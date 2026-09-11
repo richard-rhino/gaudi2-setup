@@ -1,0 +1,613 @@
+INFO 09-10 18:53:15 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 18:53:15 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 18:53:15 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 18:53:17 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 18:53:17 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 18:53:17 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 18:53:17 [__init__.py:272] Platform plugin hpu is activated
+INFO 09-10 18:53:17 [__init__.py:272] Platform plugin hpu is activated
+WARNING 09-10 18:53:17 [platform.py:373] Pin memory is not supported on HPU.
+INFO 09-10 18:53:19 [importing.py:74] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 18:53:19 [importing.py:98] Triton not installed or not compatible; certain GPU-related functions will not be available.
+WARNING 09-10 18:53:21 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 18:53:21 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 18:53:21 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+INFO 09-10 18:53:21 [nixl_utils.py:32] Setting UCX_RCACHE_MAX_UNRELEASED to '1024' to avoid a rare memory leak in UCX when using NIXL.
+WARNING 09-10 18:53:21 [nixl_utils.py:62] NIXL is not available
+WARNING 09-10 18:53:21 [nixl_utils.py:64] NIXL agent config is not available
+WARNING 09-10 18:53:21 [hpu_nixl_connector.py:276] [HPU] NixlBaseConnectorWorker.register_kv_caches has drifted from the vllm 61c9ef98 baseline that vllm_gaudi's _hpu_register_kv_caches was copied from (live token digest 2d38e3c9a2b456b5f8b790afefc64505135d92a47d9968727c7324350136f277 != baseline c28bbb0667f915b805af79c39178ffb7c312f8291c90c9318afb5e1a83625176). The HPU K/V-split override may now compute stale NIXL descriptors. Re-sync _hpu_register_kv_caches to the current upstream body, re-apply the three HPU deviations, and refresh _UPSTREAM_REGISTER_KV_CACHES_BASELINE.
+[transformers] `SiglipImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `SiglipImageProcessor` instead.
+WARNING 09-10 18:53:22 [registry.py:171] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7f39c45b75e0>. It is overwritten by the new one.
+/opt/src/vllm/vllm/benchmarks/throughput.py:1015: UserWarning: Both --input-len and --random-input-len are specified. The random version (--random-input-len) will be preferred in this run.
+  validate_args(args)
+/opt/src/vllm/vllm/benchmarks/throughput.py:1015: UserWarning: Both --output-len and --random-output-len are specified. The random version (--random-output-len) will be preferred in this run.
+  validate_args(args)
+/opt/src/vllm/vllm/benchmarks/throughput.py:1015: UserWarning: Both --prefix-len and --random-prefix-len are specified. The random version (--random-prefix-len) will be preferred in this run.
+  validate_args(args)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+When dataset path is not set, it will default to random dataset
+INFO 09-10 18:53:24 [utils.py:90] Sampling input_len from [1024, 1024] and output_len from [128, 128]
+INFO 09-10 18:53:24 [api_utils.py:286] non-default args: {'tokenizer': 'Qwen/Qwen3.8-27B', 'dtype': 'bfloat16', 'max_model_len': 2048, 'gpu_memory_utilization': 0.5, 'max_num_seqs': 64, 'mm_device_do_normalize': None, 'enable_lora': None, 'reasoning_parser_plugin': '', 'enable_bf16x3_router_gemm': False, 'model': 'Qwen/Qwen3.8-27B'}
+INFO 09-10 18:53:24 [model.py:691] Resolved architecture: Qwen3_5ForConditionalGeneration
+INFO 09-10 18:53:24 [model.py:2031] Using max model len 2048
+WARNING 09-10 18:53:25 [platform.py:132] This is a workaround! Please check the NOTE in the get_device_total_memory definition.
+INFO 09-10 18:53:25 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=8192.
+INFO 09-10 18:53:25 [config.py:625] Mamba cache mode is set to 'align' for Qwen3_5ForConditionalGeneration by default when prefix caching is enabled
+INFO 09-10 18:53:25 [kernel.py:372] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+INFO 09-10 18:53:25 [platform.py:262] [HPU] Forcing CompilationMode.NONE compilation mode
+WARNING 09-10 18:53:25 [vllm.py:674] Model Runner V2 requires Triton; using the V1 model runner instead.
+INFO 09-10 18:53:25 [compilation.py:329] Enabled custom fusions: norm_quant, act_quant
+[transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+INFO 09-10 18:53:37 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 18:53:37 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 18:53:37 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 18:53:39 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 18:53:39 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 18:53:39 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 18:53:39 [__init__.py:272] Platform plugin hpu is activated
+INFO 09-10 18:53:39 [__init__.py:272] Platform plugin hpu is activated
+WARNING 09-10 18:53:39 [platform.py:373] Pin memory is not supported on HPU.
+INFO 09-10 18:53:41 [importing.py:74] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 18:53:41 [importing.py:98] Triton not installed or not compatible; certain GPU-related functions will not be available.
+(EngineCore pid=2446) WARNING 09-10 18:53:42 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=2446) WARNING 09-10 18:53:43 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=2446) WARNING 09-10 18:53:43 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=2446) WARNING 09-10 18:53:43 [nixl_utils.py:62] NIXL is not available
+(EngineCore pid=2446) WARNING 09-10 18:53:43 [nixl_utils.py:64] NIXL agent config is not available
+(EngineCore pid=2446) WARNING 09-10 18:53:43 [hpu_nixl_connector.py:276] [HPU] NixlBaseConnectorWorker.register_kv_caches has drifted from the vllm 61c9ef98 baseline that vllm_gaudi's _hpu_register_kv_caches was copied from (live token digest 2d38e3c9a2b456b5f8b790afefc64505135d92a47d9968727c7324350136f277 != baseline c28bbb0667f915b805af79c39178ffb7c312f8291c90c9318afb5e1a83625176). The HPU K/V-split override may now compute stale NIXL descriptors. Re-sync _hpu_register_kv_caches to the current upstream body, re-apply the three HPU deviations, and refresh _UPSTREAM_REGISTER_KV_CACHES_BASELINE.
+(EngineCore pid=2446) [transformers] `SiglipImageProcessorFast` is deprecated. The `Fast` suffix for image processors has been removed; use `SiglipImageProcessor` instead.
+(EngineCore pid=2446) WARNING 09-10 18:53:44 [registry.py:171] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7fc700effd30>. It is overwritten by the new one.
+(EngineCore pid=2446) INFO 09-10 18:53:45 [core.py:123] Initializing a V1 LLM engine (v0.28.1rc1.dev496+gcd64c2dea) with config: model='Qwen/Qwen3.8-27B', speculative_config=None, tokenizer='Qwen/Qwen3.8-27B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=main, tokenizer_revision=main, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=2048, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=None, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=hpu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, per_request_spec_decode_metrics='none', kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3.8-27B, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'hpu_backend', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': None, 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': None, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_jit_warmup=True, enable_bf16x3_router_gemm=False, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=2446) INFO 09-10 18:53:46 [parallel_state.py:1798] world_size=1 rank=0 local_rank=0 distributed_init_method=file:///tmp/vllm_dist_515489dba5204b2d895eaa62b215c3dc backend=hccl
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 1
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 1
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 128
+CPU RAM       : 125 GB
+------------------------------------------------------------------------------
+(EngineCore pid=2446) INFO 09-10 18:53:49 [parallel_state.py:2142] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+fatal: not a git repository (or any parent up to mount point /)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:28] Environment:
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     hw: gaudi2
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     build: 1.24.1.482
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     engine_version: v1
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     bridge_mode: lazy
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     model_type: qwen3_5
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     prefix_caching: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     vllm_gaudi_commit: Error getting commit hash
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:28] Features:
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     fp32_alibi_biases: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     fp32_softmax: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     fused_block_softmax_adjustment: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     fused_block_softmax: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     prompt_attn_impl: fsdpa_impl
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     skip_warmup: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     merged_prefill: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     use_contiguous_pa: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     use_bucketing: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     bucketing_strategy: exp
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     defrag: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     regional_compilation: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     dynamic_shapes_compilation: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     fullgraph_compilation: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     scale_adjustment: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     flatten_input: True
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     high_level_profiler_enabled: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     track_graph_compilation: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     per_token_kv_scaling_support: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     moe_chunk: 
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     moe_token_boundary: 
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     row_parallel_chunks: 1
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     row_parallel_chunk_threshold: 8192
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     use_dispatch_fn: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     use_hpu_aligned_scale: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     enable_fsdpa_slicing: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     enable_fsdpa_q_tiling: False
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:28] User flags:
+(EngineCore pid=2446) INFO 09-10 18:53:49 [runtime.py:32]     PT_HPU_WEIGHT_SHARING: 0
+(EngineCore pid=2446) INFO 09-10 18:53:49 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=2446) WARNING 09-10 18:53:49 [hpu_model_runner.py:1406] Compact GDN mode does not support prefix caching.
+(EngineCore pid=2446) INFO 09-10 18:53:49 [hpu_model_runner.py:1407] GDN layers detected (48): VLLM_USE_HYBRID_CACHE=1, VLLM_USE_NAIVE_MAMBA_CACHE_SHARING=0, VLLM_COMPACT_GDN=1
+(EngineCore pid=2446) INFO 09-10 18:53:49 [hpu_model_runner.py:1535] Bucketing is ON.
+(EngineCore pid=2446) INFO 09-10 18:53:49 [hpu_worker.py:247] QUANT_CONFIG unchanged: None
+(EngineCore pid=2446) WARNING 09-10 18:53:49 [hpu_model_runner.py:1223] Setting OMP_NUM_THREADS to 128 and torch.set_num_threads to 128 for 128 available CPU cores and world size 1
+(EngineCore pid=2446) INFO 09-10 18:53:49 [hpu_model_runner.py:4824] Starting to load model Qwen/Qwen3.8-27B...
+(EngineCore pid=2446) INFO 09-10 18:53:50 [interface.py:414] Using default backend AttentionBackendEnum.TORCH_SDPA for vit attention
+(EngineCore pid=2446) INFO 09-10 18:53:50 [mm_encoder_attention.py:372] Using AttentionBackendEnum.TORCH_SDPA for MMEncoderAttention.
+(EngineCore pid=2446) INFO 09-10 18:53:50 [qwen_gdn_linear_attn.py:168] Using Triton/FLA GDN prefill kernel (requested=auto, head_k_dim=128).
+(EngineCore pid=2446) INFO 09-10 18:53:50 [qwen_gdn_linear_attn.py:520] GDN decode kernel: cuda
+(EngineCore pid=2446) INFO 09-10 18:53:50 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=2446) INFO 09-10 18:53:50 [weight_utils.py:895] Filesystem type for checkpoints: EXT4. Checkpoint size: 51.75 GiB. Available RAM: 73.64 GiB.
+(EngineCore pid=2446) INFO 09-10 18:53:50 [weight_utils.py:918] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=2446) Loading safetensors checkpoint shards:   0% Completed | 0/18 [00:00<?, ?it/s]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:   6% Completed | 1/18 [00:02<00:34,  2.01s/it]
+[transformers] Qwen3VL video processing does not apply the per-frame pixel cap the reference implementation (qwen-vl-utils) applies, so some videos cost far more tokens than they would there. In v5.22 the capped behavior will become the default and `cap_pixels_per_frame` will be removed. Pass `cap_pixels_per_frame=True` to adopt the reference behavior now, or `False` to keep the current behavior and silence this warning.
+INFO 09-10 18:53:53 [base.py:261] Multi-modal warmup completed in 16.742s
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  11% Completed | 2/18 [00:03<00:24,  1.54s/it]
+INFO 09-10 18:53:54 [base.py:261] Readonly multi-modal warmup completed in 0.778s
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  17% Completed | 3/18 [00:04<00:22,  1.49s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  22% Completed | 4/18 [00:06<00:21,  1.51s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  28% Completed | 5/18 [00:07<00:16,  1.27s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  33% Completed | 6/18 [00:08<00:15,  1.33s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  39% Completed | 7/18 [00:09<00:12,  1.16s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  44% Completed | 8/18 [00:11<00:13,  1.35s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  50% Completed | 9/18 [00:11<00:10,  1.22s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  56% Completed | 10/18 [00:13<00:10,  1.35s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  61% Completed | 11/18 [00:14<00:08,  1.24s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  67% Completed | 12/18 [00:16<00:08,  1.39s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  72% Completed | 13/18 [00:17<00:06,  1.26s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  78% Completed | 14/18 [00:18<00:05,  1.39s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  83% Completed | 15/18 [00:19<00:03,  1.24s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  89% Completed | 16/18 [00:21<00:02,  1.36s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards:  94% Completed | 17/18 [00:22<00:01,  1.22s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards: 100% Completed | 18/18 [00:23<00:00,  1.18s/it]
+(EngineCore pid=2446) Loading safetensors checkpoint shards: 100% Completed | 18/18 [00:23<00:00,  1.31s/it]
+(EngineCore pid=2446) 
+(EngineCore pid=2446) INFO 09-10 18:54:14 [default_loader.py:430] Loading weights took 23.59 seconds
+(EngineCore pid=2446) INFO 09-10 18:54:14 [hpu_model_runner.py:4842] Loading model weights took 51.7339 GB
+(EngineCore pid=2446) INFO 09-10 18:54:15 [hpu_model_runner.py:4935] Wrapping in HPUGraph took 0.0000 GB
+(EngineCore pid=2446) INFO 09-10 18:54:15 [hpu_model_runner.py:4963] Compilation took 0.0000 GB
+(EngineCore pid=2446) INFO 09-10 18:54:15 [interface.py:635] Setting kv cache block size to 128 for CUSTOM backend.
+(EngineCore pid=2446) INFO 09-10 18:54:15 [interface.py:933] Setting attention block size to 896 tokens to ensure that attention page size is >= mamba page size.
+(EngineCore pid=2446) INFO 09-10 18:54:15 [interface.py:957] Padding mamba page size by 14.43% to ensure that mamba page size and attention page size are exactly equal.
+(EngineCore pid=2446) INFO 09-10 18:54:15 [utils.py:306] Using LBNHC KV cache layout.
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_worker.py:404] Model profiling run took 56 MiB of device memory (51.79 GiB/94.62 GiB used) and 1.387 MiB of host memory (53.16 GiB/125.5 GiB used)
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_worker.py:432] Free device memory: 42.83 GiB, 21.42 GiB usable (gpu_memory_utilization=0.5), 2.142 GiB reserved for HPUGraphs (VLLM_GRAPH_RESERVED_MEM=0.1), 224 MiB reserved for KV cache dummy block 19.05 GiB reserved for usable KV cache
+(EngineCore pid=2446) INFO 09-10 18:54:16 [kv_cache_utils.py:2312] GPU KV cache size: 79,189 tokens, Maximum concurrency for 2,048 tokens per request: 38.67x
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_model_runner.py:6960] GDN compact: 3 groups, 64 base_slots, tensor_dim0=194 vs baseline=349, free_list_len=64
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_worker.py:546] Usable num_blocks: 348, actual allocated num_blocks (max across layers): 311936 (_PAD_BLOCK_ID=348, _PAD_SLOT_ID=44544)
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_worker.py:549] Initializing cache engine took 28.31 GiB of device memory (80.05 GiB/94.62 GiB used) and 1.137 MiB of host memory (53.16 GiB/125.5 GiB used)
+(EngineCore pid=2446) INFO 09-10 18:54:16 [exponential.py:80] Prompt bucket config (min, step, max_warmup, limit) bs:[1, 2, 1, 1], query:[128, 128, 8192, 13], blocks:[0, 1, 15, 5]
+(EngineCore pid=2446) INFO 09-10 18:54:16 [common.py:253] Generated 48 prompt buckets [bs, query, num_blocks]: [(1, 128, 0), (1, 128, 1), (1, 128, 2), (1, 128, 4), (1, 128, 8), (1, 128, 15), (1, 256, 0), (1, 256, 1), (1, 256, 2), (1, 256, 4), (1, 256, 8), (1, 256, 15), (1, 384, 0), (1, 384, 1), (1, 384, 2), (1, 384, 4), (1, 384, 8), (1, 384, 15), (1, 512, 0), (1, 512, 1), (1, 512, 2), (1, 512, 4), (1, 512, 8), (1, 512, 15), (1, 768, 0), (1, 768, 1), (1, 768, 2), (1, 768, 4), (1, 768, 8), (1, 768, 15), (1, 1024, 0), (1, 1024, 1), (1, 1024, 2), (1, 1024, 4), (1, 1024, 8), (1, 1024, 15), (1, 1536, 0), (1, 1536, 1), (1, 1536, 2), (1, 1536, 4), (1, 1536, 8), (1, 1536, 15), (1, 2048, 0), (1, 2048, 1), (1, 2048, 2), (1, 2048, 4), (1, 2048, 8), (1, 2048, 15)]
+(EngineCore pid=2446) INFO 09-10 18:54:16 [exponential.py:135] Decode bucket config (min, step, max_warmup, limit) bs:[1, 2, 64, 7], block:[1, 64, 1024, 11]
+(EngineCore pid=2446) INFO 09-10 18:54:16 [common.py:253] Generated 30 decode buckets [bs, query, num_blocks]: [(1, 1, 1), (1, 1, 16), (2, 1, 32), (4, 1, 64), (8, 1, 64), (8, 1, 128), (12, 1, 64), (12, 1, 128), (12, 1, 192), (22, 1, 64), (22, 1, 128), (22, 1, 192), (22, 1, 256), (22, 1, 352), (36, 1, 64), (36, 1, 128), (36, 1, 192), (36, 1, 256), (36, 1, 384), (36, 1, 448), (36, 1, 576), (64, 1, 64), (64, 1, 128), (64, 1, 192), (64, 1, 256), (64, 1, 384), (64, 1, 448), (64, 1, 640), (64, 1, 832), (64, 1, 1024)]
+(EngineCore pid=2446) INFO 09-10 18:54:16 [hpu_model_runner.py:6233] Multimodal bucket : []
+(EngineCore pid=2446) Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+(EngineCore pid=2446) [transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+(EngineCore pid=2446) WARNING 09-10 18:54:24 [hpu_model_runner.py:6105] No multimodal warmup resolutions for this native-resolution vision tower: patch-count buckets are empty and neither VLLM_MULTIMODAL_RESOLUTIONS nor limit-mm-per-prompt width/height is set. The vision-tower graph will recompile on the first request at each resolution. Set VLLM_MULTIMODAL_RESOLUTIONS (e.g. "1024x768,864x480x1-20") to precompile your production resolutions.
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5412] Warming up sampler with batch sizes: [1, 2, 4, 8, 12, 22, 36, 64] and following configs:
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=1.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.7, top_p=0.9, top_k=50, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.3, top_p=0.95, top_k=20, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=1.2, top_p=0.8, top_k=100, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.8, top_p=0.85, top_k=0, batch_changed=True
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=1.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.7, top_p=0.9, top_k=50, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.3, top_p=0.95, top_k=20, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=1.2, top_p=0.8, top_k=100, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5414] temp=0.8, top_p=0.85, top_k=0, batch_changed=False
+(EngineCore pid=2446) INFO 09-10 18:54:24 [hpu_model_runner.py:5415] Starting sampler warmup...
+(EngineCore pid=2446) INFO 09-10 18:54:33 [hpu_model_runner.py:5507] Sampler warmup completed successfully
+(EngineCore pid=2446) Prompt warmup processing:   0%|          | 0/48 [00:00<?, ?item/s]/opt/src/vllm-gaudi/vllm_gaudi/ops/hpu_gdn_pytorch.py:170: UserWarning: The following operations used in HPU graphs might result in accuracy issues : index_select. (Triggered internally at /npu-stack/pytorch-integration/habana_lazy/hpu_lazy_tensors.cpp:1293.)
+(EngineCore pid=2446)   eye = torch.eye(tc, dtype=qf.dtype, device=device)
+(EngineCore pid=2446) Prompt warmup processing:   0%|          | 0/48 [00:04<?, ?item/s, 0/48]Prompt warmup processing:   2%|▏         | 1/48 [00:04<03:37,  4.64s/item, 0/48]graph(%0 : BFloat16(8192, 36, strides=[36, 1], device=hpu:0),
+      %1 : Int(3, 2048, strides=[2048, 1], device=hpu:0),
+      %2 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0),
+      %3 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0),
+      %4 : BFloat16(5120, strides=[1], device=hpu:0),
+      %5 : Float(device=hpu:0),
+      %6 : Int(4, 1, strides=[1, 1], device=hpu:0),
+      %7 : Int(device=hpu:0),
+      %8 : Bool(1, strides=[1], device=hpu:0),
+      %9 : Float(194, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0),
+      %10 : BFloat16(16384, 5120, strides=[5120, 1], device=hpu:0),
+      %11 : BFloat16(96, 5120, strides=[5120, 1], device=hpu:0),
+      %12 : BFloat16(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0),
+      %13 : BFloat16(2048, 1, strides=[1, 1], device=hpu:0),
+      %14 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0),
+      %15 : BFloat16(194, 3, 10240, strides=[30720, 10240, 1], device=hpu:0),
+      %16 : Int(2, strides=[1], device=hpu:0),
+      %17 : Int(device=hpu:0),
+      %18 : Int(device=hpu:0),
+      %19 : BFloat16(10240, 4, strides=[4, 1], device=hpu:0),
+      %20 : BFloat16(48, strides=[1], device=hpu:0),
+      %21 : Float(device=hpu:0),
+      %22 : Float(48, strides=[1], device=hpu:0),
+      %23 : Float(device=hpu:0)):
+  %24 : int[] = prim::Constant[value=[0, 2, 1]]()
+  %25 : int[] = prim::Constant[value=[16, 128, 48]]()
+  %26 : int[] = prim::Constant[value=[0, 2, 1, 3]]()
+  %27 : int[] = prim::Constant[value=[16, 128, 48, 128]]()
+  %28 : int[] = prim::Constant[value=[1, 16, 128, 48, 128]]()
+  %29 : int[] = prim::Constant[value=[1, 16, 128, 48]]()
+  %30 : int[] = prim::Constant[value=[1, 2048, 48]]()
+  %31 : int[] = prim::Constant[value=[2048, 48]]()
+  %32 : int[] = prim::Constant[value=[2048, 48, 128]]()
+  %33 : int[] = prim::Constant[value=[-1]]()
+  %34 : int[] = prim::Constant[value=[1, 2048, 16, 3, 128]]()
+  %35 : bool = prim::Constant[value=1]()
+  %36 : int[] = prim::Constant[value=[1, 2048, 1]]()
+  %37 : int[] = prim::Constant[value=[1, 2048, 48, 128]]()
+  %38 : int = prim::Constant[value=4096]()
+  %39 : int[] = prim::Constant[value=[1, 2048, 16, 128]]()
+  %40 : int[] = prim::Constant[value=[10240, 2048]]()
+  %41 : int = prim::Constant[value=2048]()
+  %42 : int = prim::Constant[value=2049]()
+  %43 : int = prim::Constant[value=2050]()
+  %44 : int = prim::Constant[value=2051]()
+  %45 : int[] = prim::Constant[value=[1, 10240, 1]]()
+  %46 : int[] = prim::Constant[value=[40960, 4, 1]]()
+  %47 : int[] = prim::Constant[value=[1, -3, 9223372036854775807, 1]]()
+  %48 : int[] = prim::Constant[value=[3, 10240]]()
+  %49 : int = prim::Constant[value=-2]()
+  %50 : int[] = prim::Constant[value=[1, 1, 1]]()
+  %51 : int[] = prim::Constant[value=[1, 0, 2]]()
+  %52 : int[] = prim::Constant[value=[10240, 1, 2048]]()
+  %53 : int[] = prim::Constant[value=[-1, 10240, -1]]()
+  %54 : int = prim::Constant[value=2]()
+  %55 : Device = prim::Constant[value="hpu:0"]()
+  %56 : int = prim::Constant[value=4]()
+  %57 : int = prim::Constant[value=3]()
+  %58 : int = prim::Constant[value=-3]()
+  %59 : int = prim::Constant[value=9223372036854775807]()
+  %60 : int = prim::Constant[value=194]()
+  %61 : int = prim::Constant[value=10240]()
+  %62 : int[] = prim::Constant[value=[2048, 1]]()
+  %63 : int = prim::Constant[value=96]()
+  %64 : int = prim::Constant[value=48]()
+  %65 : bool[] = prim::Constant[value=[False]]()
+  %66 : int[] = prim::Constant[value=[0, 1, 2, 3]]()
+  %67 : int[] = prim::Constant[value=[1, 1, 1, 1]]()
+  %68 : int = prim::Constant[value=6]()
+  %69 : int[] = prim::Constant[value=[1]]()
+  %70 : NoneType = prim::Constant()
+  %71 : int = prim::Constant[value=15]()
+  %72 : float = prim::Constant[value=9.9999999999999995e-07]()
+  %73 : bool = prim::Constant[value=0]()
+  %74 : int[] = prim::Constant[value=[2048, 5120]]()
+  %75 : int = prim::Constant[value=36]()
+  %76 : int = prim::Constant[value=1]()
+  %77 : int = prim::Constant[value=18]()
+  %78 : int[] = prim::Constant[value=[6144, 1, 36]]()
+  %79 : int = prim::Constant[value=0]()
+  %80 : int[] = prim::Constant[value=[6144]]()
+  %81 : int = prim::Constant[value=-1]()
+  %id_109430_aten__view Unique ID:14278 : Int(6144, strides=[1], device=hpu:0) = aten::view[deterministic=0](%1, %80)
+  %id_109433_aten__index_select Unique ID:14279 : BFloat16(6144, 36, strides=[36, 1], device=hpu:0) = aten::index_select[deterministic=0](%0, %79, %id_109430_aten__view Unique ID:14278)
+  %id_109436_aten__view Unique ID:14280.1 : BFloat16(6144, 1, 36, strides=[36, 36, 1], device=hpu:0) = aten::view[deterministic=0](%id_109433_aten__index_select Unique ID:14279, %78)
+  %id_109443_aten__slice Unique ID:14281 : BFloat16(6144, 1, 18, strides=[18, 18, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109436_aten__view Unique ID:14280.1, %81, %79, %77, %76)
+  %86 : Tensor[] = prim::ListConstruct[deterministic=0](%id_109443_aten__slice Unique ID:14281, %id_109443_aten__slice Unique ID:14281)
+  %id_109449_aten__cat Unique ID:14283 : BFloat16(6144, 1, 36, strides=[36, 36, 1], device=hpu:0) = aten::cat[deterministic=0](%86, %81)
+  %id_109446_aten__slice Unique ID:14282 : BFloat16(6144, 1, 18, strides=[18, 18, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109436_aten__view Unique ID:14280.1, %81, %77, %75, %76)
+  %89 : Tensor[] = prim::ListConstruct[deterministic=0](%id_109446_aten__slice Unique ID:14282, %id_109446_aten__slice Unique ID:14282)
+  %id_109453_aten__cat Unique ID:14284 : BFloat16(6144, 1, 36, strides=[36, 36, 1], device=hpu:0) = aten::cat[deterministic=0](%89, %81)
+  %id_109479_model/hpu__control_edge_ Unique ID:14286 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = hpu::control_edge_[deterministic=0](%2)
+  %id_109479_model/aten__zero_ Unique ID:14286 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::zero_[deterministic=0](%id_109479_model/hpu__control_edge_ Unique ID:14286)
+  %id_109489_model/aten__view Unique ID:14289 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::view[deterministic=0](%3, %74)
+  %id_109495_model/hpu__add Unique ID:14290 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109479_model/aten__zero_ Unique ID:14286, %id_109489_model/aten__view Unique ID:14289, %76)
+  %id_109492_model/hpu__cast Unique ID:4611686018427388037 : BFloat16(device=hpu:0) = hpu::cast[deterministic=0](%5, %71)
+  %id_109486_model/hpu__add Unique ID:14288 : BFloat16(5120, strides=[1], device=hpu:0) = hpu::add[deterministic=0](%4, %id_109492_model/hpu__cast Unique ID:4611686018427388037, %76)
+  %id_109510_model/0/input_layernorm/hpu__rms_norm Unique ID:14291 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0), %id_109513_model/0/input_layernorm/hpu__rms_norm Unique ID:14292 : Float(2048, 1, strides=[1, 1], device=hpu:0) = hpu::rms_norm[deterministic=0](%id_109495_model/hpu__add Unique ID:14290, %id_109486_model/hpu__add Unique ID:14288, %72, %70, %73)
+  %id_109524_model/0/linear_attn/aten__view Unique ID:14295 : Long(1, strides=[1], device=hpu:0) = aten::view[deterministic=0](%7, %69)
+  %id_109527_model/0/linear_attn/aten__index_select Unique ID:14296 : Int(1, 1, strides=[1, 1], device=hpu:0) = aten::index_select[deterministic=0](%6, %79, %id_109524_model/0/linear_attn/aten__view Unique ID:14295)
+  %id_109550_model/0/linear_attn/aten__view Unique ID:14299 : Bool(1, 1, 1, 1, strides=[1, 1, 1, 1], device=hpu:0) = aten::view[deterministic=0](%8, %67)
+  %id_109559_model/0/linear_attn/hpu__cast Unique ID:14300 : Float(1, 1, 1, 1, strides=[1, 1, 1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109550_model/0/linear_attn/aten__view Unique ID:14299, %68)
+  %id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297.1 : Int(1, strides=[1], device=hpu:0) = aten::squeeze[deterministic=0](%id_109527_model/0/linear_attn/aten__index_select Unique ID:14296, %79)
+  %104 : Tensor[] = prim::ListConstruct[deterministic=0](%id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297.1)
+  %id_109543_model/0/linear_attn/hpu__index Unique ID:14298 : Float(1, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = hpu::index[deterministic=0](%9, %104, %65, %66, %76)
+  %id_109566_model/0/linear_attn/aten__mul Unique ID:14301 : Float(1, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109543_model/0/linear_attn/hpu__index Unique ID:14298, %id_109559_model/0/linear_attn/hpu__cast Unique ID:14300)
+  %id_109518_model/0/linear_attn/in_proj_qkvz/aten__view Unique ID:14293 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::view[deterministic=0](%id_109510_model/0/input_layernorm/hpu__rms_norm Unique ID:14291, %74)
+  %id_109521_model/0/linear_attn/in_proj_qkvz/aten__view Unique ID:14294 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::view[deterministic=0](%id_109518_model/0/linear_attn/in_proj_qkvz/aten__view Unique ID:14293, %74)
+  %id_109570_model/0/linear_attn/in_proj_qkvz/aten__linear Unique ID:14302 : BFloat16(2048, 16384, strides=[16384, 1], device=hpu:0) = aten::linear[deterministic=0](%id_109521_model/0/linear_attn/in_proj_qkvz/aten__view Unique ID:14294, %10, %70)
+  %id_109518_model/0/linear_attn/in_proj_ba/aten__view Unique ID:14293 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::view[deterministic=0](%id_109510_model/0/input_layernorm/hpu__rms_norm Unique ID:14291, %74)
+  %id_109521_model/0/linear_attn/in_proj_ba/aten__view Unique ID:14294 : BFloat16(2048, 5120, strides=[5120, 1], device=hpu:0) = aten::view[deterministic=0](%id_109518_model/0/linear_attn/in_proj_ba/aten__view Unique ID:14293, %74)
+  %id_109576_model/0/linear_attn/in_proj_ba/aten__linear Unique ID:14303 : BFloat16(2048, 96, strides=[96, 1], device=hpu:0) = aten::linear[deterministic=0](%id_109521_model/0/linear_attn/in_proj_ba/aten__view Unique ID:14294, %11, %70)
+  %id_109591_model/0/linear_attn/aten__slice Unique ID:14307 : BFloat16(2048, 48, strides=[48, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109576_model/0/linear_attn/in_proj_ba/aten__linear Unique ID:14303, %81, %79, %64, %76)
+  %id_109597_model/0/linear_attn/aten__clone Unique ID:14309 : BFloat16(2048, 48, strides=[48, 1], device=hpu:0) = aten::clone[deterministic=0](%id_109591_model/0/linear_attn/aten__slice Unique ID:14307, %79)
+  %id_109594_model/0/linear_attn/aten__slice Unique ID:14308 : BFloat16(2048, 48, strides=[48, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109576_model/0/linear_attn/in_proj_ba/aten__linear Unique ID:14303, %81, %64, %63, %76)
+  %id_109601_model/0/linear_attn/aten__clone Unique ID:14310 : BFloat16(2048, 48, strides=[48, 1], device=hpu:0) = aten::clone[deterministic=0](%id_109594_model/0/linear_attn/aten__slice Unique ID:14308, %79)
+  %id_109614_model/0/linear_attn/hpu__control_edge_ Unique ID:14311 : BFloat16(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = hpu::control_edge_[deterministic=0](%12)
+  %id_109614_model/0/linear_attn/aten__zero_ Unique ID:14311 : BFloat16(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::zero_[deterministic=0](%id_109614_model/0/linear_attn/hpu__control_edge_ Unique ID:14311)
+  %id_109621_model/0/linear_attn/aten__view Unique ID:14313.1 : BFloat16(2048, 1, strides=[1, 1], device=hpu:0) = aten::view[deterministic=0](%13, %62)
+  %id_109582_model/0/linear_attn/aten__slice Unique ID:14304 : BFloat16(2048, 10240, strides=[10240, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109570_model/0/linear_attn/in_proj_qkvz/aten__linear Unique ID:14302, %81, %79, %61, %76)
+  %id_109624_model/0/linear_attn/aten__mul Unique ID:14314 : BFloat16(2048, 10240, strides=[10240, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109582_model/0/linear_attn/aten__slice Unique ID:14304, %id_109621_model/0/linear_attn/aten__view Unique ID:14313.1)
+  %id_109921_model/0/linear_attn/hpu__control_edge_ Unique ID:14365 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = hpu::control_edge_[deterministic=0](%14)
+  %id_109921_model/0/linear_attn/aten__zero_ Unique ID:14365 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::zero_[deterministic=0](%id_109921_model/0/linear_attn/hpu__control_edge_ Unique ID:14365)
+  %id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297.3 : Int(1, strides=[1], device=hpu:0) = aten::squeeze[deterministic=0](%id_109527_model/0/linear_attn/aten__index_select Unique ID:14296, %79)
+  %id_109737_model/0/linear_attn/aten__remainder Unique ID:14337 : Int(1, strides=[1], device=hpu:0) = aten::remainder[deterministic=0](%id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297.3, %60)
+  %id_110034_model/0/linear_attn/aten__index_select Unique ID:14393 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::index_select[deterministic=0](%15, %79, %id_109737_model/0/linear_attn/aten__remainder Unique ID:14337)
+  %id_110040_model/0/linear_attn/aten__slice Unique ID:14394 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110034_model/0/linear_attn/aten__index_select Unique ID:14393, %76, %58, %59, %76)
+  %id_109849_model/0/linear_attn/aten__arange Unique ID:14357 : Long(3, strides=[1], device=hpu:0) = aten::arange[deterministic=0](%57, %56, %70, %55, %73)
+  %id_109866_model/0/linear_attn/aten__unsqueeze Unique ID:14360 : Long(1, 3, strides=[3, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_109849_model/0/linear_attn/aten__arange Unique ID:14357, %79)
+  %id_109884_model/0/linear_attn/hpu__cast Unique ID:4611686018427388039 : Int(1, 3, strides=[3, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109866_model/0/linear_attn/aten__unsqueeze Unique ID:14360, %57)
+  %id_109732_model/0/linear_attn/hpu__cast Unique ID:14336 : Long(2, strides=[1], device=hpu:0) = hpu::cast[deterministic=0](%16, %56)
+  %id_109825_model/0/linear_attn/aten__slice Unique ID:14354 : Long(1, strides=[1], device=hpu:0) = aten::slice[deterministic=0](%id_109732_model/0/linear_attn/hpu__cast Unique ID:14336, %79, %79, %76, %76)
+  %id_109819_model/0/linear_attn/aten__slice Unique ID:14353 : Long(1, strides=[1], device=hpu:0) = aten::slice[deterministic=0](%id_109732_model/0/linear_attn/hpu__cast Unique ID:14336, %79, %76, %54, %76)
+  %id_109835_model/0/linear_attn/aten__sub Unique ID:14355 : Long(1, strides=[1], device=hpu:0) = aten::sub[deterministic=0](%id_109819_model/0/linear_attn/aten__slice Unique ID:14353, %id_109825_model/0/linear_attn/aten__slice Unique ID:14354, %76)
+  %id_109843_model/0/linear_attn/aten__clamp Unique ID:14356 : Long(1, strides=[1], device=hpu:0) = aten::clamp[deterministic=0](%id_109835_model/0/linear_attn/aten__sub Unique ID:14355, %79, %70)
+  %id_109862_model/0/linear_attn/aten__unsqueeze Unique ID:14359 : Long(1, 1, strides=[1, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_109843_model/0/linear_attn/aten__clamp Unique ID:14356, %76)
+  %id_109876_model/0/linear_attn/hpu__cast Unique ID:4611686018427388038 : Int(1, 1, strides=[1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109862_model/0/linear_attn/aten__unsqueeze Unique ID:14359, %57)
+  %id_109870_model/0/linear_attn/hpu__add Unique ID:14361 : Long(1, 3, strides=[3, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109876_model/0/linear_attn/hpu__cast Unique ID:4611686018427388038, %id_109884_model/0/linear_attn/hpu__cast Unique ID:4611686018427388039, %76)
+  %id_109873_model/0/linear_attn/aten__unsqueeze Unique ID:14362 : Long(1, 1, 3, strides=[3, 3, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_109870_model/0/linear_attn/hpu__add Unique ID:14361, %76)
+  %id_109887_model/0/linear_attn/hpu__expand Unique ID:14363 : Long(1, 10240, 3, strides=[30720, 3, 1], device=hpu:0) = hpu::expand[deterministic=0](%id_109873_model/0/linear_attn/aten__unsqueeze Unique ID:14362, %53, %73)
+  %id_109726_model/0/linear_attn/aten__transpose Unique ID:14335 : BFloat16(10240, 2048, strides=[2048, 1], device=hpu:0) = aten::transpose[deterministic=0](%id_109624_model/0/linear_attn/aten__mul Unique ID:14314, %79, %76)
+  %id_109754_model/0/linear_attn/aten__view Unique ID:14340 : BFloat16(10240, 1, 2048, strides=[2048, 2048, 1], device=hpu:0) = aten::view[deterministic=0](%id_109726_model/0/linear_attn/aten__transpose Unique ID:14335, %52)
+  %id_109757_model/0/linear_attn/aten__permute Unique ID:14341 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::permute[deterministic=0](%id_109754_model/0/linear_attn/aten__view Unique ID:14340, %51)
+  %id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297 : Int(1, strides=[1], device=hpu:0) = aten::squeeze[deterministic=0](%id_109527_model/0/linear_attn/aten__index_select Unique ID:14296, %79)
+  %id_109749_model/0/linear_attn/aten__ge Unique ID:14339 : Bool(1, strides=[1], device=hpu:0) = aten::ge[deterministic=0](%id_109530_model/0/linear_attn/aten__squeeze Unique ID:14297, %17)
+  %id_109785_model/0/linear_attn/aten__view Unique ID:14348 : Bool(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = aten::view[deterministic=0](%id_109749_model/0/linear_attn/aten__ge Unique ID:14339, %50)
+  %id_109794_model/0/linear_attn/hpu__cast Unique ID:14349 : BFloat16(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109785_model/0/linear_attn/aten__view Unique ID:14348, %71)
+  %id_109772_model/0/linear_attn/aten__slice Unique ID:14345 : Bool(1, strides=[1], device=hpu:0) = aten::slice[deterministic=0](%8, %79, %79, %76, %76)
+  %id_109776_model/0/linear_attn/aten__view Unique ID:14346 : Bool(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = aten::view[deterministic=0](%id_109772_model/0/linear_attn/aten__slice Unique ID:14345, %50)
+  %id_109783_model/0/linear_attn/hpu__cast Unique ID:14347 : BFloat16(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109776_model/0/linear_attn/aten__view Unique ID:14346, %71)
+  %id_109803_model/0/linear_attn/aten__mul Unique ID:14350 : BFloat16(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109783_model/0/linear_attn/hpu__cast Unique ID:14347, %id_109794_model/0/linear_attn/hpu__cast Unique ID:14349)
+  %id_109760_model/0/linear_attn/aten__index_select Unique ID:14342 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::index_select[deterministic=0](%15, %79, %id_109737_model/0/linear_attn/aten__remainder Unique ID:14337)
+  %id_109766_model/0/linear_attn/aten__slice Unique ID:14343 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109760_model/0/linear_attn/aten__index_select Unique ID:14342, %76, %58, %59, %76)
+  %id_109769_model/0/linear_attn/aten__transpose Unique ID:14344 : BFloat16(1, 10240, 3, strides=[30720, 3, 1], device=hpu:0) = aten::transpose[deterministic=0](%id_109766_model/0/linear_attn/aten__slice Unique ID:14343, %81, %49)
+  %id_109810_model/0/linear_attn/aten__mul Unique ID:14351 : BFloat16(1, 10240, 3, strides=[30720, 3, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109769_model/0/linear_attn/aten__transpose Unique ID:14344, %id_109803_model/0/linear_attn/aten__mul Unique ID:14350)
+  %156 : Tensor[] = prim::ListConstruct[deterministic=0](%id_109810_model/0/linear_attn/aten__mul Unique ID:14351, %id_109757_model/0/linear_attn/aten__permute Unique ID:14341)
+  %id_109816_model/0/linear_attn/aten__cat Unique ID:14352 : BFloat16(1, 10240, 2051, strides=[21002240, 2051, 1], device=hpu:0) = aten::cat[deterministic=0](%156, %54)
+  %id_109902_model/0/linear_attn/aten__gather Unique ID:14364 : BFloat16(1, 10240, 3, strides=[30720, 3, 1], device=hpu:0) = aten::gather[deterministic=0](%id_109816_model/0/linear_attn/aten__cat Unique ID:14352, %54, %id_109887_model/0/linear_attn/hpu__expand Unique ID:14363, %73)
+  %id_110031_model/0/linear_attn/aten__transpose Unique ID:14392 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::transpose[deterministic=0](%id_109902_model/0/linear_attn/aten__gather Unique ID:14364, %81, %49)
+  %id_110023_model/0/linear_attn/aten__gt Unique ID:14390 : Bool(1, strides=[1], device=hpu:0) = aten::gt[deterministic=0](%id_109843_model/0/linear_attn/aten__clamp Unique ID:14356, %18)
+  %id_110027_model/0/linear_attn/aten__view Unique ID:14391 : Bool(1, 1, 1, strides=[1, 1, 1], device=hpu:0) = aten::view[deterministic=0](%id_110023_model/0/linear_attn/aten__gt Unique ID:14390, %50)
+  %id_110043_model/0/linear_attn/aten__where Unique ID:14395 : BFloat16(1, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::where[deterministic=0](%id_110027_model/0/linear_attn/aten__view Unique ID:14391, %id_110031_model/0/linear_attn/aten__transpose Unique ID:14392, %id_110040_model/0/linear_attn/aten__slice Unique ID:14394)
+  %id_110053_model/0/linear_attn/aten__view Unique ID:14397 : BFloat16(3, 10240, strides=[10240, 1], device=hpu:0) = aten::view[deterministic=0](%id_110043_model/0/linear_attn/aten__where Unique ID:14395, %48)
+  %164 : Tensor[] = prim::ListConstruct[deterministic=0](%id_109737_model/0/linear_attn/aten__remainder Unique ID:14337)
+  %id_110047_model/0/linear_attn/aten__slice Unique ID:14396 : BFloat16(194, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = aten::slice[deterministic=0](%15, %76, %58, %59, %76)
+  %id_110058_model/0/linear_attn/hpu__index_put_normal_and_neg_indices Unique ID:14398 : BFloat16(194, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = hpu::index_put_normal_and_neg_indices[deterministic=0](%id_110047_model/0/linear_attn/aten__slice Unique ID:14396, %164, %id_110053_model/0/linear_attn/aten__view Unique ID:14397, %73)
+  %id_110066_model/0/linear_attn/hpu__slice_insert Unique ID:14399 : BFloat16(194, 3, 10240, strides=[30720, 10240, 1], device=hpu:0) = hpu::slice_insert[deterministic=0](%15, %id_110058_model/0/linear_attn/hpu__index_put_normal_and_neg_indices Unique ID:14398, %47)
+  %id_109621_model/0/linear_attn/aten__view Unique ID:14313.3 : BFloat16(2048, 1, strides=[1, 1], device=hpu:0) = aten::view[deterministic=0](%13, %62)
+  %id_109997_model/0/linear_attn/hpu__strided_view Unique ID:14384 : BFloat16(1, 10240, 1, strides=[10240, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %57)
+  %id_109989_model/0/linear_attn/aten__slice Unique ID:14382 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109816_model/0/linear_attn/aten__cat Unique ID:14352, %54, %57, %44, %76)
+  %id_110000_model/0/linear_attn/aten__mul Unique ID:14385 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109989_model/0/linear_attn/aten__slice Unique ID:14382, %id_109997_model/0/linear_attn/hpu__strided_view Unique ID:14384)
+  %id_109976_model/0/linear_attn/hpu__strided_view Unique ID:14379 : BFloat16(1, 10240, 1, strides=[10240, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %54)
+  %id_109967_model/0/linear_attn/aten__slice Unique ID:14377 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109816_model/0/linear_attn/aten__cat Unique ID:14352, %54, %54, %43, %76)
+  %id_109979_model/0/linear_attn/aten__mul Unique ID:14380 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109967_model/0/linear_attn/aten__slice Unique ID:14377, %id_109976_model/0/linear_attn/hpu__strided_view Unique ID:14379)
+  %id_109955_model/0/linear_attn/hpu__strided_view Unique ID:14374 : BFloat16(1, 10240, 1, strides=[10240, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %76)
+  %id_109946_model/0/linear_attn/aten__slice Unique ID:14372 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109816_model/0/linear_attn/aten__cat Unique ID:14352, %54, %76, %42, %76)
+  %id_109958_model/0/linear_attn/aten__mul Unique ID:14375 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109946_model/0/linear_attn/aten__slice Unique ID:14372, %id_109955_model/0/linear_attn/hpu__strided_view Unique ID:14374)
+  %id_109934_model/0/linear_attn/hpu__strided_view Unique ID:14369 : BFloat16(1, 10240, 1, strides=[10240, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %79)
+  %id_109928_model/0/linear_attn/aten__slice Unique ID:14367 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_109816_model/0/linear_attn/aten__cat Unique ID:14352, %54, %79, %41, %76)
+  %id_109937_model/0/linear_attn/aten__mul Unique ID:14370 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109928_model/0/linear_attn/aten__slice Unique ID:14367, %id_109934_model/0/linear_attn/hpu__strided_view Unique ID:14369)
+  %id_109941_model/0/linear_attn/hpu__add Unique ID:14371 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109921_model/0/linear_attn/aten__zero_ Unique ID:14365, %id_109937_model/0/linear_attn/aten__mul Unique ID:14370, %76)
+  %id_109963_model/0/linear_attn/hpu__add Unique ID:14376 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109941_model/0/linear_attn/hpu__add Unique ID:14371, %id_109958_model/0/linear_attn/aten__mul Unique ID:14375, %76)
+  %id_109984_model/0/linear_attn/hpu__add Unique ID:14381 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109963_model/0/linear_attn/hpu__add Unique ID:14376, %id_109979_model/0/linear_attn/aten__mul Unique ID:14380, %76)
+  %id_110005_model/0/linear_attn/hpu__add Unique ID:14386 : BFloat16(1, 10240, 2048, strides=[20971520, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109984_model/0/linear_attn/hpu__add Unique ID:14381, %id_110000_model/0/linear_attn/aten__mul Unique ID:14385, %76)
+  %id_110012_model/0/linear_attn/aten__permute Unique ID:14387 : BFloat16(10240, 1, 2048, strides=[2048, 2048, 1], device=hpu:0) = aten::permute[deterministic=0](%id_110005_model/0/linear_attn/hpu__add Unique ID:14386, %51)
+  %id_110015_model/0/linear_attn/aten__view Unique ID:14388 : BFloat16(10240, 2048, strides=[2048, 1], device=hpu:0) = aten::view[deterministic=0](%id_110012_model/0/linear_attn/aten__permute Unique ID:14387, %40)
+  %id_110076_model/0/linear_attn/aten__silu Unique ID:14400 : BFloat16(10240, 2048, strides=[2048, 1], device=hpu:0) = aten::silu[deterministic=0](%id_110015_model/0/linear_attn/aten__view Unique ID:14388)
+  %id_110079_model/0/linear_attn/aten__squeeze Unique ID:14401 : BFloat16(10240, 2048, strides=[2048, 1], device=hpu:0) = aten::squeeze[deterministic=0](%id_110076_model/0/linear_attn/aten__silu Unique ID:14400, %79)
+  %id_110085_model/0/linear_attn/aten__transpose Unique ID:14402 : BFloat16(2048, 10240, strides=[10240, 1], device=hpu:0) = aten::transpose[deterministic=0](%id_110079_model/0/linear_attn/aten__squeeze Unique ID:14401, %79, %76)
+  %id_110088_model/0/linear_attn/aten__mul Unique ID:14403 : BFloat16(2048, 10240, strides=[10240, 1], device=hpu:0) = aten::mul[deterministic=0](%id_110085_model/0/linear_attn/aten__transpose Unique ID:14402, %id_109621_model/0/linear_attn/aten__view Unique ID:14313.3)
+  %id_110095_model/0/linear_attn/aten__slice Unique ID:14404 : BFloat16(2048, 2048, strides=[2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110088_model/0/linear_attn/aten__mul Unique ID:14403, %81, %79, %41, %76)
+  %id_110104_model/0/linear_attn/aten__view Unique ID:14407 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110095_model/0/linear_attn/aten__slice Unique ID:14404, %39)
+  %id_110107_model/0/linear_attn/aten__clone Unique ID:14408 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110104_model/0/linear_attn/aten__view Unique ID:14407, %79)
+  %id_110098_model/0/linear_attn/aten__slice Unique ID:14405 : BFloat16(2048, 2048, strides=[2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110088_model/0/linear_attn/aten__mul Unique ID:14403, %81, %41, %38, %76)
+  %id_110112_model/0/linear_attn/aten__view Unique ID:14409 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110098_model/0/linear_attn/aten__slice Unique ID:14405, %39)
+  %id_110118_model/0/linear_attn/aten__clone Unique ID:14410 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110112_model/0/linear_attn/aten__view Unique ID:14409, %79)
+  %id_110101_model/0/linear_attn/aten__slice Unique ID:14406 : BFloat16(2048, 6144, strides=[6144, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110088_model/0/linear_attn/aten__mul Unique ID:14403, %81, %38, %61, %76)
+  %id_110122_model/0/linear_attn/aten__view Unique ID:14411 : BFloat16(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110101_model/0/linear_attn/aten__slice Unique ID:14406, %37)
+  %id_110129_model/0/linear_attn/aten__clone Unique ID:14412 : BFloat16(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110122_model/0/linear_attn/aten__view Unique ID:14411, %79)
+  %id_109621_model/0/linear_attn/aten__view Unique ID:14313 : BFloat16(2048, 1, strides=[1, 1], device=hpu:0) = aten::view[deterministic=0](%13, %62)
+  %id_110132_model/0/linear_attn/aten__view Unique ID:14413 : BFloat16(1, 2048, 1, strides=[2048, 1, 1], device=hpu:0) = aten::view[deterministic=0](%id_109621_model/0/linear_attn/aten__view Unique ID:14313, %36)
+  %id_110143_model/0/linear_attn/hpu__cast Unique ID:14414 : Float(1, 2048, 1, strides=[2048, 1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_110132_model/0/linear_attn/aten__view Unique ID:14413, %68)
+  %id_109641_model/0/linear_attn/hpu__cast Unique ID:14316 : Float(48, strides=[1], device=hpu:0) = hpu::cast[deterministic=0](%20, %68)
+  %id_109632_model/0/linear_attn/hpu__cast Unique ID:14315 : Float(2048, 48, strides=[48, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109601_model/0/linear_attn/aten__clone Unique ID:14310, %68)
+  %id_109646_model/0/linear_attn/hpu__add Unique ID:14317 : Float(2048, 48, strides=[48, 1], device=hpu:0) = hpu::add[deterministic=0](%id_109632_model/0/linear_attn/hpu__cast Unique ID:14315, %id_109641_model/0/linear_attn/hpu__cast Unique ID:14316, %76)
+  %id_109665_model/0/linear_attn/aten__mul Unique ID:14321 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109646_model/0/linear_attn/hpu__add Unique ID:14317, %5)
+  %id_109669_model/0/linear_attn/aten__exp Unique ID:14322 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::exp[deterministic=0](%id_109665_model/0/linear_attn/aten__mul Unique ID:14321)
+  %id_109673_model/0/linear_attn/aten__log1p Unique ID:14323 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::log1p[deterministic=0](%id_109669_model/0/linear_attn/aten__exp Unique ID:14322)
+  %id_109677_model/0/linear_attn/aten__mul Unique ID:14324 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109673_model/0/linear_attn/aten__log1p Unique ID:14323, %5)
+  %id_109652_model/0/linear_attn/aten__mul Unique ID:14318 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109646_model/0/linear_attn/hpu__add Unique ID:14317, %5)
+  %id_109661_model/0/linear_attn/aten__le Unique ID:14320 : Bool(2048, 48, strides=[48, 1], device=hpu:0) = aten::le[deterministic=0](%id_109652_model/0/linear_attn/aten__mul Unique ID:14318, %21)
+  %id_109681_model/0/linear_attn/aten__where Unique ID:14325 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::where[deterministic=0](%id_109661_model/0/linear_attn/aten__le Unique ID:14320, %id_109677_model/0/linear_attn/aten__mul Unique ID:14324, %id_109646_model/0/linear_attn/hpu__add Unique ID:14317)
+  %id_109685_model/0/linear_attn/aten__exp Unique ID:14326 : Float(48, strides=[1], device=hpu:0) = aten::exp[deterministic=0](%22)
+  %id_109689_model/0/linear_attn/aten__neg Unique ID:14327 : Float(48, strides=[1], device=hpu:0) = aten::neg[deterministic=0](%id_109685_model/0/linear_attn/aten__exp Unique ID:14326)
+  %id_109693_model/0/linear_attn/aten__mul Unique ID:14328 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109689_model/0/linear_attn/aten__neg Unique ID:14327, %id_109681_model/0/linear_attn/aten__where Unique ID:14325)
+  %id_109717_model/0/linear_attn/aten__unsqueeze Unique ID:14332 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_109693_model/0/linear_attn/aten__mul Unique ID:14328, %79)
+  %id_110147_model/0/linear_attn/aten__mul Unique ID:14415 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109717_model/0/linear_attn/aten__unsqueeze Unique ID:14332, %id_110143_model/0/linear_attn/hpu__cast Unique ID:14414)
+  %id_109700_model/0/linear_attn/hpu__cast Unique ID:14329 : Float(2048, 48, strides=[48, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109597_model/0/linear_attn/aten__clone Unique ID:14309, %68)
+  %id_109705_model/0/linear_attn/aten__sigmoid Unique ID:14330 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::sigmoid[deterministic=0](%id_109700_model/0/linear_attn/hpu__cast Unique ID:14329)
+  %id_109712_model/0/linear_attn/hpu__cast Unique ID:14331 : BFloat16(2048, 48, strides=[48, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_109705_model/0/linear_attn/aten__sigmoid Unique ID:14330, %71)
+  %id_109720_model/0/linear_attn/aten__unsqueeze Unique ID:14333 : BFloat16(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_109712_model/0/linear_attn/hpu__cast Unique ID:14331, %79)
+  %id_110155_model/0/linear_attn/aten__mul Unique ID:14416 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::mul[deterministic=0](%id_109720_model/0/linear_attn/aten__unsqueeze Unique ID:14333, %id_110143_model/0/linear_attn/hpu__cast Unique ID:14414)
+  %id_110236_model/0/linear_attn/hpu__cast Unique ID:4611686018427388043 : Float(device=hpu:0) = hpu::cast[deterministic=0](%23, %68)
+  %id_110162_model/0/linear_attn/aten__unsqueeze Unique ID:14417 : BFloat16(1, 2048, 16, 1, 128, strides=[4194304, 2048, 128, 128, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_110107_model/0/linear_attn/aten__clone Unique ID:14408, %57)
+  %id_110165_model/0/linear_attn/hpu__expand Unique ID:14418 : BFloat16(1, 2048, 16, 3, 128, strides=[12582912, 6144, 384, 128, 1], device=hpu:0) = hpu::expand[deterministic=0](%id_110162_model/0/linear_attn/aten__unsqueeze Unique ID:14417, %34, %73)
+  %id_110168_model/0/linear_attn/aten__clone Unique ID:14419 : BFloat16(1, 2048, 16, 3, 128, strides=[12582912, 6144, 384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110165_model/0/linear_attn/hpu__expand Unique ID:14418, %79)
+  %id_110171_model/0/linear_attn/aten__view Unique ID:14420 : BFloat16(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110168_model/0/linear_attn/aten__clone Unique ID:14419, %37)
+  %id_110211_model/0/linear_attn/hpu__cast Unique ID:14425 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_110171_model/0/linear_attn/aten__view Unique ID:14420, %68)
+  %id_110217_model/0/linear_attn/aten__mul Unique ID:14426 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::mul[deterministic=0](%id_110211_model/0/linear_attn/hpu__cast Unique ID:14425, %id_110211_model/0/linear_attn/hpu__cast Unique ID:14425)
+  %id_110222_model/0/linear_attn/aten__sum Unique ID:14427 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = aten::sum[deterministic=0](%id_110217_model/0/linear_attn/aten__mul Unique ID:14426, %33, %35, %70)
+  %id_110233_model/0/linear_attn/hpu__add Unique ID:14429 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = hpu::add[deterministic=0](%id_110222_model/0/linear_attn/aten__sum Unique ID:14427, %id_110236_model/0/linear_attn/hpu__cast Unique ID:4611686018427388043, %76)
+  %id_110247_model/0/linear_attn/aten__sqrt Unique ID:14430 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = aten::sqrt[deterministic=0](%id_110233_model/0/linear_attn/hpu__add Unique ID:14429)
+  %id_110251_model/0/linear_attn/aten__div Unique ID:14431 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::div[deterministic=0](%id_110211_model/0/linear_attn/hpu__cast Unique ID:14425, %id_110247_model/0/linear_attn/aten__sqrt Unique ID:14430)
+  %id_110278_model/0/linear_attn/hpu__cast Unique ID:4611686018427388044 : Float(device=hpu:0) = hpu::cast[deterministic=0](%23, %68)
+  %id_110179_model/0/linear_attn/aten__unsqueeze Unique ID:14421 : BFloat16(1, 2048, 16, 1, 128, strides=[4194304, 2048, 128, 128, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_110118_model/0/linear_attn/aten__clone Unique ID:14410, %57)
+  %id_110188_model/0/linear_attn/hpu__expand Unique ID:14422 : BFloat16(1, 2048, 16, 3, 128, strides=[12582912, 6144, 384, 128, 1], device=hpu:0) = hpu::expand[deterministic=0](%id_110179_model/0/linear_attn/aten__unsqueeze Unique ID:14421, %34, %73)
+  %id_110191_model/0/linear_attn/aten__clone Unique ID:14423 : BFloat16(1, 2048, 16, 3, 128, strides=[12582912, 6144, 384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110188_model/0/linear_attn/hpu__expand Unique ID:14422, %79)
+  %id_110194_model/0/linear_attn/aten__view Unique ID:14424 : BFloat16(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110191_model/0/linear_attn/aten__clone Unique ID:14423, %37)
+  %id_110258_model/0/linear_attn/hpu__cast Unique ID:14432 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_110194_model/0/linear_attn/aten__view Unique ID:14424, %68)
+  %id_110262_model/0/linear_attn/aten__mul Unique ID:14433 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::mul[deterministic=0](%id_110258_model/0/linear_attn/hpu__cast Unique ID:14432, %id_110258_model/0/linear_attn/hpu__cast Unique ID:14432)
+  %id_110269_model/0/linear_attn/aten__sum Unique ID:14434 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = aten::sum[deterministic=0](%id_110262_model/0/linear_attn/aten__mul Unique ID:14433, %33, %35, %70)
+  %id_110275_model/0/linear_attn/hpu__add Unique ID:14435 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = hpu::add[deterministic=0](%id_110269_model/0/linear_attn/aten__sum Unique ID:14434, %id_110278_model/0/linear_attn/hpu__cast Unique ID:4611686018427388044, %76)
+  %id_110281_model/0/linear_attn/aten__sqrt Unique ID:14436 : Float(1, 2048, 48, 1, strides=[98304, 48, 1, 1], device=hpu:0) = aten::sqrt[deterministic=0](%id_110275_model/0/linear_attn/hpu__add Unique ID:14435)
+  %id_110293_model/0/linear_attn/aten__div Unique ID:14437 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::div[deterministic=0](%id_110258_model/0/linear_attn/hpu__cast Unique ID:14432, %id_110281_model/0/linear_attn/aten__sqrt Unique ID:14436)
+  %id_110303_model/0/linear_attn/aten__view Unique ID:14440 : BFloat16(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110129_model/0/linear_attn/aten__clone Unique ID:14412, %32)
+  %id_110309_model/0/linear_attn/hpu__cast Unique ID:14441 : Float(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_110303_model/0/linear_attn/aten__view Unique ID:14440, %68)
+  %id_110311_model/0/linear_attn/aten__view Unique ID:14442 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110147_model/0/linear_attn/aten__mul Unique ID:14415, %31)
+  %id_110322_model/0/linear_attn/aten__slice Unique ID:14444 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110311_model/0/linear_attn/aten__view Unique ID:14442, %79, %79, %41, %76)
+  %id_110325_model/0/linear_attn/aten__view Unique ID:14445 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110322_model/0/linear_attn/aten__slice Unique ID:14444, %30)
+  %id_110328_model/0/linear_attn/aten__view Unique ID:14446 : Float(1, 16, 128, 48, strides=[98304, 6144, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110325_model/0/linear_attn/aten__view Unique ID:14445, %29)
+  %id_110331_model/0/linear_attn/aten__cumsum Unique ID:14447 : Float(1, 16, 128, 48, strides=[98304, 6144, 48, 1], device=hpu:0) = aten::cumsum[deterministic=0](%id_110328_model/0/linear_attn/aten__view Unique ID:14446, %54, %70)
+  %id_110300_model/0/linear_attn/aten__view Unique ID:14439 : Float(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110293_model/0/linear_attn/aten__div Unique ID:14437, %32)
+  %id_110353_model/0/linear_attn/aten__slice Unique ID:14452 : Float(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110300_model/0/linear_attn/aten__view Unique ID:14439, %79, %79, %41, %76)
+  %id_110365_model/0/linear_attn/aten__view Unique ID:14456 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110353_model/0/linear_attn/aten__slice Unique ID:14452, %37)
+  %id_110380_model/0/linear_attn/aten__view Unique ID:14461 : Float(1, 16, 128, 48, 128, strides=[12582912, 786432, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110365_model/0/linear_attn/aten__view Unique ID:14456, %28)
+  %id_110392_model/0/linear_attn/aten__view Unique ID:14465 : Float(16, 128, 48, 128, strides=[786432, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110380_model/0/linear_attn/aten__view Unique ID:14461, %27)
+  %id_110395_model/0/linear_attn/aten__permute Unique ID:14466 : Float(16, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_110392_model/0/linear_attn/aten__view Unique ID:14465, %26)
+  %id_110398_model/0/linear_attn/aten__clone Unique ID:14467 : Float(16, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110395_model/0/linear_attn/aten__permute Unique ID:14466, %79)
+  %id_110356_model/0/linear_attn/aten__slice Unique ID:14453 : Float(2048, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110309_model/0/linear_attn/hpu__cast Unique ID:14441, %79, %79, %41, %76)
+  %id_110368_model/0/linear_attn/aten__view Unique ID:14457 : Float(1, 2048, 48, 128, strides=[12582912, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110356_model/0/linear_attn/aten__slice Unique ID:14453, %37)
+  %id_110383_model/0/linear_attn/aten__view Unique ID:14462 : Float(1, 16, 128, 48, 128, strides=[12582912, 786432, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110368_model/0/linear_attn/aten__view Unique ID:14457, %28)
+  %id_110407_model/0/linear_attn/aten__view Unique ID:14469 : Float(16, 128, 48, 128, strides=[786432, 6144, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_110383_model/0/linear_attn/aten__view Unique ID:14462, %27)
+  %id_110416_model/0/linear_attn/aten__permute Unique ID:14470 : Float(16, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_110407_model/0/linear_attn/aten__view Unique ID:14469, %26)
+  %id_110419_model/0/linear_attn/aten__clone Unique ID:14471 : Float(16, 48, 128, 128, strides=[786432, 16384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110416_model/0/linear_attn/aten__permute Unique ID:14470, %79)
+  %id_110334_model/0/linear_attn/aten__view Unique ID:14448 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110331_model/0/linear_attn/aten__cumsum Unique ID:14447, %30)
+  %id_110344_model/0/linear_attn/hpu__identity Unique ID:14449 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = hpu::identity[deterministic=0](%id_110334_model/0/linear_attn/aten__view Unique ID:14448)
+  %id_110347_model/0/linear_attn/aten__view Unique ID:14450 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110344_model/0/linear_attn/hpu__identity Unique ID:14449, %31)
+  %id_110371_model/0/linear_attn/aten__view Unique ID:14458 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110347_model/0/linear_attn/aten__view Unique ID:14450, %30)
+  %id_110386_model/0/linear_attn/aten__view Unique ID:14463 : Float(1, 16, 128, 48, strides=[98304, 6144, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110371_model/0/linear_attn/aten__view Unique ID:14458, %29)
+  %id_110426_model/0/linear_attn/aten__view Unique ID:14473 : Float(16, 128, 48, strides=[6144, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110386_model/0/linear_attn/aten__view Unique ID:14463, %25)
+  %id_110433_model/0/linear_attn/aten__permute Unique ID:14474 : Float(16, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_110426_model/0/linear_attn/aten__view Unique ID:14473, %24)
+  %id_110439_model/0/linear_attn/aten__clone Unique ID:14475 : Float(16, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110433_model/0/linear_attn/aten__permute Unique ID:14474, %79)
+  %id_110319_model/0/linear_attn/aten__view Unique ID:14443 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110155_model/0/linear_attn/aten__mul Unique ID:14416, %31)
+  %id_110359_model/0/linear_attn/aten__slice Unique ID:14454 : Float(2048, 48, strides=[48, 1], device=hpu:0) = aten::slice[deterministic=0](%id_110319_model/0/linear_attn/aten__view Unique ID:14443, %79, %79, %41, %76)
+  %id_110374_model/0/linear_attn/aten__view Unique ID:14459 : Float(1, 2048, 48, strides=[98304, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110359_model/0/linear_attn/aten__slice Unique ID:14454, %30)
+  %id_110389_model/0/linear_attn/aten__view Unique ID:14464 : Float(1, 16, 128, 48, strides=[98304, 6144, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110374_model/0/linear_attn/aten__view Unique ID:14459, %29)
+  %id_110445_model/0/linear_attn/aten__view Unique ID:14477 : Float(16, 128, 48, strides=[6144, 48, 1], device=hpu:0) = aten::view[deterministic=0](%id_110389_model/0/linear_attn/aten__view Unique ID:14464, %25)
+  %id_110455_model/0/linear_attn/aten__permute Unique ID:14478 : Float(16, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_110445_model/0/linear_attn/aten__view Unique ID:14477, %24)
+  %id_110461_model/0/linear_attn/aten__clone Unique ID:14479 : Float(16, 48, 128, strides=[6144, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_110455_model/0/linear_attn/aten__permute Unique ID:14478, %79)
+  return (%id_109449_aten__cat Unique ID:14283, %id_109453_aten__cat Unique ID:14284, %id_109479_model/aten__zero_ Unique ID:14286, %id_109495_model/hpu__add Unique ID:14290, %id_109510_model/0/input_layernorm/hpu__rms_norm Unique ID:14291, %id_109527_model/0/linear_attn/aten__index_select Unique ID:14296, %id_109566_model/0/linear_attn/aten__mul Unique ID:14301, %id_109570_model/0/linear_attn/in_proj_qkvz/aten__linear Unique ID:14302, %id_109576_model/0/linear_attn/in_proj_ba/aten__linear Unique ID:14303, %id_109597_model/0/linear_attn/aten__clone Unique ID:14309, %id_109601_model/0/linear_attn/aten__clone Unique ID:14310, %id_109614_model/0/linear_attn/aten__zero_ Unique ID:14311, %id_109624_model/0/linear_attn/aten__mul Unique ID:14314, %id_109921_model/0/linear_attn/aten__zero_ Unique ID:14365, %id_110066_model/0/linear_attn/hpu__slice_insert Unique ID:14399, %id_110088_model/0/linear_attn/aten__mul Unique ID:14403, %id_110107_model/0/linear_attn/aten__clone Unique ID:14408, %id_110118_model/0/linear_attn/aten__clone Unique ID:14410, %id_110129_model/0/linear_attn/aten__clone Unique ID:14412, %id_110143_model/0/linear_attn/hpu__cast Unique ID:14414, %id_110147_model/0/linear_attn/aten__mul Unique ID:14415, %id_110155_model/0/linear_attn/aten__mul Unique ID:14416, %id_110251_model/0/linear_attn/aten__div Unique ID:14431, %id_110293_model/0/linear_attn/aten__div Unique ID:14437, %id_110309_model/0/linear_attn/hpu__cast Unique ID:14441, %id_110331_model/0/linear_attn/aten__cumsum Unique ID:14447, %id_110398_model/0/linear_attn/aten__clone Unique ID:14467, %id_110419_model/0/linear_attn/aten__clone Unique ID:14471, %id_110439_model/0/linear_attn/aten__clone Unique ID:14475, %id_110461_model/0/linear_attn/aten__clone Unique ID:14479)
+Prompt warmup processing:   2%|▏         | 1/48 [00:05<04:14,  5.43s/item, 0/48]
+(EngineCore pid=2446) Process EngineCore:
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385] EngineCore failed to start.
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385] Traceback (most recent call last):
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1347, in run_engine_core
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return func(*args, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1104, in __init__
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     super().__init__(
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 145, in __init__
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     kv_cache_config = self._initialize_kv_caches(vllm_config)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return func(*args, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 354, in _initialize_kv_caches
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.model_executor.initialize_from_config(kv_cache_configs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/executor/abstract.py", line 122, in initialize_from_config
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.collective_rpc("initialize_from_config", args=(kv_cache_configs,))
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/executor/uniproc_executor.py", line 103, in collective_rpc
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     result = run_method(self.driver_worker, method, args, kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/serial_utils.py", line 510, in run_method
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return func(*args, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm/vllm/v1/worker/worker_base.py", line 349, in initialize_from_config
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.worker.initialize_from_config(kv_cache_config)  # type: ignore
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 550, in initialize_from_config
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.compile_or_warm_up_model()
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 555, in compile_or_warm_up_model
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.model_runner.warmup_model()  # type: ignore[union-attr]
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return func(*args, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 6314, in warmup_model
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.warmup_graphs(
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5539, in warmup_graphs
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self._prepare_dummy_scenario(prompt_cfg, decode_cfg)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5744, in _prepare_dummy_scenario
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self._execute_dummy_scenario(requests, scheduled_tokens)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5772, in _execute_dummy_scenario
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self.sample_tokens(None)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return func(*args, **kwargs)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 4467, in sample_tokens
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     self._execute_model_generic(
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 3691, in _execute_model_generic
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     hidden_states = self.model.forward(input_ids=token_ids,
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 890, in forward
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     return wrapped_hpugraph_forward(
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 764, in wrapped_hpugraph_forward
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     cached.graph.replayV3(input_tensor_list, cached.asynchronous)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 118, in replayV3
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385]     _hpu_C.replayV3(self.hpu_graph, tlistI, asynchronous)
+(EngineCore pid=2446) ERROR 09-10 18:54:38 [core.py:1385] RuntimeError: Neither storage attached to input tensor, not its view. Uniqueid: 14399 Strided Params Has Value: 0 Failing Graph: 
+(EngineCore pid=2446) Traceback (most recent call last):
+(EngineCore pid=2446)   File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=2446)     self.run()
+(EngineCore pid=2446)   File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+(EngineCore pid=2446)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1389, in run_engine_core
+(EngineCore pid=2446)     raise e
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1347, in run_engine_core
+(EngineCore pid=2446)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2446)     return func(*args, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1104, in __init__
+(EngineCore pid=2446)     super().__init__(
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 145, in __init__
+(EngineCore pid=2446)     kv_cache_config = self._initialize_kv_caches(vllm_config)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=2446)     return func(*args, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 354, in _initialize_kv_caches
+(EngineCore pid=2446)     self.model_executor.initialize_from_config(kv_cache_configs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/executor/abstract.py", line 122, in initialize_from_config
+(EngineCore pid=2446)     self.collective_rpc("initialize_from_config", args=(kv_cache_configs,))
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/executor/uniproc_executor.py", line 103, in collective_rpc
+(EngineCore pid=2446)     result = run_method(self.driver_worker, method, args, kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/serial_utils.py", line 510, in run_method
+(EngineCore pid=2446)     return func(*args, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm/vllm/v1/worker/worker_base.py", line 349, in initialize_from_config
+(EngineCore pid=2446)     self.worker.initialize_from_config(kv_cache_config)  # type: ignore
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 550, in initialize_from_config
+(EngineCore pid=2446)     self.compile_or_warm_up_model()
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 555, in compile_or_warm_up_model
+(EngineCore pid=2446)     self.model_runner.warmup_model()  # type: ignore[union-attr]
+(EngineCore pid=2446)   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=2446)     return func(*args, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 6314, in warmup_model
+(EngineCore pid=2446)     self.warmup_graphs(
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5539, in warmup_graphs
+(EngineCore pid=2446)     self._prepare_dummy_scenario(prompt_cfg, decode_cfg)
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5744, in _prepare_dummy_scenario
+(EngineCore pid=2446)     self._execute_dummy_scenario(requests, scheduled_tokens)
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5772, in _execute_dummy_scenario
+(EngineCore pid=2446)     self.sample_tokens(None)
+(EngineCore pid=2446)   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=2446)     return func(*args, **kwargs)
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 4467, in sample_tokens
+(EngineCore pid=2446)     self._execute_model_generic(
+(EngineCore pid=2446)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 3691, in _execute_model_generic
+(EngineCore pid=2446)     hidden_states = self.model.forward(input_ids=token_ids,
+(EngineCore pid=2446)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 890, in forward
+(EngineCore pid=2446)     return wrapped_hpugraph_forward(
+(EngineCore pid=2446)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 764, in wrapped_hpugraph_forward
+(EngineCore pid=2446)     cached.graph.replayV3(input_tensor_list, cached.asynchronous)
+(EngineCore pid=2446)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 118, in replayV3
+(EngineCore pid=2446)     _hpu_C.replayV3(self.hpu_graph, tlistI, asynchronous)
+(EngineCore pid=2446) RuntimeError: Neither storage attached to input tensor, not its view. Uniqueid: 14399 Strided Params Has Value: 0 Failing Graph: 
+
+Traceback (most recent call last):
+  File "/usr/local/bin/vllm", line 6, in <module>
+    sys.exit(main())
+  File "/opt/src/vllm/vllm/entrypoints/cli/main.py", line 97, in main
+    args.dispatch_function(args)
+  File "/opt/src/vllm/vllm/entrypoints/cli/benchmark/throughput.py", line 22, in cmd
+    main(args)
+  File "/opt/src/vllm/vllm/benchmarks/throughput.py", line 1055, in main
+    elapsed_time, request_outputs = run_vllm(
+  File "/opt/src/vllm/vllm/benchmarks/throughput.py", line 48, in run_vllm
+    llm = LLM.from_engine_args(engine_args)
+  File "/opt/src/vllm/vllm/entrypoints/llm.py", line 385, in from_engine_args
+    return cls(**vars(engine_args))
+  File "/opt/src/vllm/vllm/entrypoints/llm.py", line 343, in __init__
+    self.llm_engine = LLMEngine.from_engine_args(
+  File "/opt/src/vllm/vllm/v1/engine/llm_engine.py", line 184, in from_engine_args
+    return cls(
+  File "/opt/src/vllm/vllm/v1/engine/llm_engine.py", line 109, in __init__
+    self.engine_core = EngineCoreClient.make_client(
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 122, in make_client
+    return SyncMPClient(
+  File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+    return func(*args, **kwargs)
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 880, in __init__
+    super().__init__(
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 656, in __init__
+    with launch_core_engines(
+  File "/usr/lib/python3.10/contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "/opt/src/vllm/vllm/v1/engine/utils.py", line 1240, in launch_core_engines
+    wait_for_engine_startup(
+  File "/opt/src/vllm/vllm/v1/engine/utils.py", line 1320, in wait_for_engine_startup
+    raise RuntimeError(
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {'EngineCore': 1}
+exit=1

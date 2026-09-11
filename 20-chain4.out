@@ -1,0 +1,20 @@
+### 30B-A3B TP=8 ngram-spec
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=8 extra=[--speculative-config '{"method":"ngram","num_speculative_tokens":3,"prompt_lookup_max":4,"prompt_lookup_min":2}'] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(Worker_TP1 pid=630436) ERROR 09-10 21:28:07 [multiproc_executor.py:1007] IndexError: index 16 is out of bounds for axis 0 with size 16
+(Worker_TP0 pid=630435) ERROR 09-10 21:28:07 [multiproc_executor.py:1007] IndexError: index 16 is out of bounds for axis 0 with size 16
+(EngineCore pid=630221) ERROR 09-10 21:28:07 [core.py:1330]     raise RuntimeError(
+(EngineCore pid=630221) ERROR 09-10 21:28:07 [core.py:1330] RuntimeError: Worker failed with error 'index 16 is out of bounds for axis 0 with size 16', please check the stack trace above for the root 
+### gpt-oss-120b 2x(TP=4)
+=== server: openai/gpt-oss-120b TP=4 extra=[--data-parallel-size 2] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(EngineCore_DP1 pid=659611) ERROR 09-10 21:31:03 [core.py:1330] RuntimeError: Worker failed with error 'Input must be 2D', please check the stack trace above for the root cause
+(Worker_DP0_TP0 pid=660490) ERROR 09-10 21:31:03 [multiproc_executor.py:1007] AssertionError: Input must be 2D
+(EngineCore_DP0 pid=659610) ERROR 09-10 21:31:03 [core.py:1330]     raise RuntimeError(
+(EngineCore_DP0 pid=659610) ERROR 09-10 21:31:03 [core.py:1330] RuntimeError: Worker failed with error 'Input must be 2D', please check the stack trace above for the root cause
+### Coder-Next TP=8 eager 32k
+=== server: Qwen/Qwen3-Coder-Next TP=8 extra=[] max_model_len=32768 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+CHAIN4-DONE (Coder-Next aborted: eager warmup ETA 14 h at 32k)

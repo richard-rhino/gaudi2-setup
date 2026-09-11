@@ -1,0 +1,26 @@
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=8 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+ready after 11 min
+(Worker_TP6 pid=399194) INFO 09-10 19:23:57 [hpu_model_runner.py:6233] Warmup finished in 627 secs, allocated 13.35 GiB of device memory
+(Worker_TP1 pid=399189) INFO 09-10 19:23:57 [hpu_model_runner.py:6233] Warmup finished in 628 secs, allocated 13.33 GiB of device memory
+=== chat-10: 40 req, 10 users, 1024 in / 512 out ===
+| chat-10 | 10 | 1024 / 512 | 28.9 | 27.7 | 0.2 / 0.7 | 260.43 | 800.04 |
+=== chat-16: 48 req, 16 users, 1024 in / 512 out ===
+| chat-16 | 16 | 1024 / 512 | 27.6 | 22.9 | 0.2 / 1.0 | 385.13 | 1165.47 |
+=== agentic-10-32k: 20 req, 10 users, 32768 in / 1024 out ===
+| agentic-10-32k | 10 | 32768 / 1024 | 19.9 | 15.1 | 4.3 / 21.9 | 159.86 | 5157.62 |
+=== mixed-16: 48 req, 16 users, 8192 in / 768 out ===
+| mixed-16 | 16 | 8192 / 768 | 23.8 | 22.1 | 0.6 / 5.4 | 343.13 | 4050.81 |
+=== longctx-4-100k: 4 req, 4 users, 100000 in / 512 out ===
+| longctx-4-100k | 4 | 100000 / 512 | 11.9 | 7.4 | 48.5 / 74.2 | 22.47 | 4721.53 |
+=== done -> /home/gaudi2/setup/office10-Qwen_Qwen3-30B-A3B-Instruct-2507-tp8--ctx131072.md (server still up on :8000) ===
+=== server: openai/gpt-oss-120b TP=8 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(Worker_TP3 pid=442454) ERROR 09-10 19:36:29 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(Worker_TP0 pid=442451) ERROR 09-10 19:36:29 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(EngineCore pid=442238) ERROR 09-10 19:36:29 [core.py:1330]     raise RuntimeError(
+(EngineCore pid=442238) ERROR 09-10 19:36:29 [core.py:1330] RuntimeError: Worker failed with error 'view size is not compatible with input tensor's size and stride (at least one dimension spans across
+=== server: Qwen/Qwen3-Coder-Next TP=8 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+ALL-DONE (Coder-Next aborted: eager warmup ETA 19 h at 128k)

@@ -1,0 +1,8 @@
+=== starting server: Qwen/Qwen3-235B-A22B-Instruct-2507-FP8 TP=8 max_model_len=32768 ===
+SERVER FAILED:
+(Worker_TP0 pid=4903) ERROR 09-10 16:51:10 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+(Worker_TP2 pid=4905) ERROR 09-10 16:51:10 [multiproc_executor.py:901]     raise ValueError(
+(Worker_TP2 pid=4905) ERROR 09-10 16:51:10 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+(Worker_TP7 pid=4910) ERROR 09-10 16:51:11 [multiproc_executor.py:901]     raise ValueError(
+(Worker_TP7 pid=4910) ERROR 09-10 16:51:11 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+exit=1

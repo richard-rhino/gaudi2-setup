@@ -1,0 +1,279 @@
+Using vLLM commit cd64c2dea9c72af333de7ec05293d54bbf1bd128
+Requirement already satisfied: cmake>=3.26.1 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 2)) (4.4.3)
+Requirement already satisfied: ninja in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 3)) (1.13.2)
+Requirement already satisfied: packaging>=24.2 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 4)) (26.2)
+Requirement already satisfied: setuptools<81.0.0,>=77.0.3 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 5)) (80.10.2)
+Requirement already satisfied: setuptools-scm>=8 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 6)) (10.2.3)
+Requirement already satisfied: setuptools-rust>=1.9.0 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 7)) (1.13.0)
+Requirement already satisfied: wheel in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 8)) (0.47.0)
+Requirement already satisfied: jinja2>=3.1.6 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 9)) (3.1.6)
+Requirement already satisfied: regex in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 10)) (2026.7.19)
+Requirement already satisfied: build in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 11)) (1.6.0)
+Requirement already satisfied: protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6 in /usr/local/lib/python3.10/dist-packages (from -r /dev/fd/63 (line 12)) (7.35.1)
+Requirement already satisfied: vcs-versioning<3,>=2.3.2.dev0 in /usr/local/lib/python3.10/dist-packages (from setuptools-scm>=8->-r /dev/fd/63 (line 6)) (2.3.4)
+Requirement already satisfied: tomli>=1 in /usr/local/lib/python3.10/dist-packages (from setuptools-scm>=8->-r /dev/fd/63 (line 6)) (2.4.1)
+Requirement already satisfied: typing-extensions>=4.1 in /usr/local/lib/python3.10/dist-packages (from setuptools-scm>=8->-r /dev/fd/63 (line 6)) (4.16.0)
+Requirement already satisfied: semantic_version<3,>=2.8.2 in /usr/local/lib/python3.10/dist-packages (from setuptools-rust>=1.9.0->-r /dev/fd/63 (line 7)) (2.10.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2>=3.1.6->-r /dev/fd/63 (line 9)) (3.0.3)
+Requirement already satisfied: pyproject_hooks in /usr/local/lib/python3.10/dist-packages (from build->-r /dev/fd/63 (line 11)) (1.2.0)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Obtaining file:///opt/src/vllm
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: regex in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2026.7.19)
+Requirement already satisfied: cachetools in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (7.1.8)
+Requirement already satisfied: psutil in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (7.2.2)
+Requirement already satisfied: sentencepiece in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.2.2)
+Requirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.2.6)
+Requirement already satisfied: requests>=2.26.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.34.2)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.69.1)
+Requirement already satisfied: blake3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.0.9)
+Requirement already satisfied: py-cpuinfo in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (9.0.0)
+Requirement already satisfied: transformers>=5.10.4 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (5.16.1)
+Requirement already satisfied: huggingface_hub>=1.28.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.30.0)
+Requirement already satisfied: tokenizers>=0.21.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.23.2)
+Requirement already satisfied: safetensors>=0.6.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.0)
+Requirement already satisfied: protobuf!=6.30.*,!=6.31.*,!=6.32.*,!=6.33.0.*,!=6.33.1.*,!=6.33.2.*,!=6.33.3.*,!=6.33.4.*,>=5.29.6 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (7.35.1)
+Requirement already satisfied: fastapi<0.137.0,>=0.133.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.136.3)
+Requirement already satisfied: starlette>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.6.0)
+Requirement already satisfied: aiohttp>=3.13.3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.14.3)
+Requirement already satisfied: openai>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.11.0)
+Requirement already satisfied: pydantic>=2.12.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.13.4)
+Requirement already satisfied: prometheus_client>=0.18.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.26.0)
+Requirement already satisfied: pillow in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (12.3.0)
+Requirement already satisfied: prometheus-fastapi-instrumentator>=8.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (8.1.0)
+Requirement already satisfied: tiktoken>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.14.0)
+Requirement already satisfied: lm-format-enforcer==0.11.3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.11.3)
+Requirement already satisfied: llguidance<1.8.0,>=1.7.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.7.6)
+Requirement already satisfied: outlines_core==0.2.14 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.2.14)
+Requirement already satisfied: lark==1.2.2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.2.2)
+Requirement already satisfied: xgrammar<1.0.0,>=0.2.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.2.6)
+Requirement already satisfied: typing_extensions>=4.10 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.16.0)
+Requirement already satisfied: filelock>=3.16.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.32.0)
+Requirement already satisfied: partial-json-parser in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.2.1.1.post7)
+Requirement already satisfied: jsonschema>=4.23.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.26.0)
+Requirement already satisfied: pyzmq>=25.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (27.2.0)
+Requirement already satisfied: msgspec in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.21.1)
+Requirement already satisfied: mistral_common>=1.11.6 in /usr/local/lib/python3.10/dist-packages (from mistral_common[image]>=1.11.6->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.11.7)
+Requirement already satisfied: opencv-python-headless>=4.13.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (5.0.0.93)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (6.0.3)
+Requirement already satisfied: einops in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.2)
+Requirement already satisfied: compressed-tensors==0.17.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.17.0)
+Requirement already satisfied: depyf==0.20.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.20.0)
+Requirement already satisfied: cloudpickle in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.1.2)
+Requirement already satisfied: watchfiles in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.2.0)
+Requirement already satisfied: python-json-logger in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.2.0)
+Requirement already satisfied: ninja in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.13.2)
+Requirement already satisfied: pybase64 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.5.0)
+Requirement already satisfied: cbor2 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (6.1.4)
+Requirement already satisfied: ijson in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.5.1)
+Requirement already satisfied: setproctitle in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.3.7)
+Requirement already satisfied: openai-harmony>=0.0.3 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.0.8)
+Requirement already satisfied: anthropic>=0.71.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.4.0)
+Requirement already satisfied: model-hosting-container-standards<1.0.0,>=0.1.14 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.1.16)
+Requirement already satisfied: mcp<3.0.0,>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.2.0)
+Requirement already satisfied: opentelemetry-sdk>=1.27.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-api>=1.27.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-exporter-otlp>=1.27.0 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-semantic-conventions-ai>=0.4.1 in /usr/local/lib/python3.10/dist-packages (from vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.5.1)
+Requirement already satisfied: torch>=2.10.0 in /usr/local/lib/python3.10/dist-packages (from compressed-tensors==0.17.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.11.0a0+git009b5f6)
+Requirement already satisfied: loguru in /usr/local/lib/python3.10/dist-packages (from compressed-tensors==0.17.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.7.3)
+Requirement already satisfied: astor in /usr/local/lib/python3.10/dist-packages (from depyf==0.20.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.1)
+Requirement already satisfied: dill in /usr/local/lib/python3.10/dist-packages (from depyf==0.20.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.4.1)
+Requirement already satisfied: interegular>=0.3.2 in /usr/local/lib/python3.10/dist-packages (from lm-format-enforcer==0.11.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.3.3)
+Requirement already satisfied: packaging in /usr/local/lib/python3.10/dist-packages (from lm-format-enforcer==0.11.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (26.2)
+Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137.0,>=0.133.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.4.2)
+Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137.0,>=0.133.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.0.5)
+Requirement already satisfied: fastapi-cli>=0.0.8 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.0.32)
+Requirement already satisfied: fastar>=0.9.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.12.0)
+Requirement already satisfied: httpx<1.0.0,>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.28.1)
+Requirement already satisfied: jinja2>=3.1.5 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.1.6)
+Requirement already satisfied: python-multipart>=0.0.18 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.0.32)
+Requirement already satisfied: email-validator>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.3.0)
+Requirement already satisfied: uvicorn>=0.12.0 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.52.4)
+Requirement already satisfied: pydantic-settings>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.15.0)
+Requirement already satisfied: pydantic-extra-types>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.11.1)
+Requirement already satisfied: anyio in /usr/local/lib/python3.10/dist-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.15.1)
+Requirement already satisfied: certifi in /usr/local/lib/python3.10/dist-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2026.7.22)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.0.9)
+Requirement already satisfied: idna in /usr/local/lib/python3.10/dist-packages (from httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.18)
+Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.16.0)
+Requirement already satisfied: httpx2>=2.5.0 in /usr/local/lib/python3.10/dist-packages (from mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.12.0)
+Requirement already satisfied: mcp-types==2.2.0 in /usr/local/lib/python3.10/dist-packages (from mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.2.0)
+Requirement already satisfied: pyjwt>=2.10.1 in /usr/local/lib/python3.10/dist-packages (from pyjwt[crypto]>=2.10.1->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.13.0)
+Requirement already satisfied: sse-starlette>=3.0.0 in /usr/local/lib/python3.10/dist-packages (from mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.4.11)
+Requirement already satisfied: jmespath in /usr/local/lib/python3.10/dist-packages (from model-hosting-container-standards<1.0.0,>=0.1.14->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.1.0)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from model-hosting-container-standards<1.0.0,>=0.1.14->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (80.10.2)
+Requirement already satisfied: supervisor>=4.2.0 in /usr/local/lib/python3.10/dist-packages (from model-hosting-container-standards<1.0.0,>=0.1.14->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.3.0)
+Requirement already satisfied: apache-tvm-ffi>=0.1.10 in /usr/local/lib/python3.10/dist-packages (from xgrammar<1.0.0,>=0.2.1->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.1.13.post3)
+Requirement already satisfied: triton in /usr/local/lib/python3.10/dist-packages (from xgrammar<1.0.0,>=0.2.1->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.8.0)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.7.1)
+Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.4.0)
+Requirement already satisfied: async-timeout<6.0,>=4.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (5.0.1)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (26.1.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.8.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (6.8.0)
+Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.5.2)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.10/dist-packages (from aiohttp>=3.13.3->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.24.5)
+Requirement already satisfied: docstring-parser<1,>=0.15 in /usr/local/lib/python3.10/dist-packages (from anthropic>=0.71.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.18.0)
+Requirement already satisfied: jiter<1,>=0.4.0 in /usr/local/lib/python3.10/dist-packages (from anthropic>=0.71.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.16.0)
+Requirement already satisfied: sniffio<2,>=1 in /usr/local/lib/python3.10/dist-packages (from anthropic>=0.71.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.3.1)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio->httpx<1.0.0,>=0.23.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.3.1)
+Requirement already satisfied: httpcore2==2.12.0 in /usr/local/lib/python3.10/dist-packages (from httpx2>=2.5.0->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.12.0)
+Requirement already satisfied: truststore>=0.10 in /usr/local/lib/python3.10/dist-packages (from httpx2>=2.5.0->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.10.4)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.12.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.0)
+Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.12.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.46.4)
+Requirement already satisfied: dnspython>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from email-validator>=2.0.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.8.0)
+Requirement already satisfied: typer>=0.16.0 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.27.2)
+Requirement already satisfied: rich-toolkit>=0.14.8 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.20.5)
+Requirement already satisfied: tomli>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.4.1)
+Requirement already satisfied: fastapi-cloud-cli>=0.1.1 in /usr/local/lib/python3.10/dist-packages (from fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.25.0)
+Requirement already satisfied: rignore>=0.5.1 in /usr/local/lib/python3.10/dist-packages (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.1)
+Requirement already satisfied: sentry-sdk>=2.20.0 in /usr/local/lib/python3.10/dist-packages (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.69.1)
+Requirement already satisfied: detect-installer>=0.1.0 in /usr/local/lib/python3.10/dist-packages (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.2.1)
+Requirement already satisfied: agent-detector>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from fastapi-cloud-cli>=0.1.1->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.0.0)
+Requirement already satisfied: click<9.0.0,>=8.4.2 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub>=1.28.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (8.5.0)
+Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub>=1.28.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2026.6.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.5.2 in /usr/local/lib/python3.10/dist-packages (from huggingface_hub>=1.28.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.6.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2>=3.1.5->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.0.3)
+Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.10/dist-packages (from jsonschema>=4.23.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2025.9.1)
+Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.10/dist-packages (from jsonschema>=4.23.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.37.0)
+Requirement already satisfied: rpds-py>=0.25.0 in /usr/local/lib/python3.10/dist-packages (from jsonschema>=4.23.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.30.0)
+Requirement already satisfied: opentelemetry-exporter-otlp-proto-grpc==1.44.0 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-exporter-otlp-proto-http==1.44.0 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: googleapis-common-protos~=1.57 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.75.3)
+Requirement already satisfied: grpcio<2.0.0,>=1.63.2 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.83.0)
+Requirement already satisfied: opentelemetry-exporter-otlp-proto-common==1.44.0 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-proto==1.44.0 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-exporter-otlp-proto-grpc==1.44.0->opentelemetry-exporter-otlp>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.44.0)
+Requirement already satisfied: opentelemetry-semantic-conventions==0.65b0 in /usr/local/lib/python3.10/dist-packages (from opentelemetry-sdk>=1.27.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.65b0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests>=2.26.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.4.9)
+Requirement already satisfied: urllib3<3,>=1.26 in /usr/local/lib/python3.10/dist-packages (from requests>=2.26.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.7.0)
+Requirement already satisfied: pycountry>=23 in /usr/local/lib/python3.10/dist-packages (from pydantic-extra-types[pycountry]>=2.10.5->mistral_common>=1.11.6->mistral_common[image]>=1.11.6->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (26.2.16)
+Requirement already satisfied: python-dotenv>=0.21.0 in /usr/local/lib/python3.10/dist-packages (from pydantic-settings>=2.0.0->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.2.3)
+Requirement already satisfied: cryptography>=3.4.0 in /usr/local/lib/python3.10/dist-packages (from pyjwt[crypto]>=2.10.1->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (49.0.0)
+Requirement already satisfied: cffi>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.1.0)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.10/dist-packages (from cffi>=2.0.0->cryptography>=3.4.0->pyjwt[crypto]>=2.10.1->mcp<3.0.0,>=2.0.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.0)
+Requirement already satisfied: rich>=13.7.1 in /usr/local/lib/python3.10/dist-packages (from rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (15.0.0)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (2.21.0)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich>=13.7.1->rich-toolkit>=0.14.8->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.1.2)
+Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.10/dist-packages (from torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.14.0)
+Requirement already satisfied: networkx>=2.5.1 in /usr/local/lib/python3.10/dist-packages (from torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (3.4.2)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.10/dist-packages (from sympy>=1.13.3->torch>=2.10.0->compressed-tensors==0.17.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.3.0)
+Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from typer>=0.16.0->fastapi-cli>=0.0.8->fastapi-cli[standard]>=0.0.8; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (1.5.4)
+Requirement already satisfied: httptools>=0.8.0 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.8.0)
+Requirement already satisfied: uvloop>=0.15.1 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (0.22.1)
+Requirement already satisfied: websockets>=13.0 in /usr/local/lib/python3.10/dist-packages (from uvicorn[standard]>=0.12.0; extra == "standard"->fastapi[standard]<0.137.0,>=0.133.0->vllm==0.28.1rc1.dev496+gcd64c2dea.empty) (16.1.1)
+Building wheels for collected packages: vllm
+  Building editable for vllm (pyproject.toml): started
+  Building editable for vllm (pyproject.toml): finished with status 'done'
+  Created wheel for vllm: filename=vllm-0.28.1rc1.dev496+gcd64c2dea.empty-0.editable-cp310-cp310-linux_x86_64.whl size=11984 sha256=5f8111a73d04d22343457c34d828a70729fb560b6604cb89b8be40c6446ffce4
+  Stored in directory: /tmp/pip-ephem-wheel-cache-u8vrt85_/wheels/73/52/dc/f3a901823dbe45f120c7f99058187f72002613e22188b71be6
+Successfully built vllm
+Installing collected packages: vllm
+  Attempting uninstall: vllm
+    Found existing installation: vllm 0.26.0+empty
+    Uninstalling vllm-0.26.0+empty:
+      Successfully uninstalled vllm-0.26.0+empty
+Successfully installed vllm-0.28.1rc1.dev496+gcd64c2dea.empty
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Obtaining file:///opt/src/vllm-gaudi
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: pandas>=2.3.3 in /usr/local/lib/python3.10/dist-packages (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2.3.3)
+Requirement already satisfied: numba>=0.67.0 in /usr/local/lib/python3.10/dist-packages (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.67.0)
+Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.10/dist-packages (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2.2.6)
+Requirement already satisfied: kaldi-native-fbank>=1.22.3 in /usr/local/lib/python3.10/dist-packages (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (1.22.3)
+Collecting tblib==3.2.2 (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a)
+  Downloading tblib-3.2.2-py3-none-any.whl.metadata (27 kB)
+Requirement already satisfied: fastapi<0.137 in /usr/local/lib/python3.10/dist-packages (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.136.3)
+Collecting setuptools<85.0.0,>=83.0.0 (from vllm_gaudi==0.27.0rc1.dev79+g79e13da0a)
+  Downloading setuptools-84.0.0-py3-none-any.whl.metadata (6.6 kB)
+Requirement already satisfied: starlette>=0.46.0 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (1.6.0)
+Requirement already satisfied: pydantic>=2.9.0 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2.13.4)
+Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (4.16.0)
+Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.4.2)
+Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.10/dist-packages (from fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.0.5)
+Requirement already satisfied: llvmlite<0.50,>=0.49.0dev0 in /usr/local/lib/python3.10/dist-packages (from numba>=0.67.0->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.49.0)
+Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.10/dist-packages (from pandas>=2.3.3->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas>=2.3.3->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2026.3.post1)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas>=2.3.3->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2026.3)
+Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.9.0->fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (0.8.0)
+Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.10/dist-packages (from pydantic>=2.9.0->fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (2.46.4)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.8.2->pandas>=2.3.3->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (1.17.0)
+Requirement already satisfied: anyio<5,>=3.6.2 in /usr/local/lib/python3.10/dist-packages (from starlette>=0.46.0->fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (4.15.1)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.6.2->starlette>=0.46.0->fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (1.3.1)
+Requirement already satisfied: idna>=2.8 in /usr/local/lib/python3.10/dist-packages (from anyio<5,>=3.6.2->starlette>=0.46.0->fastapi<0.137->vllm_gaudi==0.27.0rc1.dev79+g79e13da0a) (3.18)
+Downloading tblib-3.2.2-py3-none-any.whl (12 kB)
+Downloading setuptools-84.0.0-py3-none-any.whl (818 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 818.2/818.2 kB 421.0 kB/s  0:00:01
+Building wheels for collected packages: vllm_gaudi
+  Building editable for vllm_gaudi (pyproject.toml): started
+  Building editable for vllm_gaudi (pyproject.toml): finished with status 'done'
+  Created wheel for vllm_gaudi: filename=vllm_gaudi-0.27.0rc1.dev79+g79e13da0a-0.editable-py3-none-any.whl size=11029 sha256=59c5fae0e0a095726e46aad30c432dda1721c4fd4d4c36d1d9e5b56d79b2eb74
+  Stored in directory: /tmp/pip-ephem-wheel-cache-efts8fv2/wheels/42/ae/76/3fca045de52a49124cfad477e29040a1c2307073120a0779c0
+Successfully built vllm_gaudi
+Installing collected packages: tblib, setuptools, vllm_gaudi
+  Attempting uninstall: tblib
+    Found existing installation: tblib 3.1.0
+    Uninstalling tblib-3.1.0:
+      Successfully uninstalled tblib-3.1.0
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 80.10.2
+    Uninstalling setuptools-80.10.2:
+      Successfully uninstalled setuptools-80.10.2
+  Attempting uninstall: vllm_gaudi
+    Found existing installation: vllm_gaudi 0.26.0
+    Uninstalling vllm_gaudi-0.26.0:
+      Successfully uninstalled vllm_gaudi-0.26.0
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+torch 2.11.0a0+git009b5f6 requires setuptools<82, but you have setuptools 84.0.0 which is incompatible.
+torchvision 0.26.0+cpu requires torch==2.11.0, but you have torch 2.11.0a0+git009b5f6 which is incompatible.
+Successfully installed setuptools-84.0.0 tblib-3.2.2 vllm_gaudi-0.27.0rc1.dev79+g79e13da0a
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Requirement already satisfied: transformers==5.16.1 in /usr/local/lib/python3.10/dist-packages (5.16.1)
+Requirement already satisfied: huggingface-hub<2.0,>=1.5.0 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (1.30.0)
+Requirement already satisfied: numpy>=1.17 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (2.2.6)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (26.2)
+Requirement already satisfied: pyyaml>=5.1 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (6.0.3)
+Requirement already satisfied: regex>=2025.10.22 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (2026.7.19)
+Requirement already satisfied: tokenizers<0.24.0,>=0.23.1 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (0.23.2)
+Requirement already satisfied: typer in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (0.27.2)
+Requirement already satisfied: safetensors>=0.8.0 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (0.8.0)
+Requirement already satisfied: tqdm>=4.60 in /usr/local/lib/python3.10/dist-packages (from transformers==5.16.1) (4.69.1)
+Requirement already satisfied: click<9.0.0,>=8.4.2 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (8.5.0)
+Requirement already satisfied: filelock>=3.10.0 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (3.32.0)
+Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (2026.6.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.5.2 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (1.6.0)
+Requirement already satisfied: httpx<1,>=0.23.0 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (0.28.1)
+Requirement already satisfied: typing-extensions>=4.1.0 in /usr/local/lib/python3.10/dist-packages (from huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (4.16.0)
+Requirement already satisfied: anyio in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (4.15.1)
+Requirement already satisfied: certifi in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (2026.7.22)
+Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (1.0.9)
+Requirement already satisfied: idna in /usr/local/lib/python3.10/dist-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (3.18)
+Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.10/dist-packages (from httpcore==1.*->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (0.16.0)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /usr/local/lib/python3.10/dist-packages (from anyio->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.5.0->transformers==5.16.1) (1.3.1)
+Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from typer->transformers==5.16.1) (1.5.4)
+Requirement already satisfied: rich>=13.8.0 in /usr/local/lib/python3.10/dist-packages (from typer->transformers==5.16.1) (15.0.0)
+Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.10/dist-packages (from typer->transformers==5.16.1) (0.0.5)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.8.0->typer->transformers==5.16.1) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.10/dist-packages (from rich>=13.8.0->typer->transformers==5.16.1) (2.21.0)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.10/dist-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers==5.16.1) (0.1.2)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/cpu
+Requirement already satisfied: torchaudio==2.11.0 in /usr/local/lib/python3.10/dist-packages (2.11.0+cpu)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+vllm 0.28.1rc1.dev496+gcd64c2dea.empty + vllm_gaudi 0.27.0rc1.dev79+g79e13da0a OK
+exit=0

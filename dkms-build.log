@@ -1,0 +1,13 @@
+Sign command: /usr/lib/linux-kbuild-6.1/scripts/sign-file
+Signing key: /var/lib/dkms/mok.key
+Public certificate (MOK): /var/lib/dkms/mok.pub
+
+Building module:
+Cleaning build area...
+pushd /var/lib/dkms/habanalabs/1.24.1-482/build && make -j 128 KVERSION=6.1.0-53-amd64 GIT_SHA=b336d5e MAKE_IB=1 && popd.....
+Signing module /var/lib/dkms/habanalabs/1.24.1-482/build/drivers/net/ethernet/intel/hbl_en/habanalabs_en.ko
+Signing module /var/lib/dkms/habanalabs/1.24.1-482/build/drivers/net/ethernet/intel/hbl_cn/habanalabs_cn.ko
+Signing module /var/lib/dkms/habanalabs/1.24.1-482/build/drivers/accel/habanalabs/habanalabs.ko
+Signing module /var/lib/dkms/habanalabs/1.24.1-482/build/drivers/infiniband/hw/hbl/habanalabs_ib.ko
+Signing module /var/lib/dkms/habanalabs/1.24.1-482/build/compat/habanalabs_compat.ko
+Cleaning build area...

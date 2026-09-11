@@ -1,0 +1,27 @@
+-c              ==> PCI bus ID -d              ==> Download input tensors only once, the same tensors will be used throughout all the iterations of the test -dis_mon        ==> Disables the monitor display (monitoring is still executed) -dmesg          ==> Adds running dmesg to the qual report (Note: the dmesg will be cleaned) -enable_ports_check ==> Enable verifying NIC internal/external ports are up -enable_serr    ==> Enable SERR for ECC error -f2             ==> Functional test selector -l              ==> Power level [extreme,high] -mon_cfg        ==> ScreenDrawer INI configuration path -rmod           ==> Running mode -sensors        ==> Enable sensors collection, -sensors <sample time in seconds>  -serdes         ==> Enable serdes test [int / ext]. using -serdes ext requires loopback dongles on external ports -t              ==> Execution time in seconds -toggle         ==> check port toggling count during test exceution 
+== quick memory test on card b3 ==
+hl_qual - PCI link speed (gen): N/A
+hl_qual - PCI link width: N/A
+hl_qual - HBM size: 96 GB
+hl_qual - set CPU affinity to CPUs: 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127
+Runner - No plugin was identified
+Failed to set plugin under test
+hl_qual - Plugin report END: 
+
+##################################   Device measurment report #######################################
+
+                   0000:b3:00.0
+Min Temp:                     0
+Max Temp:                     0
+min Clock:                    0
+max Clock:                    0
+min Power_54V:                0
+max Power_54V:                0
+Sram Serr count:              0
+Sram Derr count:              0
+Dram Serr count:              0
+Dram Derr count:              0
+##################################   Test result summary      #######################################
+hl_qual - device with busID: 0000:b3:00.0 result: FAILED
+##################################   hl qual report #######################################
+FAILED

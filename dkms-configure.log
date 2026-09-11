@@ -1,0 +1,13 @@
+Setting up habanalabs-dkms (1.24.1-482) ...
+Adding Module to DKMS build system habanalabs 1.24.1-482
+Doing initial module build habanalabs 1.24.1-482
+Installing initial module habanalabs 1.24.1-482
+
+The driver does not load automatically. To load the driver, do the following:
+rmmod habanalabs_ib; rmmod habanalabs_en; rmmod habanalabs_cn; rmmod habanalabs; rmmod habanalabs_compat
+modprobe habanalabs_compat && modprobe habanalabs && modprobe habanalabs_cn && modprobe habanalabs_en && modprobe habanalabs_ib
+or reboot
+-------------------------------------------------------------------
+Habanalabs Driver package was installed successfully.
+
+Processing triggers for libc-bin (2.36-9+deb12u14) ...

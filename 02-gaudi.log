@@ -1,0 +1,77 @@
+Hit:1 http://deb.debian.org/debian bookworm InRelease
+Hit:2 http://security.debian.org/debian-security bookworm-security InRelease
+Hit:3 http://deb.debian.org/debian bookworm-updates InRelease
+Get:4 https://vault.habana.ai/artifactory/debian jammy InRelease [5,807 B]
+Get:5 https://vault.habana.ai/artifactory/debian jammy/main amd64 Packages [31.9 kB]
+Fetched 37.7 kB in 1s (52.3 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following NEW packages will be installed:
+  habanalabs-container-runtime habanalabs-dkms habanalabs-firmware
+  habanalabs-firmware-tools habanalabs-graph habanalabs-rdma-core
+  habanalabs-thunk
+0 upgraded, 7 newly installed, 0 to remove and 0 not upgraded.
+Need to get 403 MB of archives.
+After this operation, 1,493 MB of additional disk space will be used.
+Get:1 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-container-runtime amd64 1.24.1-482 [4,888 kB]
+Get:2 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-dkms all 1.24.1-482 [5,136 kB]
+Get:3 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-firmware amd64 1.24.1-482 [10.7 MB]
+Get:4 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-firmware-tools amd64 1.24.1-482 [470 kB]
+Get:5 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-rdma-core all 1.24.1-482 [1,990 kB]
+Get:6 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-thunk all 1.24.1-482 [2,062 kB]
+Get:7 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-graph amd64 1.24.1-482 [378 MB]
+Fetched 403 MB in 14s (28.2 MB/s)
+Selecting previously unselected package habanalabs-container-runtime.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 86054 files and directories currently installed.)
+Preparing to unpack .../0-habanalabs-container-runtime_1.24.1-482_amd64.deb ...
+Unpacking habanalabs-container-runtime (1.24.1-482) ...
+Selecting previously unselected package habanalabs-dkms.
+Preparing to unpack .../1-habanalabs-dkms_1.24.1-482_all.deb ...
+Unpacking habanalabs-dkms (1.24.1-482) ...
+Selecting previously unselected package habanalabs-firmware.
+Preparing to unpack .../2-habanalabs-firmware_1.24.1-482_amd64.deb ...
+Unpacking habanalabs-firmware (1.24.1-482) ...
+Selecting previously unselected package habanalabs-firmware-tools.
+Preparing to unpack .../3-habanalabs-firmware-tools_1.24.1-482_amd64.deb ...
+Unpacking habanalabs-firmware-tools (1.24.1-482) ...
+Selecting previously unselected package habanalabs-rdma-core.
+Preparing to unpack .../4-habanalabs-rdma-core_1.24.1-482_all.deb ...
+Unpacking habanalabs-rdma-core (1.24.1-482) ...
+Selecting previously unselected package habanalabs-thunk.
+Preparing to unpack .../5-habanalabs-thunk_1.24.1-482_all.deb ...
+Unpacking habanalabs-thunk (1.24.1-482) ...
+Selecting previously unselected package habanalabs-graph.
+Preparing to unpack .../6-habanalabs-graph_1.24.1-482_amd64.deb ...
+Unpacking habanalabs-graph (1.24.1-482) ...
+Setting up habanalabs-rdma-core (1.24.1-482) ...
+Habanalabs rdma-core package was installed successfully.
+Setting up habanalabs-dkms (1.24.1-482) ...
+Adding Module to DKMS build system habanalabs 1.24.1-482
+Doing initial module build habanalabs 1.24.1-482
+Error! Bad return status for module build on kernel: 6.1.0-53-amd64 (x86_64)
+Consult /var/lib/dkms/habanalabs/1.24.1-482/build/make.log for more information.
+dpkg: error processing package habanalabs-dkms (--configure):
+ installed habanalabs-dkms package post-installation script subprocess returned error exit status 10
+Setting up habanalabs-firmware (1.24.1-482) ...
+Firmware package for Habana Labs processing accelerators installation finished.
+Setting up habanalabs-container-runtime (1.24.1-482) ...
+Setting up habanalabs-thunk (1.24.1-482) ...
+
+
+Habanalabs hl-thunk package installed successfully
+
+
+Setting up habanalabs-firmware-tools (1.24.1-482) ...
+Firmware tools package for Habana Labs processing accelerators installation finished.
+Setting up habanalabs-graph (1.24.1-482) ...
+/opt/habanalabs/media/ffmpeg/lib /
+/
+Graph compiler package for Habana Labs processing accelerators installation finished.
+Please close terminal window to allow new settings to take effect.
+Processing triggers for man-db (2.11.2-2) ...
+Processing triggers for libc-bin (2.36-9+deb12u14) ...
+Errors were encountered while processing:
+ habanalabs-dkms
+E: Sub-process /usr/bin/dpkg returned an error code (1)

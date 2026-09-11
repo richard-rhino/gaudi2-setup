@@ -1,0 +1,15 @@
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=4 extra=[--data-parallel-size 2] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(ApiServer_1 pid=465896) TimeoutError: Timed out waiting for engine core processes to start. This is often caused by slow weight loading for large models. Waited 600s (configured by VLLM_ENGINE_READY_
+(ApiServer_0 pid=465895) TimeoutError: Timed out waiting for engine core processes to start. This is often caused by slow weight loading for large models. Waited 600s (configured by VLLM_ENGINE_READY_
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=2 extra=[--data-parallel-size 4] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(EngineCore_DP2 pid=499440) ERROR 09-10 20:02:30 [core.py:1330] RuntimeError: Worker failed with error '[Rank:0] FATAL ERROR :: MODULE:PT_DEVMEM Allocation failed for size::46661632 (44.5)MB', please 
+(Worker_DP3_TP0 pid=501121) ERROR 09-10 20:02:30 [multiproc_executor.py:1007] RuntimeError: [Rank:0] FATAL ERROR :: MODULE:PT_DEVMEM Allocation failed for size::46661632 (44.5)MB
+(EngineCore_DP3 pid=499441) ERROR 09-10 20:02:30 [core.py:1330]     raise RuntimeError(
+(EngineCore_DP3 pid=499441) ERROR 09-10 20:02:30 [core.py:1330] RuntimeError: Worker failed with error '[Rank:0] FATAL ERROR :: MODULE:PT_DEVMEM Allocation failed for size::46661632 (44.5)MB', please 
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SWEEP-DONE
+exit=0

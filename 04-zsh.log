@@ -1,0 +1,56 @@
+Cloning Oh My Zsh...
+From https://github.com/ohmyzsh/ohmyzsh
+ * [new branch]      add-docker-compose-config -> origin/add-docker-compose-config
+ * [new branch]      copilot/docker-plugin-load-fix -> origin/copilot/docker-plugin-load-fix
+ * [new branch]      copilot/fix-per-directory-history-regression -> origin/copilot/fix-per-directory-history-regression
+ * [new branch]      feat/appsignal-cli-plugin -> origin/feat/appsignal-cli-plugin
+ * [new branch]      feat/opencode-plugin -> origin/feat/opencode-plugin
+ * [new branch]      feat/shopify-plugin  -> origin/feat/shopify-plugin
+ * [new branch]      feat/theme-browser-local -> origin/feat/theme-browser-local
+ * [new branch]      fix/agnoster-conda-env-prompt -> origin/fix/agnoster-conda-env-prompt
+ * [new branch]      fix/common-aliases-open-command -> origin/fix/common-aliases-open-command
+ * [new branch]      fix/duplicate-alias-definitions -> origin/fix/duplicate-alias-definitions
+ * [new branch]      fix/emacs-nw-no-wait -> origin/fix/emacs-nw-no-wait
+ * [new branch]      fix/installer-backup-history -> origin/fix/installer-backup-history
+ * [new branch]      fix/ssh-agent-honor-existing -> origin/fix/ssh-agent-honor-existing
+ * [new branch]      master               -> origin/master
+ * [new branch]      perf/appearance-cache-ls-diff-probes -> origin/perf/appearance-cache-ls-diff-probes
+ * [new branch]      perf/git-plugin-cache-git-version -> origin/perf/git-plugin-cache-git-version
+ * [new branch]      perf/git-prompt-fewer-forks -> origin/perf/git-prompt-fewer-forks
+ * [new branch]      perf/init-hostname-without-scutil -> origin/perf/init-hostname-without-scutil
+ * [new branch]      perf/init-revision-from-git-head -> origin/perf/init-revision-from-git-head
+ * [new branch]      perf/lib-autoload-cli-diagnostics -> origin/perf/lib-autoload-cli-diagnostics
+ * [new branch]      perf/lib-lazy-vcs-info-patch -> origin/perf/lib-lazy-vcs-info-patch
+ * [new branch]      perf/termsupport-memoize-cwd -> origin/perf/termsupport-memoize-cwd
+ * [new branch]      rr-13813-introduce-cooldown-feature -> origin/rr-13813-introduce-cooldown-feature
+ * [new branch]      task/rr-14045-omz-plugin-create -> origin/task/rr-14045-omz-plugin-create
+ * [new branch]      task/rr-herdr-plugin -> origin/task/rr-herdr-plugin
+Already on 'master'
+branch 'master' set up to track 'origin/master'.
+/home/gaudi2
+
+Looking for an existing zsh config...
+Using the Oh My Zsh template file and adding it to /home/gaudi2/.zshrc.
+
+         __                                     __   
+  ____  / /_     ____ ___  __  __   ____  _____/ /_  
+ / __ \/ __ \   / __ `__ \/ / / /  /_  / / ___/ __ \ 
+/ /_/ / / / /  / / / / / / /_/ /    / /_(__  ) / / / 
+\____/_/ /_/  /_/ /_/ /_/\__, /    /___/____/_/ /_/  
+                        /____/                       ....is now installed!
+
+
+Before you scream Oh My Zsh! look over the `.zshrc` file to select plugins, themes, and options.
+
+• Follow along on X (https://x.com/ohmyzsh) or Bluesky (https://bsky.app/profile/ohmyz.sh)
+• Questions or ideas? Join the community on https://discord.gg/ohmyzsh
+• Help support the project: sponsor us on https://opencollective.com/ohmyzsh,
+  or grab stickers, shirts, and swag from https://commitgoods.com/ohmyzsh
+
+Run zsh to try it out.
+Cloning into '/home/gaudi2/.oh-my-zsh/custom/plugins/zsh-autosuggestions'...
+Cloning into '/home/gaudi2/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting'...
+Cloning into '/home/gaudi2/.oh-my-zsh/custom/plugins/zsh-completions'...
+Cloning into '/home/gaudi2/.oh-my-zsh/custom/plugins/zsh-history-substring-search'...
+Cloning into '/home/gaudi2/.oh-my-zsh/custom/themes/powerlevel10k'...
+=== 04-zsh done === log out and back in (login shell was set by 01-base.sh), or run: exec zsh

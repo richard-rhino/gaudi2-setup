@@ -1,0 +1,8 @@
+=== starting server: Qwen/Qwen3-235B-A22B-Instruct-2507-FP8 TP=4 cards=all extra=[--data-parallel-size 2] max_model_len=32768 ===
+SERVER FAILED:
+(Worker_DP1_TP1 pid=8316) ERROR 09-10 16:52:50 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+(Worker_DP0_TP0 pid=8321) ERROR 09-10 16:52:50 [multiproc_executor.py:901]     raise ValueError(
+(Worker_DP0_TP0 pid=8321) ERROR 09-10 16:52:50 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+(Worker_DP1_TP2 pid=8317) ERROR 09-10 16:52:50 [multiproc_executor.py:901]     raise ValueError(
+(Worker_DP1_TP2 pid=8317) ERROR 09-10 16:52:50 [multiproc_executor.py:901] ValueError: The output_size of gate's and up's weight = 192 is not divisible by weight quantization block_n = 128.
+exit=1

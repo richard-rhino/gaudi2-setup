@@ -1,0 +1,20 @@
+### 30B-A3B TP=8 maxseqs16
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=8 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+ready after 11 min
+(Worker_TP7 pid=588086) INFO 09-10 20:45:45 [hpu_model_runner.py:6233] Warmup finished in 612 secs, allocated 13.32 GiB of device memory
+(Worker_TP2 pid=588081) INFO 09-10 20:45:45 [hpu_model_runner.py:6233] Warmup finished in 612 secs, allocated 13.32 GiB of device memory
+=== chat-10: 40 req, 10 users, 1024 in / 512 out ===
+| chat-10 | 10 | 1024 / 512 | 28.2 | 27.0 | 0.2 / 0.7 | 251.78 | 773.47 |
+=== chat-16: 48 req, 16 users, 1024 in / 512 out ===
+| chat-16 | 16 | 1024 / 512 | 29.8 | 27.0 | 0.2 / 1.0 | 423.93 | 1282.89 |
+=== agentic-10-32k: 20 req, 10 users, 32768 in / 1024 out ===
+| agentic-10-32k | 10 | 32768 / 1024 | 19.8 | 14.9 | 5.0 / 23.3 | 161.00 | 5194.34 |
+=== mixed-16: 48 req, 16 users, 8192 in / 768 out ===
+| mixed-16 | 16 | 8192 / 768 | 23.5 | 21.9 | 0.6 / 5.3 | 343.00 | 4049.28 |
+=== longctx-4-100k: 4 req, 4 users, 100000 in / 512 out ===
+| longctx-4-100k | 4 | 100000 / 512 | 11.8 | 7.6 | 46.7 / 71.9 | 22.80 | 4790.25 |
+=== done -> /home/gaudi2/setup/office10-Qwen_Qwen3-30B-A3B-Instruct-2507-tp8--ctx131072-mem0.85.md (server still up on :8000) ===
+### 30B-A3B TP=8 ngram-spec
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=8 extra=[--speculative-config {"method":"ngram","num_speculative_tokens":3,"prompt_lookup_max":4,"prompt_lookup_min":2}] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)

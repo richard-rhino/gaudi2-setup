@@ -1,0 +1,640 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2023-2025, Intel Corporation.
+# All Rights Reserved.
+#
+# Unauthorized copying of this file, via any medium is strictly prohibited.
+# Proprietary and confidential.
+#
+
+# Generates a makefile containing flags at $1
+# Generates a c header containing defines with same flags at $2
+#
+# inputs:
+# - $1: path to the makefile to generate
+# - $2: path to the c header to generate
+#
+# env inputs:
+# - KERNELDIR: Path to kernel's build dir, used to determine compatibility flags.
+# - OFED_PATH: Path to ofed build/source dir, used to determine ofed compatibility flags.
+#
+
+error() { >&2 echo "generate_flags.sh: $*"; exit 1; }
+
+readonly OUTPUT_M="${1:?"No output makefile path provided!"}"
+readonly OUTPUT_H="${2:?"No output header path provided!"}"
+
+if [ -z "$KERNELDIR" ]; then
+    >&2 echo "'KERNELDIR' not defined!"
+    exit 1
+fi
+
+mkdir -p "$(dirname "$OUTPUT_M")"
+mkdir -p "$(dirname "$OUTPUT_H")"
+
+# Usually, the kernel headers and kernel build files are installed in different locations, and
+# there are two ways of linking them:
+# 1. /lib/modules/$(uname -r)/build/ contains symbolic links to the directories that contain the
+#    headers/sources.
+# 2. /lib/modules/$(uname -r)/build/Makefile includes a makefile from the directory that contains
+#    the headers/sources, something like:
+#    ```
+#    $ cat /lib/modules/$(uname -r)/build/Makefile
+#    include ../../../linux-5.14.21-150500.53/Makefile
+#    ```
+#    in this case:
+#    the makefile only has 1 line                 and contains an `include...Makefile`
+if [ "$(wc -l <"$KERNELDIR/Makefile")" -eq 1 ] && grep -qP 'include.+Makefile' "$KERNELDIR/Makefile"; then
+    # Handle case 2, extract the relative path from the makefile and append it to the kernel build
+    # dir.
+    _inc="$(sed -e 's/include //' -e 's/Makefile//' "$KERNELDIR/Makefile" | xargs)"
+    # Debian's linux-headers-<ver>-<arch>/Makefile includes the common headers by ABSOLUTE path.
+    if [[ "$_inc" == /* ]]; then
+        KERNEL_HEADERS_PATH="$_inc"
+    else
+        KERNEL_HEADERS_PATH="$KERNELDIR/$_inc"
+    fi
+else
+    # Handle case 1.
+    KERNEL_HEADERS_PATH="$KERNELDIR"
+fi
+
+if [ -n "$OFED_PATH" ]; then
+    IB_PATH="$OFED_PATH"
+    IB_HEADERS_PATH="$OFED_PATH"
+else
+    IB_PATH="$KERNELDIR"
+    IB_HEADERS_PATH="$KERNEL_HEADERS_PATH"
+fi
+
+cat >"$OUTPUT_M" <<EOF
+#
+# Automatically generated file; DO NOT EDIT.
+#
+
+EOF
+
+cat >"$OUTPUT_H" <<EOF
+/*
+ * Automatically generated file; DO NOT EDIT.
+ */
+
+EOF
+
+# Start populating config file.
+function enable_config() {
+    local name=$1
+
+    echo "$name=y" >>"$OUTPUT_M"
+    echo "export $name" >>"$OUTPUT_M"
+
+    echo "#define $name 1" >>"$OUTPUT_H"
+}
+
+grep -qs "u64_to_user_ptr" "$KERNEL_HEADERS_PATH/include/linux/kernel.h" &&
+    enable_config _HAS_U64_TO_USERPTR
+
+grep -qs "DIV_ROUND_UP_ULL" "$KERNEL_HEADERS_PATH/include/linux/kernel.h" "$KERNEL_HEADERS_PATH/include/linux/math.h" &&
+    enable_config _HAS_DIV_ROUND_UP_ULL
+
+grep -qs "DIV_ROUND_DOWN_ULL" "$KERNEL_HEADERS_PATH/include/linux/kernel.h" "$KERNEL_HEADERS_PATH/include/linux/math.h" &&
+    enable_config _HAS_DIV_ROUND_DOWN_ULL
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/coresight.h" ] &&
+    enable_config _HAS_CORESIGHT_H
+
+grep -s "IS_ERR_VALUE" "$KERNEL_HEADERS_PATH/include/linux/err.h" |
+    grep -qs "(unsigned long)(void \*)(x)" &&
+    enable_config _HAS_CAST_IN_IS_ERR_VALUE
+
+grep -s -B 1 "_IOC_TYPECHECK" "$KERNEL_HEADERS_PATH/include/asm-generic/ioctl.h" |
+    grep -qs "__CHECKER__" &&
+    enable_config _HAS_FIX_IN_IOC_TYPECHECK
+
+grep -qs -iP "lower_32_bits.*ffffffff" "$KERNEL_HEADERS_PATH/include/linux/kernel.h" &&
+    enable_config _LOWER_32_BITS_USES_MASK
+
+grep -qs "dma_pool_zalloc" "$KERNEL_HEADERS_PATH/include/linux/dmapool.h" &&
+    enable_config _HAS_DMA_POOL_ZALLOC
+
+grep -qs "kref_read" "$KERNEL_HEADERS_PATH/include/linux/kref.h" &&
+    enable_config _HAS_KREF_READ
+
+grep -qs "device_add_groups" "$KERNEL_HEADERS_PATH/include/linux/device.h" &&
+    enable_config _HAS_DEVICE_ADD_GROUPS
+
+grep -qs "static inline.*device_add_group" "$KERNEL_HEADERS_PATH/include/linux/device.h" &&
+    enable_config _HAS_DEVICE_ADD_GROUP
+
+grep -qs "pci_ioremap_wc_bar" "$KERNEL_HEADERS_PATH/include/linux/pci.h" &&
+    enable_config _HAS_PCI_IOREMAP_WC_BAR
+
+grep -qs "kvmalloc_array" "$KERNEL_HEADERS_PATH/include/linux/mm.h" "$KERNEL_HEADERS_PATH/include/linux/slab.h" &&
+    enable_config _HAS_KVMALLOC_ARRAY
+
+grep -qs "kvcalloc" "$KERNEL_HEADERS_PATH/include/linux/mm.h" "$KERNEL_HEADERS_PATH/include/linux/slab.h" &&
+    enable_config _HAS_KVCALLOC
+
+grep -qs "pci_alloc_irq_vectors" "$KERNEL_HEADERS_PATH/include/linux/pci.h" &&
+    enable_config _HAS_PCI_ALLOC_IRQ_VECTORS
+
+grep -qs "struct frame_vector" "$KERNEL_HEADERS_PATH/include/linux/mm.h" &&
+    enable_config _HAS_FRAME_VECTOR
+
+grep -qs "unpin_user_pages_dirty_lock" "$KERNEL_HEADERS_PATH/include/linux/mm.h" &&
+    enable_config _HAS_USER_PAGES_DIRTY_LOCK
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/dax.h" ] &&
+    enable_config _HAS_DAX_H
+
+grep -qs "vma_is_fsdax" "$KERNEL_HEADERS_PATH/include/linux/fs.h" &&
+    enable_config _HAS_VMA_IS_FSDAX
+
+grep -qs "hwmon_device_register_with_info" "$KERNEL_HEADERS_PATH/include/linux/hwmon.h" &&
+    enable_config _HAS_HWMON_DEVICE_REGISTER_WITH_INFO
+
+grep -qs "HWMON_I_ENABLE" "$KERNEL_HEADERS_PATH/include/linux/hwmon.h" &&
+    enable_config _HAS_HWMON_HWMON_I_ENABLE
+
+grep -qs "HWMON_T_ENABLE" "$KERNEL_HEADERS_PATH/include/linux/hwmon.h" &&
+    enable_config _HAS_HWMON_HWMON_T_ENABLE
+
+grep -qs "HWMON_PWM_ENABLE" "$KERNEL_HEADERS_PATH/include/linux/hwmon.h" &&
+    enable_config _HAS_HWMON_HWMON_PWM_ENABLE
+
+grep -qs "hwmon_max" "$KERNEL_HEADERS_PATH/include/linux/hwmon.h" &&
+    enable_config _HAS_HWMON_HWMON_MAX
+
+grep -s -A 2 "struct gen_pool_chunk {" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" |
+    grep -qs "atomic_long_t avail" &&
+    enable_config _HAS_GEN_POOL_CHUNK_WITH_ATOMIC_LONG
+
+grep -qs "gen_pool_dma_alloc" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ALLOC
+
+grep -qs "gen_pool_dma_alloc_align" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ALLOC_ALIGN
+
+grep -qs "gen_pool_dma_zalloc" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ZALLOC
+
+grep -qs "cdev_device_add" "$KERNEL_HEADERS_PATH/include/linux/cdev.h" &&
+    enable_config _HAS_CDEV_DEVICE_ADD
+
+grep -qs "ktime_get_raw_ns" "$KERNEL_HEADERS_PATH/include/linux/timekeeping.h" &&
+    enable_config _HAS_KTIME_GET_RAW_NS
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/bitfield.h" ] &&
+    enable_config _HAS_BITFIELD_H
+
+grep -s -A 1 "GENMASK" "$KERNEL_HEADERS_PATH/include/linux/bitops.h" "$KERNEL_HEADERS_PATH/include/linux/bits.h" |
+    grep -qs "(1UL << (l))" &&
+    enable_config _HAS_OVERFLOW_PROT_IN_GENMASK
+
+grep -qs "struct ethtool_link_ksettings" "$KERNEL_HEADERS_PATH/include/linux/ethtool.h" &&
+    enable_config _HAS_ETHTOOL_LINK_KSETTINGS
+
+grep -qs "ndo_size" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" &&
+    enable_config _HAS_NDO_FIELD_NDO_SIZE
+
+grep -s -A50 "struct net_device_ops_extended {" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" |
+    grep -qs "ndo_change_mtu" &&
+    enable_config _HAS_NDO_EXT_CHANGE_MTU
+
+grep -qs "min_mtu" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" &&
+    enable_config _HAS_MIN_MAX_MTU
+
+grep -qs "array_index_nospec" "$KERNEL_HEADERS_PATH/include/linux/nospec.h" &&
+    enable_config _HAS_NO_SPEC
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/sched/signal.h" ] &&
+    enable_config _HAS_SCHED_SIGNAL_H
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/io-64-nonatomic-lo-hi.h" ] &&
+    enable_config _HAS_IO_64_NONATOMIC_LO_HI_H
+
+grep -s "access_ok" "$KERNEL_HEADERS_PATH/include/asm-generic/uaccess.h" |
+    grep -qs "type" &&
+    enable_config _HAS_TYPE_ARG_IN_ACCESS_OK
+
+grep -qs "dma_mmap_coherent" "$KERNEL_HEADERS_PATH/include/linux/dma-mapping.h" &&
+    grep -qs "dma_can_mmap" "$KERNEL_HEADERS_PATH/include/linux/dma-mapping.h" &&
+    enable_config _HAS_HAS_DMA_MMAP_COHERENT
+
+grep -qs "dma_map_resource" "$KERNEL_HEADERS_PATH/include/linux/dma-mapping.h" &&
+    enable_config _HAS_DMA_MAP_RESOURCE
+
+grep -s -A 5 "dma_map_resource" "$KERNEL_HEADERS_PATH/include/linux/dma-mapping.h" |
+    grep -qs "struct dma_attrs" &&
+    enable_config _HAS_DMA_MAP_RESOURCE_WITH_DMA_ATTRS
+
+grep -qs "define static_assert" "$KERNEL_HEADERS_PATH/include/linux/build_bug.h" &&
+    enable_config _HAS_STATIC_ASSERT
+
+grep -s -A 20 "struct pci_host_bridge {" "$KERNEL_HEADERS_PATH/include/linux/pci.h" |
+    grep -qs "no_ext_tags" &&
+    enable_config _HAS_PCI_CONFIGURE_EXTENDED_TAGS
+
+grep -qs "strscpy" "$KERNEL_HEADERS_PATH/include/linux/string.h" &&
+    enable_config _HAS_STRSCPY
+
+grep -s "get_user_pages_locked" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "struct task_struct" &&
+    enable_config _HAS_GET_USER_PAGES_LOCKED_WITH_TASK_PTR
+
+grep -s "int (\*attach)" "$KERNEL_HEADERS_PATH/include/linux/dma-buf.h" |
+    grep -qs "struct device" &&
+    enable_config _HAS_DMA_BUF_OP_ATTACH_WITH_DEV
+
+grep -qs "ib_umem_dmabuf_get" "$KERNEL_HEADERS_PATH/include/rdma/ib_umem.h" &&
+    enable_config _HAS_IB_UMEM_DMABUF_GET
+
+grep -qs "mmap_read_lock" "$KERNEL_HEADERS_PATH/include/linux/mmap_lock.h" &&
+    enable_config _HAS_MMAP_READ_LOCK
+
+grep -qs "mmgrab" "$KERNEL_HEADERS_PATH/include/linux/sched/mm.h" "$KERNEL_HEADERS_PATH/include/linux/sched.h" &&
+    enable_config _HAS_MMGRAB
+
+grep -s "get_user_pages_remote" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "struct task_struct" &&
+    enable_config _HAS_GET_USER_PAGES_REMOTE_WITH_TASK_PTR
+
+grep -s -P "get_user_pages[^\w]" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "struct task_struct" &&
+    enable_config _HAS_GET_USER_PAGES_WITH_TASK_PTR
+
+grep -s -A 1 "get_user_pages" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "gup_flags" &&
+    enable_config _HAS_GET_USER_PAGES_WITH_GUP_FLAGS
+
+grep -s -A 2 " get_user_pages" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "vmas" &&
+    enable_config _HAS_GET_USER_PAGES_WITH_VMAS
+
+grep -qs "get_user_pages_remote" "$KERNEL_HEADERS_PATH/include/linux/mm.h" &&
+    enable_config _HAS_GET_USER_PAGES_REMOTE
+
+grep -s -A 3 "get_user_pages_remote" "$KERNEL_HEADERS_PATH/include/linux/mm.h" |
+    grep -qs "locked" &&
+    enable_config _HAS_GET_USER_PAGES_REMOTE_LOCKED
+
+grep -qs "jiffies64_to_msecs" "$KERNEL_HEADERS_PATH/include/linux/jiffies.h" &&
+    enable_config _HAS_JIFFIES64_TO_MSEC
+
+grep -qs "__rcu \*ifa_list;" "$KERNEL_HEADERS_PATH/include/linux/inetdevice.h" &&
+    enable_config _HAS_RCU_IFA_LIST
+
+grep -qs "peer2peer" "$KERNEL_HEADERS_PATH/include/linux/dma-buf.h" &&
+    enable_config _HAS_PEER2PEER
+
+enable_config _HAS_AUX_BUS_H
+
+if ! grep -qs "struct auxiliary_device_id" {"$KERNEL_HEADERS_PATH","$IB_HEADERS_PATH"}/include/linux/mod_devicetable.h; then
+    enable_config _HAS_NO_AUX_BUS
+
+    # We're using our compat aux bus, it's using the void version.
+    enable_config _HAS_AUX_VOID_REMOVE_H
+
+    BUS_TYPE=$(grep -hs -A 30 -F "struct bus_type {" "$KERNEL_HEADERS_PATH/include/linux/device.h" \
+                                                     "$KERNEL_HEADERS_PATH/include/linux/device/bus.h")
+    BUS_TYPE_MATCH=$(printf "%s\n" "$BUS_TYPE" | grep -F "(*match)" | xargs)
+    BUS_TYPE_UEVENT=$(printf "%s\n" "$BUS_TYPE" | grep -F "(*uevent)" | xargs)
+    BUS_TYPE_REMOVE=$(printf "%s\n" "$BUS_TYPE" | grep -F "(*remove)" | xargs)
+
+    case "$BUS_TYPE_MATCH" in
+        *"const struct device_driver *"* ) enable_config _BUS_TYPE_fn_MATCH_arg_CONST_DEVICE_DRIVER ;;
+        *"struct device_driver *"* ) enable_config _BUS_TYPE_fn_MATCH_arg_DEVICE_DRIVER ;;
+        * ) error "unexpected arguments in struct bus_type::match: '$BUS_TYPE_MATCH'" ;;
+    esac
+
+    case "$BUS_TYPE_UEVENT" in
+        *"const struct device *"* ) enable_config _BUS_TYPE_fn_UEVENT_arg_CONST_DEVICE ;;
+        *"struct device *"* ) enable_config _BUS_TYPE_fn_UEVENT_arg_DEVICE ;;
+        * ) error "unexpected arguments in struct bus_type::uevent: '$BUS_TYPE_UEVENT'" ;;
+    esac
+
+    case "$BUS_TYPE_REMOVE" in
+        "int "* ) enable_config _BUS_TYPE_fn_REMOVE_ret_INT ;;
+        "void "* ) enable_config _BUS_TYPE_fn_REMOVE_ret_VOID ;;
+        * ) error "unexpected return type in struct bus_type::remove: '$BUS_TYPE_REMOVE'" ;;
+    esac
+
+    DEVICE=$(grep -hs -A 110 -F "struct device {" "$KERNEL_HEADERS_PATH/include/linux/device.h")
+    DEVICE_BUS=$(printf "%s\n" "$DEVICE" | grep -F "*bus;" | xargs)
+
+    case "$DEVICE_BUS" in
+        "const struct bus_type"* ) enable_config _DEVICE_member_BUS_type_CONST_BUS_TYPE ;;
+        "struct bus_type"* ) enable_config _DEVICE_member_BUS_type_BUS_TYPE ;;
+        * ) error "unexpected type of *bus in struct device: '$DEVICE_BUS'" ;;
+    esac
+else
+    grep -qs -F "void (*remove)(struct auxiliary_device *auxdev)" "$KERNEL_HEADERS_PATH/include/linux/auxiliary_bus.h" "$IB_HEADERS_PATH/include/linux/auxiliary_bus.h" &&
+        enable_config _HAS_AUX_VOID_REMOVE_H
+fi
+
+grep "EXPORT_SYMBOL_NS_GPL" "$KERNEL_HEADERS_PATH/include/linux/export.h" | grep -qs "_gpl" &&
+    enable_config _HAS_EXPORT_SYMBOL_NS_GPL_LOWERCASE
+
+grep "EXPORT_SYMBOL_NS_GPL" "$KERNEL_HEADERS_PATH/include/linux/export.h" | grep -qs "__EXPORT_SYMBOL_NS" &&
+    enable_config _HAS__EXPORT_SYMBOL_NS
+
+grep -s -A 2 "int __irq_alloc_descs" "$KERNEL_HEADERS_PATH/include/linux/irq.h" |
+    grep -qs "affinity" &&
+    enable_config _HAS_IRQ_ALLOC_DESCS_AFFINITY
+
+grep -s "void handle_simple_irq" "$KERNEL_HEADERS_PATH/include/linux/irq.h" |
+    grep -qs "unsigned int" &&
+    enable_config _HAS_HANDLE_SIMPLE_IRQ_2_ARGUMENTS
+
+grep -qs "__poll_t" "$KERNEL_HEADERS_PATH/include/uapi/linux/types.h" &&
+    enable_config _HAS_POLL_T
+
+grep -s "hmm_range_fault" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" |
+    grep -qs "flags" &&
+    enable_config _HAS_HMM_RANGE_FAULT_FLAGS
+
+grep -s -A 5 "struct hmm_range" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" |
+    grep -qs "hmm_pfns" &&
+    enable_config _HAS_HMM_RANGE_HMM_PFNS
+
+grep -qs "mmu_interval_read_begin" "$KERNEL_HEADERS_PATH/include/linux/mmu_notifier.h" &&
+    enable_config _HAS_MMU_INTERVAL_READ_BEGIN
+
+grep -s -A 10 "struct hmm_range {" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" |
+    grep -qs notifier &&
+    enable_config _HAS_HMM_RANGE_INTERVAL_NOTIFIER
+
+grep -s -A 10 "struct hmm_range {" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" |
+    grep -qs '\*flags' &&
+    enable_config _HAS_MMU_RANGE_FLAGS
+
+grep -qs "hmm_pfn_to_page" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" &&
+    enable_config _HAS_HMM_PFN_TO_PAGE
+
+grep -qs "HMM_PFN_DEVICE_PRIVATE" "$KERNEL_HEADERS_PATH/include/linux/hmm.h" &&
+    enable_config _HAS_HMM_PFN_DEVICE_PRIVATE
+
+grep -qs "bitmap_find_next_zero_area_off" "$KERNEL_HEADERS_PATH/include/linux/bitmap.h" &&
+    enable_config _HAS_BITMAP_FIND_NEXT_ZERO_AREA_OFF
+
+grep -qs "bitmap_zalloc" "$KERNEL_HEADERS_PATH/include/linux/bitmap.h" &&
+    enable_config _HAS_BITMAP_ZALLOC
+
+grep -qs "bitmap_free" "$KERNEL_HEADERS_PATH/include/linux/bitmap.h" &&
+    enable_config _HAS_BITMAP_FREE
+
+grep -qs "gen_pool_dma_alloc_algo" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ALLOC_ALGO
+
+grep -qs "struct genpool_data_align {" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GENPOOL_DATA_ALIGN_STRUCT
+
+grep -qs "gen_pool_first_fit_align" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_FIRST_FIT_ALIGN
+
+grep -s -A 5 "typedef unsigned long (\*genpool_algo_t)" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" |
+    grep -qs "unsigned long start_addr" &&
+    enable_config _HAS_GENPOOL_ALGO_T_WITH_START_ADDR
+
+grep -qs "gen_pool_dma_zalloc_align" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ZALLOC_ALIGN
+
+grep -qs "gen_pool_dma_zalloc_algo" "$KERNEL_HEADERS_PATH/include/linux/genalloc.h" &&
+    enable_config _HAS_GEN_POOL_DMA_ZALLOC_ALGO
+
+grep -qs "dma_map_sgtable" "$KERNEL_HEADERS_PATH/include/linux/dma-mapping.h" &&
+    enable_config _HAS_DMA_MAP_SGTABLE
+
+grep -qs "device_iommu_mapped" "$KERNEL_HEADERS_PATH/include/linux/device.h" &&
+    enable_config _HAS_DEVICE_IOMMU_MAPPED
+
+grep -qs "FOLL_POPULATE" "$KERNEL_HEADERS_PATH/include/linux/mm.h" &&
+    enable_config _HAS_FOLL_POPULATE
+
+grep -qs -w "dma_resv_wait_timeout" "$KERNEL_HEADERS_PATH/include/linux/dma-resv.h" &&
+    enable_config _HAS_DMA_RESV_WAIT_TIMEOUT
+
+grep -qs -w "DMA_RESV_USAGE_KERNEL" "$KERNEL_HEADERS_PATH/include/linux/dma-resv.h" &&
+    enable_config _HAS_DMA_RESV_USAGE_KERNEL
+
+grep -qs -w "get_random_u32" "$KERNEL_HEADERS_PATH/include/linux/random.h" &&
+    enable_config _HAS_RANDOM_U32
+
+grep -qs "check_add_overflow" "$KERNEL_HEADERS_PATH/include/linux/overflow.h" &&
+    enable_config _HAS_CHECK_ADD_OVERFLOW
+
+grep -qs -w "supported_coalesce_params" "$KERNEL_HEADERS_PATH/include/linux/ethtool.h" &&
+    enable_config _HAS_ETHTOOL_COALESCE_PARAMS
+
+grep -s -w -A 3 "get_coalesce" "$KERNEL_HEADERS_PATH/include/linux/ethtool.h" |
+    grep -qs "struct netlink_ext_ack" &&
+    enable_config _HAS_ETHTOOL_COALESCE_EXT_PARAMS
+
+[ -f "$KERNEL_HEADERS_PATH/include/drm/drm_accel.h" ] &&
+    enable_config _HAS_DRM_ACCEL_H
+
+grep -s -A 200 'struct drm_driver {' "$KERNEL_HEADERS_PATH/include/drm/drm_drv.h" 2>/dev/null |
+    grep -qm1 'char \*date' &&
+    enable_config _HAS_DRM_DRIVER_DATE
+
+grep -s -A 10 "struct class {" "$KERNEL_HEADERS_PATH/include/linux/device.h" "$KERNEL_HEADERS_PATH/include/linux/device/class.h" |
+    grep -s "devnode" |
+    grep -qsi "const struct device" &&
+    enable_config _HAS_DEVNODE_WITH_CONST_DEVICE
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/sched/clock.h" ] &&
+    enable_config _HAS_SCHED_CLOCK_H
+
+grep -qs "vm_flags_set" "$KERNEL_HEADERS_PATH/include/linux/mm.h" &&
+    enable_config _HAS_VM_FLAGS_SET
+
+grep -qs "struct xarray\|RH_KABI_RENAME(radix_tree_root, xarray)" "$KERNEL_HEADERS_PATH/include/linux/xarray.h" &&
+    enable_config _HAS_XARRAY_LIB
+
+grep -qs "void idr_remove" "$KERNEL_HEADERS_PATH/include/linux/idr.h" &&
+    enable_config _HAS_OLD_IDR_LIB
+
+grep -qs "xa_lock" "$KERNEL_HEADERS_PATH/include/linux/xarray.h" &&
+    enable_config _HAS_XA_LOCK_DEFINES
+
+grep -qs "void \*memset32" "$KERNEL_HEADERS_PATH/include/linux/string.h" &&
+    enable_config _HAS_MEMSET32
+
+grep -s -A 100 "struct device {" "$KERNEL_HEADERS_PATH/include/linux/device.h" |
+    grep -qs "const struct class" &&
+    enable_config _HAS_DEVICE_WITH_CONST_CLASS
+
+grep -s "class_create" "$KERNEL_HEADERS_PATH/include/linux/device.h" \
+    "$KERNEL_HEADERS_PATH/include/linux/device/class.h" |
+    grep -qs "owner" &&
+    enable_config _HAS_CLASS_CREATE_WITH_MODULE
+
+grep -qs "debugfs_root" "$KERNEL_HEADERS_PATH/include/drm/drm_device.h" &&
+    enable_config _HAS_DEBUGFS_ROOT_IN_DRM_DEVICE
+
+grep -qs "pci_enable_pcie_error_reporting" "$KERNEL_HEADERS_PATH/include/linux/aer.h" &&
+    enable_config _HAS_PCI_ENABLE_PCIE_ERROR_REPORTING
+
+grep -qs "irq_set_affinity_and_hint" "$KERNEL_HEADERS_PATH/include/linux/interrupt.h" &&
+    enable_config _HAS_IRQ_AFFINITY_NEW_INTERFACE
+
+grep -qs "void eventfd_signal" "$KERNEL_HEADERS_PATH/include/linux/eventfd.h" &&
+    enable_config _HAS_EVENTFD_SIGNAL_SINGLE_PARAM
+
+grep -qs -wF "__assign_str(dst)" "$KERNEL_HEADERS_PATH/include/trace/stages/stage6_event_callback.h" &&
+    enable_config _HAS_ASSIGN_STR_ONE_ARG
+
+grep -s -w "kernel_write" "$KERNEL_HEADERS_PATH/include/linux/fs.h" |
+    grep -qs ", loff_t \*" &&
+    enable_config _HAS_KERNEL_WRITE_WITH_PTR
+
+grep -qs "200000baseKR4_Full_BIT" "$KERNEL_HEADERS_PATH/include/uapi/linux/ethtool.h" &&
+    enable_config _HAS_200G_KSETTINGS
+
+grep -qs "400000baseKR4_Full_BIT" "$KERNEL_HEADERS_PATH/include/uapi/linux/ethtool.h" "$IB_HEADERS_PATH/include/linux/ethtool.h" &&
+    enable_config _HAS_100G_PER_LANE_KSETTINGS
+
+grep -qs "ib_alloc_device(drv_struct, member)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_SAFE_IB_ALLOC_DEVICE
+
+grep -s -A 1 "int ib_register_device" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs dma_device &&
+    enable_config _HAS_DMA_IB_REGISTER_DEVICE
+
+grep -s "get_port_immutable" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs u32 &&
+    enable_config _HAS_EX_RDMA_PORTS
+
+grep -qs "DECLARE_RDMA_OBJ_SIZE(ib_qp)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IB_QP_SIZE
+
+grep -qs "DECLARE_RDMA_OBJ_SIZE(ib_cq)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IB_CQ_SIZE
+
+grep -qs "rdma_ah_init_attr" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_AH_INIT_ATTR
+
+grep -qs "int (\*create_qp)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_INT_CREATE_QP
+
+grep -qs "int (\*dealloc_pd)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_INT_DEALLOC_PD
+
+grep -qs "int (\*destroy_ah)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_INT_DESTROY_AH
+
+grep -qs -F "int (*create_cq)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_INT_CREATE_CQ &&
+    grep -s -F -A 1 "int (*create_cq)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs -F "struct uverbs_attr_bundle" &&
+    enable_config _HAS_CREATE_CQ_ATTRS
+
+grep -qs -F "int (*destroy_cq)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_INT_DESTROY_CQ
+
+grep -qs "reg_user_mr_dmabuf" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_REG_USER_MR_DMABUF &&
+    grep -s -A 10 "reg_user_mr_dmabuf" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs "struct uverbs_attr_bundle" &&
+    enable_config _HAS_REG_USER_MR_DMABUF_ATTR
+
+grep -qs "uverbs_ex_cmd_mask" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_EX_CMD_MASK
+
+grep -qs "RDMA_DRIVER_HBL" "$IB_HEADERS_PATH/include/uapi/rdma/ib_user_ioctl_verbs.h" &&
+    enable_config _HAS_RDMA_DRIVER_HBL
+
+grep -qs "ibdev_printk" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IBDEV_PRINT
+
+grep -s "reg_user_mr" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs attr &&
+    enable_config _HAS_REG_MR_ATTR
+
+grep -s -A 200 'struct ib_mr {' "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" 2>/dev/null |
+    grep -qm1 'struct ib_dmah \*dmah' &&
+    enable_config _HAS_IB_MR_DMAH
+
+grep -s -A 1 "struct ib_device_ops {" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" |
+    grep -qs owner &&
+    enable_config _HAS_DEVICE_OPS_INFO
+
+grep -qs "enum ib_port_phys_state" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IB_PORT_PHYS_STATE
+
+grep -qs "void (\*mmap_free)" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_MMAP_FREE
+
+grep -qs "rdma_user_mmap_entry_insert_range" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_RDMA_USER_MMAP_ENTRY_INSERT_RANGE
+
+grep -qs -w "uverbs_copy_to_struct_or_zero" "$IB_PATH/Module.symvers" &&
+    enable_config _HAS_UVERBS_COPY_TO_STRUCT_OR_ZERO
+
+grep -qs "unsigned int txqueue" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" &&
+    enable_config _HAS_NDO_TX_TIMEOUT_TXQUEUE
+
+grep -qs "void (\*ndo_get_stats64)" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" &&
+    enable_config _HAS_VOID_NDO_GET_STATS64
+
+if [ -n "$OFED_PATH" ]; then
+    enable_config _HAS_IB_DEV_DBG
+fi
+
+grep -s -A 4 "netif_napi_add" "$KERNEL_HEADERS_PATH/include/linux/netdevice.h" |
+    grep -qs '@weight' &&
+    enable_config _HAS_NAPI_ADD_WEIGHT
+
+grep -qs -w "IB_SPEED_NDR" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IB_SPEED_NDR
+
+grep -qs -w "alloc_hw_device_stats" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_IB_DEVICE_STATS
+
+grep -qs -w "struct rdma_stat_desc" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_STRUCT_RDMA_STAT_DESC
+
+grep -qs -w "fill_res_qp_entry" "$IB_HEADERS_PATH/include/rdma/ib_verbs.h" &&
+    enable_config _HAS_RES_QP_ENTRY
+
+grep -qs -w "rdma_nl_put_driver_string" "$IB_HEADERS_PATH/include/rdma/restrack.h" &&
+    enable_config _HAS_RES_RDMA_NL_PUT_DRIVER_STRING
+
+grep -qs "enum rdma_nldev_print_type" "$IB_HEADERS_PATH/include/uapi/rdma/rdma_netlink.h" &&
+    enable_config _HAS_ENUM_RDMA_NLDEV_PRINT_TYPE
+
+grep -qs "eth_hw_addr_set" "$KERNEL_HEADERS_PATH/include/linux/etherdevice.h" &&
+    enable_config _HAS_ETH_HW_ADDR_SET
+
+[ -f "$KERNEL_HEADERS_PATH/include/linux/units.h" ] &&
+    enable_config _HAS_UNITS_H
+
+grep -qs "define MAX_ORDER 11" "$KERNEL_HEADERS_PATH/include/linux/mmzone.h" &&
+    enable_config _HAS_MAX_ORDER_11
+
+grep -qs "define MAX_ORDER 10" "$KERNEL_HEADERS_PATH/include/linux/mmzone.h" &&
+    enable_config _HAS_MAX_ORDER_10
+
+grep -qs "define MAX_PAGE_ORDER" "$KERNEL_HEADERS_PATH/include/linux/mmzone.h" &&
+    enable_config _HAS_MAX_PAGE_ORDER
+
+grep -qs -F "ethtool_puts" "$KERNEL_HEADERS_PATH/include/linux/ethtool.h" "$IB_PATH/Module.symvers" &&
+    enable_config _HAS_ETHTOOL_PUTS
+
+if [ -n "$OFED_PATH" ]; then
+    grep -qs -F "ethtool_puts" "$OFED_PATH/include/linux/ethtool.h" "$IB_PATH/Module.symvers" &&
+        enable_config _HAS_ETHTOOL_PUTS
+fi
+
+grep -qs -F "read_poll_timeout" "$KERNEL_HEADERS_PATH/include/linux/iopoll.h" &&
+    enable_config _HAS_READ_POLL_TIMEOUT
+
+grep -qs -F "sysfs_emit" "$KERNEL_HEADERS_PATH/include/linux/sysfs.h" &&
+    enable_config _HAS_SYSFS_EMIT
+
+grep -s -A 30 'struct attribute_group {' "$KERNEL_HEADERS_PATH/include/linux/sysfs.h" |
+    grep -qs "const struct bin_attribute.*bin_attrs" &&
+    enable_config _HAS_CONST_BIN_ATTRIBUTE
+
+exit 0

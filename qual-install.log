@@ -1,0 +1,38 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libsensors-config libsensors5 lm-sensors
+Suggested packages:
+  fancontrol read-edid i2c-tools
+The following NEW packages will be installed:
+  habanalabs-qual libsensors-config libsensors5 lm-sensors
+0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+Need to get 35.0 MB of archives.
+After this operation, 168 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 libsensors-config all 1:3.6.0-7.1 [14.3 kB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 libsensors5 amd64 1:3.6.0-7.1 [34.2 kB]
+Get:3 http://deb.debian.org/debian bookworm/main amd64 lm-sensors amd64 1:3.6.0-7.1 [97.2 kB]
+Get:4 https://vault.habana.ai/artifactory/debian jammy/main amd64 habanalabs-qual amd64 1.24.1-482 [34.9 MB]
+Fetched 35.0 MB in 2s (15.3 MB/s)
+Selecting previously unselected package libsensors-config.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 98424 files and directories currently installed.)
+Preparing to unpack .../libsensors-config_1%3a3.6.0-7.1_all.deb ...
+Unpacking libsensors-config (1:3.6.0-7.1) ...
+Selecting previously unselected package libsensors5:amd64.
+Preparing to unpack .../libsensors5_1%3a3.6.0-7.1_amd64.deb ...
+Unpacking libsensors5:amd64 (1:3.6.0-7.1) ...
+Selecting previously unselected package lm-sensors.
+Preparing to unpack .../lm-sensors_1%3a3.6.0-7.1_amd64.deb ...
+Unpacking lm-sensors (1:3.6.0-7.1) ...
+Selecting previously unselected package habanalabs-qual.
+Preparing to unpack .../habanalabs-qual_1.24.1-482_amd64.deb ...
+Unpacking habanalabs-qual (1.24.1-482) ...
+Setting up libsensors-config (1:3.6.0-7.1) ...
+Setting up libsensors5:amd64 (1:3.6.0-7.1) ...
+Setting up lm-sensors (1:3.6.0-7.1) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/lm-sensors.service → /lib/systemd/system/lm-sensors.service.
+Setting up habanalabs-qual (1.24.1-482) ...
+Habanalabs Qual package installed successfully
+Processing triggers for libc-bin (2.36-9+deb12u14) ...
+Processing triggers for man-db (2.11.2-2) ...

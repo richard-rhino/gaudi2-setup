@@ -1,0 +1,720 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+INFO 09-10 15:08:05 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:08:05 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:08:05 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:08:05 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:08:05 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:08:05 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:08:05 [__init__.py:237] Platform plugin hpu is activated
+INFO 09-10 15:08:05 [__init__.py:237] Platform plugin hpu is activated
+WARNING 09-10 15:08:05 [platform.py:369] Pin memory is not supported on HPU.
+INFO 09-10 15:08:08 [importing.py:53] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 15:08:08 [importing.py:88] Triton not installed or not compatible; certain GPU-related functions will not be available.
+WARNING 09-10 15:08:09 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:08:09 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:08:09 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:08:09 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+INFO 09-10 15:08:10 [nixl_utils.py:32] Setting UCX_RCACHE_MAX_UNRELEASED to '1024' to avoid a rare memory leak in UCX when using NIXL.
+WARNING 09-10 15:08:10 [nixl_utils.py:58] NIXL is not available
+WARNING 09-10 15:08:10 [nixl_utils.py:60] NIXL agent config is not available
+WARNING 09-10 15:08:10 [registry.py:159] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7f4e5e799990>. It is overwritten by the new one.
+/opt/src/vllm/vllm/benchmarks/throughput.py:1159: UserWarning: Both --input-len and --random-input-len are specified. The random version (--random-input-len) will be preferred in this run.
+  validate_args(args)
+/opt/src/vllm/vllm/benchmarks/throughput.py:1159: UserWarning: Both --output-len and --random-output-len are specified. The random version (--random-output-len) will be preferred in this run.
+  validate_args(args)
+/opt/src/vllm/vllm/benchmarks/throughput.py:1159: UserWarning: Both --prefix-len and --random-prefix-len are specified. The random version (--random-prefix-len) will be preferred in this run.
+  validate_args(args)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+When dataset path is not set, it will default to random dataset
+INFO 09-10 15:08:12 [utils.py:90] Sampling input_len from [1024, 1024] and output_len from [128, 128]
+INFO 09-10 15:08:13 [api_utils.py:273] non-default args: {'tokenizer': 'Qwen/Qwen3.6-35B-A3B', 'trust_remote_code': True, 'dtype': 'bfloat16', 'max_model_len': 2048, 'gpu_memory_utilization': 0.5, 'max_num_seqs': 128, 'enable_lora': None, 'reasoning_parser_plugin': '', 'enable_bf16x3_router_gemm': False, 'model': 'Qwen/Qwen3.6-35B-A3B'}
+INFO 09-10 15:08:14 [model.py:623] Resolved architecture: Qwen3_5MoeForConditionalGeneration
+INFO 09-10 15:08:14 [model.py:1788] Using max model len 2048
+WARNING 09-10 15:08:14 [platform.py:132] This is a workaround! Please check the NOTE in the get_device_total_memory definition.
+INFO 09-10 15:08:14 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=8192.
+INFO 09-10 15:08:14 [vllm.py:1109] Asynchronous scheduling is enabled.
+INFO 09-10 15:08:14 [kernel.py:295] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+INFO 09-10 15:08:14 [platform.py:258] [HPU] Forcing CompilationMode.NONE compilation mode
+INFO 09-10 15:08:14 [compilation.py:329] Enabled custom fusions: norm_quant, act_quant
+[transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+INFO 09-10 15:08:30 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:08:30 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:08:30 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:08:30 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:08:30 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:08:30 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:08:30 [__init__.py:237] Platform plugin hpu is activated
+INFO 09-10 15:08:30 [__init__.py:237] Platform plugin hpu is activated
+WARNING 09-10 15:08:30 [platform.py:369] Pin memory is not supported on HPU.
+INFO 09-10 15:08:32 [importing.py:53] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 15:08:32 [importing.py:88] Triton not installed or not compatible; certain GPU-related functions will not be available.
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [nixl_utils.py:58] NIXL is not available
+(EngineCore pid=33021) WARNING 09-10 15:08:33 [nixl_utils.py:60] NIXL agent config is not available
+(EngineCore pid=33021) WARNING 09-10 15:08:34 [registry.py:159] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7efc50245360>. It is overwritten by the new one.
+(EngineCore pid=33021) INFO 09-10 15:08:34 [core.py:116] Initializing a V1 LLM engine (v0.26.0) with config: model='Qwen/Qwen3.6-35B-A3B', speculative_config=None, tokenizer='Qwen/Qwen3.6-35B-A3B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=2048, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=None, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=hpu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3.6-35B-A3B, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'hpu_backend', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': None, 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': None, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_bf16x3_router_gemm=False, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=33021) Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+(EngineCore pid=33021) INFO 09-10 15:08:36 [parallel_state.py:1615] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://10.x.x.x:44547 backend=hccl
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 1
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 128
+CPU RAM       : 125 GB
+------------------------------------------------------------------------------
+(EngineCore pid=33021) INFO 09-10 15:08:39 [parallel_state.py:1946] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+fatal: not a git repository (or any parent up to mount point /)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:28] Environment:
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     hw: gaudi2
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     build: 1.24.1.482
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     engine_version: v1
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     bridge_mode: eager
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     model_type: qwen3_5_moe
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     prefix_caching: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     vllm_gaudi_commit: Error getting commit hash
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:28] Features:
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     fp32_alibi_biases: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     fp32_softmax: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     fused_block_softmax_adjustment: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     fused_block_softmax: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     prompt_attn_impl: fsdpa_impl
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     skip_warmup: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     merged_prefill: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     use_contiguous_pa: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     use_bucketing: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     bucketing_strategy: exp
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     defrag: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     regional_compilation: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     dynamic_shapes_compilation: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     fullgraph_compilation: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     scale_adjustment: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     flatten_input: True
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     high_level_profiler_enabled: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     track_graph_compilation: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     per_token_kv_scaling_support: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     moe_chunk: 
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     moe_token_boundary: 
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     row_parallel_chunks: 1
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     row_parallel_chunk_threshold: 8192
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     use_dispatch_fn: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     use_hpu_aligned_scale: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     enable_fsdpa_slicing: False
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:28] User flags:
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     PT_HPU_WEIGHT_SHARING: 0
+(EngineCore pid=33021) INFO 09-10 15:08:39 [runtime.py:32]     RUNTIME_SCALE_PATCHING: 1
+(EngineCore pid=33021) INFO 09-10 15:08:39 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=33021) INFO 09-10 15:08:39 [hpu_model_runner.py:1394] GDN layers detected (30): VLLM_USE_HYBRID_CACHE=1, VLLM_USE_NAIVE_MAMBA_CACHE_SHARING=0, VLLM_COMPACT_GDN=1
+(EngineCore pid=33021) INFO 09-10 15:08:39 [hpu_model_runner.py:1522] Bucketing is ON.
+(EngineCore pid=33021) INFO 09-10 15:08:39 [hpu_worker.py:247] QUANT_CONFIG unchanged: None
+(EngineCore pid=33021) WARNING 09-10 15:08:39 [hpu_model_runner.py:1211] Setting OMP_NUM_THREADS to 128 and torch.set_num_threads to 128 for 128 available CPU cores and world size 1
+(EngineCore pid=33021) INFO 09-10 15:08:39 [hpu_model_runner.py:4741] Starting to load model Qwen/Qwen3.6-35B-A3B...
+(EngineCore pid=33021) INFO 09-10 15:08:39 [interface.py:414] Using default backend AttentionBackendEnum.TORCH_SDPA for vit attention
+(EngineCore pid=33021) INFO 09-10 15:08:39 [mm_encoder_attention.py:373] Using AttentionBackendEnum.TORCH_SDPA for MMEncoderAttention.
+(EngineCore pid=33021) INFO 09-10 15:08:39 [qwen_gdn_linear_attn.py:150] Using Triton/FLA GDN prefill kernel (requested=auto, head_k_dim=128).
+(EngineCore pid=33021) INFO 09-10 15:08:39 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=33021) INFO 09-10 15:08:40 [weight_utils.py:869] Filesystem type for checkpoints: EXT4. Checkpoint size: 66.97 GiB. Available RAM: 81.05 GiB.
+(EngineCore pid=33021) INFO 09-10 15:08:40 [weight_utils.py:892] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=33021) Loading safetensors checkpoint shards:   0% Completed | 0/26 [00:00<?, ?it/s]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:   4% Completed | 1/26 [00:20<08:37, 20.72s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:   8% Completed | 2/26 [00:28<05:13, 13.07s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  12% Completed | 3/26 [00:46<05:55, 15.47s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  15% Completed | 4/26 [01:02<05:38, 15.39s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  19% Completed | 5/26 [01:05<03:49, 10.94s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  23% Completed | 6/26 [01:06<02:35,  7.76s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  27% Completed | 7/26 [01:10<02:01,  6.42s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  31% Completed | 8/26 [01:32<03:27, 11.50s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  35% Completed | 9/26 [01:38<02:44,  9.66s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  38% Completed | 10/26 [01:56<03:16, 12.31s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  42% Completed | 11/26 [02:00<02:25,  9.68s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  46% Completed | 12/26 [02:08<02:11,  9.37s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  50% Completed | 13/26 [02:12<01:40,  7.75s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  54% Completed | 14/26 [02:21<01:35,  7.94s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  58% Completed | 15/26 [02:25<01:14,  6.78s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  62% Completed | 16/26 [02:34<01:15,  7.58s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  65% Completed | 17/26 [02:37<00:55,  6.15s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  69% Completed | 18/26 [02:47<00:57,  7.20s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  73% Completed | 19/26 [02:49<00:40,  5.80s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  77% Completed | 20/26 [02:51<00:27,  4.52s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  81% Completed | 21/26 [02:52<00:17,  3.43s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  85% Completed | 22/26 [02:53<00:11,  2.85s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  88% Completed | 23/26 [02:55<00:07,  2.37s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  92% Completed | 24/26 [02:56<00:04,  2.04s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards:  96% Completed | 25/26 [02:57<00:01,  1.75s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards: 100% Completed | 26/26 [02:57<00:00,  1.38s/it]
+(EngineCore pid=33021) Loading safetensors checkpoint shards: 100% Completed | 26/26 [02:57<00:00,  6.84s/it]
+(EngineCore pid=33021) 
+(EngineCore pid=33021) INFO 09-10 15:11:38 [default_loader.py:430] Loading weights took 177.98 seconds
+(EngineCore pid=33021) INFO 09-10 15:11:40 [hpu_model_runner.py:4759] Loading model weights took 65.5214 GB
+(EngineCore pid=33021) INFO 09-10 15:11:41 [hpu_model_runner.py:4852] Wrapping in HPUGraph took 0.0000 GB
+(EngineCore pid=33021) INFO 09-10 15:11:42 [hpu_model_runner.py:4880] Compilation took 0.0000 GB
+(EngineCore pid=33021) INFO 09-10 15:11:42 [interface.py:635] Setting kv cache block size to 128 for CUSTOM backend.
+(EngineCore pid=33021) INFO 09-10 15:11:42 [interface.py:905] Setting attention block size to 1152 tokens to ensure that attention page size is >= mamba page size.
+(EngineCore pid=33021) INFO 09-10 15:11:42 [interface.py:929] Padding mamba page size by 9.92% to ensure that mamba page size and attention page size are exactly equal.
+(EngineCore pid=33021) INFO 09-10 15:11:43 [hpu_worker.py:404] Model profiling run took 0 B of device memory (65.55 GiB/94.62 GiB used) and 36.27 MiB of host memory (44.79 GiB/125.5 GiB used)
+(EngineCore pid=33021) INFO 09-10 15:11:43 [hpu_worker.py:432] Free device memory: 29.08 GiB, 14.54 GiB usable (gpu_memory_utilization=0.5), 1.454 GiB reserved for HPUGraphs (VLLM_GRAPH_RESERVED_MEM=0.1), 90 MiB reserved for KV cache dummy block 13 GiB reserved for usable KV cache
+(EngineCore pid=33021) INFO 09-10 15:11:43 [kv_cache_utils.py:2177] GPU KV cache size: 242,073 tokens
+(EngineCore pid=33021) INFO 09-10 15:11:43 [kv_cache_utils.py:2178] Maximum concurrency for 2,048 tokens per request: 118.20x
+(EngineCore pid=33021) INFO 09-10 15:11:43 [hpu_model_runner.py:6886] GDN compact: 3 groups, 128 base_slots, tensor_dim0=386 vs baseline=592, free_list_len=128
+(EngineCore pid=33021) INFO 09-10 15:11:44 [hpu_worker.py:546] Usable num_blocks: 591, actual allocated num_blocks (max across layers): 680960 (_PAD_BLOCK_ID=591, _PAD_SLOT_ID=75648)
+(EngineCore pid=33021) INFO 09-10 15:11:44 [hpu_worker.py:549] Initializing cache engine took 20.7 GiB of device memory (86.23 GiB/94.62 GiB used) and 380 KiB of host memory (44.75 GiB/125.5 GiB used)
+(EngineCore pid=33021) INFO 09-10 15:11:44 [exponential.py:80] Prompt bucket config (min, step, max_warmup, limit) bs:[1, 2, 1, 1], query:[128, 128, 8192, 13], blocks:[0, 1, 15, 5]
+(EngineCore pid=33021) INFO 09-10 15:11:44 [common.py:245] Generated 48 prompt buckets [bs, query, num_blocks]: [(1, 128, 0), (1, 128, 1), (1, 128, 2), (1, 128, 4), (1, 128, 8), (1, 128, 15), (1, 256, 0), (1, 256, 1), (1, 256, 2), (1, 256, 4), (1, 256, 8), (1, 256, 15), (1, 384, 0), (1, 384, 1), (1, 384, 2), (1, 384, 4), (1, 384, 8), (1, 384, 15), (1, 512, 0), (1, 512, 1), (1, 512, 2), (1, 512, 4), (1, 512, 8), (1, 512, 15), (1, 768, 0), (1, 768, 1), (1, 768, 2), (1, 768, 4), (1, 768, 8), (1, 768, 15), (1, 1024, 0), (1, 1024, 1), (1, 1024, 2), (1, 1024, 4), (1, 1024, 8), (1, 1024, 15), (1, 1536, 0), (1, 1536, 1), (1, 1536, 2), (1, 1536, 4), (1, 1536, 8), (1, 1536, 15), (1, 2048, 0), (1, 2048, 1), (1, 2048, 2), (1, 2048, 4), (1, 2048, 8), (1, 2048, 15)]
+(EngineCore pid=33021) INFO 09-10 15:11:44 [exponential.py:105] Decode bucket config (min, step, max_warmup, limit) bs:[1, 2, 128, 8], block:[1, 128, 2048, 14]
+(EngineCore pid=33021) INFO 09-10 15:11:44 [common.py:245] Generated 34 decode buckets [bs, query, num_blocks]: [(1, 1, 1), (1, 1, 16), (2, 1, 32), (4, 1, 64), (8, 1, 128), (12, 1, 128), (12, 1, 192), (22, 1, 128), (22, 1, 256), (22, 1, 352), (40, 1, 128), (40, 1, 256), (40, 1, 384), (40, 1, 512), (40, 1, 640), (72, 1, 128), (72, 1, 256), (72, 1, 384), (72, 1, 512), (72, 1, 640), (72, 1, 768), (72, 1, 896), (72, 1, 1152), (128, 1, 128), (128, 1, 256), (128, 1, 384), (128, 1, 512), (128, 1, 640), (128, 1, 768), (128, 1, 896), (128, 1, 1152), (128, 1, 1408), (128, 1, 1664), (128, 1, 2048)]
+(EngineCore pid=33021) INFO 09-10 15:11:44 [hpu_model_runner.py:6101] Multimodal bucket : []
+(EngineCore pid=33021) [transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+(EngineCore pid=33021) WARNING 09-10 15:11:55 [hpu_model_runner.py:5991] No multimodal warmup resolutions for this native-resolution vision tower: patch-count buckets are empty and neither VLLM_MULTIMODAL_RESOLUTIONS nor limit-mm-per-prompt width/height is set. The vision-tower graph will recompile on the first request at each resolution. Set VLLM_MULTIMODAL_RESOLUTIONS (e.g. "1024x768,864x480x1-20") to precompile your production resolutions.
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5321] Warming up sampler with batch sizes: [1, 2, 4, 8, 12, 22, 40, 72, 128] and following configs:
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=1.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.7, top_p=0.9, top_k=50, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.3, top_p=0.95, top_k=20, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=1.2, top_p=0.8, top_k=100, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.8, top_p=0.85, top_k=0, batch_changed=True
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=1.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.7, top_p=0.9, top_k=50, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.3, top_p=0.95, top_k=20, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=1.2, top_p=0.8, top_k=100, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5323] temp=0.8, top_p=0.85, top_k=0, batch_changed=False
+(EngineCore pid=33021) INFO 09-10 15:11:55 [hpu_model_runner.py:5324] Starting sampler warmup...
+(EngineCore pid=33021) INFO 09-10 15:12:03 [hpu_model_runner.py:5416] Sampler warmup completed successfully
+(EngineCore pid=33021) Prompt warmup processing:   0%|          | 0/48 [00:00<?, ?item/s]/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: hpu::batch_as_strided (with implementation in ???): The output of this custom operator (1) must not also be an input to this custom operator and (2) may not alias any inputs to this custom operator or other returns. The most common way to trigger this error is if we have y = custom_op(x) and y and x are the same Tensor. Please instead return a clone of the offending output tensor(s) (e.g. return x.clone()) or refactor the custom operator to not return y. This is deprecated and will become an error in PyTorch 2.12.
+(EngineCore pid=33021)   return fn(*args, **kwargs)
+(EngineCore pid=33021) Prompt warmup processing:   0%|          | 0/48 [00:34<?, ?item/s, 0/48]Prompt warmup processing:   2%|▏         | 1/48 [00:34<27:07, 34.63s/item, 0/48]Prompt warmup processing:   2%|▏         | 1/48 [00:41<27:07, 34.63s/item, 1/48]Prompt warmup processing:   4%|▍         | 2/48 [00:41<14:08, 18.44s/item, 1/48]Prompt warmup processing:   4%|▍         | 2/48 [00:42<14:08, 18.44s/item, 2/48]Prompt warmup processing:   6%|▋         | 3/48 [00:42<07:49, 10.44s/item, 2/48]Prompt warmup processing:   6%|▋         | 3/48 [00:43<07:49, 10.44s/item, 3/48]Prompt warmup processing:   8%|▊         | 4/48 [00:43<04:53,  6.68s/item, 3/48]Prompt warmup processing:   8%|▊         | 4/48 [00:44<04:53,  6.68s/item, 4/48]Prompt warmup processing:  10%|█         | 5/48 [00:44<03:17,  4.59s/item, 4/48]Prompt warmup processing:  10%|█         | 5/48 [00:45<03:17,  4.59s/item, 5/48]Prompt warmup processing:  12%|█▎        | 6/48 [00:45<02:19,  3.33s/item, 5/48]Prompt warmup processing:  12%|█▎        | 6/48 [01:22<02:19,  3.33s/item, 6/48]Prompt warmup processing:  15%|█▍        | 7/48 [01:22<09:51, 14.43s/item, 6/48]Prompt warmup processing:  15%|█▍        | 7/48 [01:23<09:51, 14.43s/item, 7/48]Prompt warmup processing:  17%|█▋        | 8/48 [01:23<06:49, 10.24s/item, 7/48]Prompt warmup processing:  17%|█▋        | 8/48 [01:25<06:49, 10.24s/item, 8/48]Prompt warmup processing:  19%|█▉        | 9/48 [01:25<04:50,  7.44s/item, 8/48]Prompt warmup processing:  19%|█▉        | 9/48 [01:42<04:50,  7.44s/item, 9/48]Prompt warmup processing:  21%|██        | 10/48 [01:42<06:44, 10.64s/item, 9/48]Prompt warmup processing:  21%|██        | 10/48 [01:58<06:44, 10.64s/item, 10/48]Prompt warmup processing:  23%|██▎       | 11/48 [01:58<07:27, 12.08s/item, 10/48]Prompt warmup processing:  23%|██▎       | 11/48 [02:18<07:27, 12.08s/item, 11/48]Prompt warmup processing:  25%|██▌       | 12/48 [02:18<08:42, 14.51s/item, 11/48]Prompt warmup processing:  25%|██▌       | 12/48 [02:37<08:42, 14.51s/item, 12/48]Prompt warmup processing:  27%|██▋       | 13/48 [02:37<09:20, 16.00s/item, 12/48]Prompt warmup processing:  27%|██▋       | 13/48 [02:39<09:20, 16.00s/item, 13/48]Prompt warmup processing:  29%|██▉       | 14/48 [02:39<06:33, 11.58s/item, 13/48]Prompt warmup processing:  29%|██▉       | 14/48 [02:51<06:33, 11.58s/item, 14/48]Prompt warmup processing:  31%|███▏      | 15/48 [02:51<06:31, 11.87s/item, 14/48]Prompt warmup processing:  31%|███▏      | 15/48 [03:04<06:31, 11.87s/item, 15/48]Prompt warmup processing:  33%|███▎      | 16/48 [03:04<06:29, 12.17s/item, 15/48]Prompt warmup processing:  33%|███▎      | 16/48 [03:17<06:29, 12.17s/item, 16/48]Prompt warmup processing:  35%|███▌      | 17/48 [03:17<06:21, 12.31s/item, 16/48]Prompt warmup processing:  35%|███▌      | 17/48 [03:30<06:21, 12.31s/item, 17/48]Prompt warmup processing:  38%|███▊      | 18/48 [03:30<06:21, 12.73s/item, 17/48]Prompt warmup processing:  38%|███▊      | 18/48 [03:48<06:21, 12.73s/item, 18/48]Prompt warmup processing:  40%|███▉      | 19/48 [03:48<06:49, 14.12s/item, 18/48]Prompt warmup processing:  40%|███▉      | 19/48 [04:01<06:49, 14.12s/item, 19/48]Prompt warmup processing:  42%|████▏     | 20/48 [04:01<06:25, 13.75s/item, 19/48]Prompt warmup processing:  42%|████▏     | 20/48 [04:14<06:25, 13.75s/item, 20/48]Prompt warmup processing:  44%|████▍     | 21/48 [04:14<06:04, 13.48s/item, 20/48]Prompt warmup processing:  44%|████▍     | 21/48 [04:25<06:04, 13.48s/item, 21/48]Prompt warmup processing:  46%|████▌     | 22/48 [04:25<05:37, 13.00s/item, 21/48]Prompt warmup processing:  46%|████▌     | 22/48 [04:38<05:37, 13.00s/item, 22/48]Prompt warmup processing:  48%|████▊     | 23/48 [04:38<05:21, 12.85s/item, 22/48]Prompt warmup processing:  48%|████▊     | 23/48 [04:50<05:21, 12.85s/item, 23/48]Prompt warmup processing:  50%|█████     | 24/48 [04:50<05:06, 12.75s/item, 23/48]Prompt warmup processing:  50%|█████     | 24/48 [05:08<05:06, 12.75s/item, 24/48]Prompt warmup processing:  52%|█████▏    | 25/48 [05:08<05:27, 14.25s/item, 24/48]Prompt warmup processing:  52%|█████▏    | 25/48 [05:19<05:27, 14.25s/item, 25/48]Prompt warmup processing:  54%|█████▍    | 26/48 [05:19<04:52, 13.32s/item, 25/48]Prompt warmup processing:  54%|█████▍    | 26/48 [05:32<04:52, 13.32s/item, 26/48]Prompt warmup processing:  56%|█████▋    | 27/48 [05:32<04:33, 13.03s/item, 26/48]Prompt warmup processing:  56%|█████▋    | 27/48 [05:44<04:33, 13.03s/item, 27/48]Prompt warmup processing:  58%|█████▊    | 28/48 [05:44<04:16, 12.81s/item, 27/48]Prompt warmup processing:  58%|█████▊    | 28/48 [05:56<04:16, 12.81s/item, 28/48]Prompt warmup processing:  60%|██████    | 29/48 [05:56<03:56, 12.42s/item, 28/48]Prompt warmup processing:  60%|██████    | 29/48 [06:08<03:56, 12.42s/item, 29/48]Prompt warmup processing:  62%|██████▎   | 30/48 [06:08<03:43, 12.42s/item, 29/48]Prompt warmup processing:  62%|██████▎   | 30/48 [06:25<03:43, 12.42s/item, 30/48]Prompt warmup processing:  65%|██████▍   | 31/48 [06:25<03:55, 13.87s/item, 30/48]Prompt warmup processing:  65%|██████▍   | 31/48 [06:38<03:55, 13.87s/item, 31/48]Prompt warmup processing:  67%|██████▋   | 32/48 [06:38<03:34, 13.43s/item, 31/48]Prompt warmup processing:  67%|██████▋   | 32/48 [06:50<03:34, 13.43s/item, 32/48]Prompt warmup processing:  69%|██████▉   | 33/48 [06:50<03:14, 12.99s/item, 32/48]Prompt warmup processing:  69%|██████▉   | 33/48 [07:03<03:14, 12.99s/item, 33/48]Prompt warmup processing:  71%|███████   | 34/48 [07:03<03:01, 12.99s/item, 33/48]Prompt warmup processing:  71%|███████   | 34/48 [07:14<03:01, 12.99s/item, 34/48]Prompt warmup processing:  73%|███████▎  | 35/48 [07:14<02:42, 12.51s/item, 34/48]Prompt warmup processing:  73%|███████▎  | 35/48 [07:26<02:42, 12.51s/item, 35/48]Prompt warmup processing:  75%|███████▌  | 36/48 [07:26<02:29, 12.45s/item, 35/48]Prompt warmup processing:  75%|███████▌  | 36/48 [07:43<02:29, 12.45s/item, 36/48]Prompt warmup processing:  77%|███████▋  | 37/48 [07:43<02:31, 13.80s/item, 36/48]Prompt warmup processing:  77%|███████▋  | 37/48 [07:55<02:31, 13.80s/item, 37/48]Prompt warmup processing:  79%|███████▉  | 38/48 [07:55<02:11, 13.19s/item, 37/48]Prompt warmup processing:  79%|███████▉  | 38/48 [08:07<02:11, 13.19s/item, 38/48]Prompt warmup processing:  81%|████████▏ | 39/48 [08:07<01:54, 12.72s/item, 38/48]Prompt warmup processing:  81%|████████▏ | 39/48 [08:18<01:54, 12.72s/item, 39/48]Prompt warmup processing:  83%|████████▎ | 40/48 [08:18<01:39, 12.42s/item, 39/48]Prompt warmup processing:  83%|████████▎ | 40/48 [08:30<01:39, 12.42s/item, 40/48]Prompt warmup processing:  85%|████████▌ | 41/48 [08:30<01:24, 12.13s/item, 40/48]Prompt warmup processing:  85%|████████▌ | 41/48 [08:41<01:24, 12.13s/item, 41/48]Prompt warmup processing:  88%|████████▊ | 42/48 [08:41<01:11, 11.88s/item, 41/48]Prompt warmup processing:  88%|████████▊ | 42/48 [08:57<01:11, 11.88s/item, 42/48]Prompt warmup processing:  90%|████████▉ | 43/48 [08:57<01:05, 13.07s/item, 42/48]Prompt warmup processing:  90%|████████▉ | 43/48 [09:08<01:05, 13.07s/item, 43/48]Prompt warmup processing:  92%|█████████▏| 44/48 [09:08<00:49, 12.46s/item, 43/48]Prompt warmup processing:  92%|█████████▏| 44/48 [09:20<00:49, 12.46s/item, 44/48]Prompt warmup processing:  94%|█████████▍| 45/48 [09:20<00:36, 12.32s/item, 44/48]Prompt warmup processing:  94%|█████████▍| 45/48 [09:32<00:36, 12.32s/item, 45/48]Prompt warmup processing:  96%|█████████▌| 46/48 [09:32<00:24, 12.23s/item, 45/48]Prompt warmup processing:  96%|█████████▌| 46/48 [09:44<00:24, 12.23s/item, 46/48]Prompt warmup processing:  98%|█████████▊| 47/48 [09:44<00:12, 12.15s/item, 46/48]Prompt warmup processing:  98%|█████████▊| 47/48 [09:56<00:12, 12.15s/item, 47/48]Prompt warmup processing: 100%|██████████| 48/48 [09:56<00:00, 12.13s/item, 47/48]Prompt warmup processing: 100%|██████████| 48/48 [09:56<00:00, 12.43s/item, 47/48]
+(EngineCore pid=33021) INFO 09-10 15:21:59 [hpu_model_runner.py:5174] Graph/Prompt captured:48 used_mem:36.53 MiB
+(EngineCore pid=33021) Decode warmup processing:   0%|          | 0/34 [00:00<?, ?item/s]/usr/local/lib/python3.10/dist-packages/torch/_dynamo/variables/functions.py:2202: UserWarning: Dynamo detected a call to a `functools.lru_cache`-wrapped function at 'hpu_model_runner.py:7643'. Dynamo ignores the cache wrapper and directly traces the wrapped function. Silent incorrectness is only a *potential* risk, not something we have observed. Enable TORCH_LOGS=+dynamo for a DEBUG stack trace.
+(EngineCore pid=33021) 
+(EngineCore pid=33021) This call originates from:
+(EngineCore pid=33021)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 7643, in _set_block_mapping
+(EngineCore pid=33021)     if not is_fake_hpu():
+(EngineCore pid=33021) 
+(EngineCore pid=33021)   torch._dynamo.utils.warn_once(msg)
+(EngineCore pid=33021) Decode warmup processing:   0%|          | 0/34 [00:17<?, ?item/s, 0/34]Decode warmup processing:   3%|▎         | 1/34 [00:17<09:28, 17.22s/item, 0/34]Decode warmup processing:   3%|▎         | 1/34 [00:33<09:28, 17.22s/item, 1/34]Decode warmup processing:   6%|▌         | 2/34 [00:33<08:57, 16.80s/item, 1/34]Decode warmup processing:   6%|▌         | 2/34 [00:45<08:57, 16.80s/item, 2/34]Decode warmup processing:   9%|▉         | 3/34 [00:45<07:27, 14.44s/item, 2/34]Decode warmup processing:   9%|▉         | 3/34 [00:57<07:27, 14.44s/item, 3/34]Decode warmup processing:  12%|█▏        | 4/34 [00:57<06:48, 13.61s/item, 3/34]Decode warmup processing:  12%|█▏        | 4/34 [01:09<06:48, 13.61s/item, 4/34]Decode warmup processing:  15%|█▍        | 5/34 [01:09<06:14, 12.90s/item, 4/34]Decode warmup processing:  15%|█▍        | 5/34 [01:20<06:14, 12.90s/item, 5/34]Decode warmup processing:  18%|█▊        | 6/34 [01:20<05:46, 12.36s/item, 5/34]Decode warmup processing:  18%|█▊        | 6/34 [01:33<05:46, 12.36s/item, 6/34]Decode warmup processing:  21%|██        | 7/34 [01:33<05:33, 12.37s/item, 6/34]Decode warmup processing:  21%|██        | 7/34 [01:45<05:33, 12.37s/item, 7/34]Decode warmup processing:  24%|██▎       | 8/34 [01:45<05:19, 12.29s/item, 7/34]Decode warmup processing:  24%|██▎       | 8/34 [01:57<05:19, 12.29s/item, 8/34]Decode warmup processing:  26%|██▋       | 9/34 [01:57<05:05, 12.21s/item, 8/34]Decode warmup processing:  26%|██▋       | 9/34 [02:09<05:05, 12.21s/item, 9/34]Decode warmup processing:  29%|██▉       | 10/34 [02:09<04:52, 12.19s/item, 9/34]Decode warmup processing:  29%|██▉       | 10/34 [02:19<04:52, 12.19s/item, 10/34]Decode warmup processing:  32%|███▏      | 11/34 [02:19<04:25, 11.54s/item, 10/34]Decode warmup processing:  32%|███▏      | 11/34 [02:34<04:25, 11.54s/item, 11/34]Decode warmup processing:  35%|███▌      | 12/34 [02:34<04:35, 12.53s/item, 11/34]Decode warmup processing:  35%|███▌      | 12/34 [02:44<04:35, 12.53s/item, 12/34]Decode warmup processing:  38%|███▊      | 13/34 [02:44<04:11, 11.97s/item, 12/34]Decode warmup processing:  38%|███▊      | 13/34 [02:55<04:11, 11.97s/item, 13/34]Decode warmup processing:  41%|████      | 14/34 [02:55<03:48, 11.45s/item, 13/34]Decode warmup processing:  41%|████      | 14/34 [03:04<03:48, 11.45s/item, 14/34]Decode warmup processing:  44%|████▍     | 15/34 [03:04<03:27, 10.91s/item, 14/34]Decode warmup processing:  44%|████▍     | 15/34 [03:15<03:27, 10.91s/item, 15/34]Decode warmup processing:  47%|████▋     | 16/34 [03:15<03:15, 10.85s/item, 15/34]Decode warmup processing:  47%|████▋     | 16/34 [03:24<03:15, 10.85s/item, 16/34]Decode warmup processing:  50%|█████     | 17/34 [03:24<02:57, 10.44s/item, 16/34]Decode warmup processing:  50%|█████     | 17/34 [03:34<02:57, 10.44s/item, 17/34]Decode warmup processing:  53%|█████▎    | 18/34 [03:34<02:44, 10.28s/item, 17/34]Decode warmup processing:  53%|█████▎    | 18/34 [03:45<02:44, 10.28s/item, 18/34]Decode warmup processing:  56%|█████▌    | 19/34 [03:45<02:33, 10.23s/item, 18/34]Decode warmup processing:  56%|█████▌    | 19/34 [03:58<02:33, 10.23s/item, 19/34]Decode warmup processing:  59%|█████▉    | 20/34 [03:58<02:35, 11.11s/item, 19/34]Decode warmup processing:  59%|█████▉    | 20/34 [04:08<02:35, 11.11s/item, 20/34]Decode warmup processing:  62%|██████▏   | 21/34 [04:08<02:20, 10.83s/item, 20/34]Decode warmup processing:  62%|██████▏   | 21/34 [04:18<02:20, 10.83s/item, 21/34]Decode warmup processing:  65%|██████▍   | 22/34 [04:18<02:08, 10.68s/item, 21/34]Decode warmup processing:  65%|██████▍   | 22/34 [04:27<02:08, 10.68s/item, 22/34]Decode warmup processing:  68%|██████▊   | 23/34 [04:27<01:50, 10.06s/item, 22/34]Decode warmup processing:  68%|██████▊   | 23/34 [04:35<01:50, 10.06s/item, 23/34]Decode warmup processing:  71%|███████   | 24/34 [04:35<01:34,  9.45s/item, 23/34]Decode warmup processing:  71%|███████   | 24/34 [04:45<01:34,  9.45s/item, 24/34]Decode warmup processing:  74%|███████▎  | 25/34 [04:45<01:25,  9.53s/item, 24/34]Decode warmup processing:  74%|███████▎  | 25/34 [04:52<01:25,  9.53s/item, 25/34]Decode warmup processing:  76%|███████▋  | 26/34 [04:52<01:10,  8.82s/item, 25/34]Decode warmup processing:  76%|███████▋  | 26/34 [04:59<01:10,  8.82s/item, 26/34]Decode warmup processing:  79%|███████▉  | 27/34 [04:59<00:59,  8.45s/item, 26/34]Decode warmup processing:  79%|███████▉  | 27/34 [05:06<00:59,  8.45s/item, 27/34]Decode warmup processing:  82%|████████▏ | 28/34 [05:06<00:47,  7.97s/item, 27/34]Decode warmup processing:  82%|████████▏ | 28/34 [05:11<00:47,  7.97s/item, 28/34]Decode warmup processing:  85%|████████▌ | 29/34 [05:11<00:35,  7.13s/item, 28/34]Decode warmup processing:  85%|████████▌ | 29/34 [05:17<00:35,  7.13s/item, 29/34]Decode warmup processing:  88%|████████▊ | 30/34 [05:17<00:26,  6.65s/item, 29/34]Decode warmup processing:  88%|████████▊ | 30/34 [05:21<00:26,  6.65s/item, 30/34]Decode warmup processing:  91%|█████████ | 31/34 [05:21<00:17,  5.80s/item, 30/34]Decode warmup processing:  91%|█████████ | 31/34 [05:24<00:17,  5.80s/item, 31/34]Decode warmup processing:  94%|█████████▍| 32/34 [05:24<00:10,  5.06s/item, 31/34]Decode warmup processing:  94%|█████████▍| 32/34 [05:34<00:10,  5.06s/item, 32/34]Decode warmup processing:  97%|█████████▋| 33/34 [05:34<00:06,  6.66s/item, 32/34]Decode warmup processing:  97%|█████████▋| 33/34 [05:40<00:06,  6.66s/item, 33/34]Decode warmup processing: 100%|██████████| 34/34 [05:40<00:00,  6.39s/item, 33/34]Decode warmup processing: 100%|██████████| 34/34 [05:40<00:00, 10.02s/item, 33/34]
+(EngineCore pid=33021) INFO 09-10 15:27:40 [hpu_model_runner.py:5174] Graph/Decode captured:34 used_mem:0 B
+(EngineCore pid=33021) INFO 09-10 15:27:40 [hpu_model_runner.py:6198] Running validation warmup to trigger guard specializations...
+(EngineCore pid=33021) INFO 09-10 15:27:40 [hpu_model_runner.py:6215] Validation warmup: 6 prompt buckets (seq_len=2048)
+(EngineCore pid=33021) Prompt warmup processing:   0%|          | 0/6 [00:00<?, ?item/s]Prompt warmup processing:   0%|          | 0/6 [00:29<?, ?item/s, 0/6]Prompt warmup processing:  17%|█▋        | 1/6 [00:29<02:26, 29.40s/item, 0/6]Prompt warmup processing:  17%|█▋        | 1/6 [00:31<02:26, 29.40s/item, 1/6]Prompt warmup processing:  33%|███▎      | 2/6 [00:31<00:52, 13.17s/item, 1/6]Prompt warmup processing:  33%|███▎      | 2/6 [00:33<00:52, 13.17s/item, 2/6]Prompt warmup processing:  50%|█████     | 3/6 [00:33<00:24,  8.00s/item, 2/6]Prompt warmup processing:  50%|█████     | 3/6 [00:34<00:24,  8.00s/item, 3/6]Prompt warmup processing:  67%|██████▋   | 4/6 [00:34<00:11,  5.56s/item, 3/6]Prompt warmup processing:  67%|██████▋   | 4/6 [00:36<00:11,  5.56s/item, 4/6]Prompt warmup processing:  83%|████████▎ | 5/6 [00:36<00:04,  4.22s/item, 4/6]Prompt warmup processing:  83%|████████▎ | 5/6 [00:38<00:04,  4.22s/item, 5/6]Prompt warmup processing: 100%|██████████| 6/6 [00:38<00:00,  3.44s/item, 5/6]Prompt warmup processing: 100%|██████████| 6/6 [00:38<00:00,  6.44s/item, 5/6]
+(EngineCore pid=33021) Decode warmup processing:   0%|          | 0/1 [00:00<?, ?item/s]Decode warmup processing:   0%|          | 0/1 [00:01<?, ?item/s, 0/1]Decode warmup processing: 100%|██████████| 1/1 [00:01<00:00,  1.74s/item, 0/1]Decode warmup processing: 100%|██████████| 1/1 [00:01<00:00,  1.74s/item, 0/1]
+(EngineCore pid=33021) INFO 09-10 15:28:20 [hpu_model_runner.py:6222] Validation warmup complete.
+(EngineCore pid=33021) INFO 09-10 15:28:20 [hpu_model_runner.py:6233] Warmup finished in 997 secs, allocated 639.3 MiB of device memory
+(EngineCore pid=33021) INFO 09-10 15:28:20 [core.py:347] init engine (profile, create kv cache, warmup model) took 998.66 s
+(EngineCore pid=33021) INFO 09-10 15:28:21 [vllm.py:1109] Asynchronous scheduling is enabled.
+(EngineCore pid=33021) WARNING 09-10 15:28:21 [vllm.py:1213] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore pid=33021) INFO 09-10 15:28:21 [kernel.py:295] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore pid=33021) INFO 09-10 15:28:21 [compilation.py:329] Enabled custom fusions: norm_quant, act_quant
+Rendering prompts:   0%|          | 0/128 [00:00<?, ?it/s]Rendering prompts:   1%|          | 1/128 [00:00<00:26,  4.77it/s]Rendering prompts:   9%|▉         | 12/128 [00:00<00:02, 46.24it/s]Rendering prompts:  27%|██▋       | 34/128 [00:00<00:00, 108.57it/s]Rendering prompts:  49%|████▉     | 63/128 [00:00<00:00, 169.34it/s]Rendering prompts:  72%|███████▏  | 92/128 [00:01<00:00, 92.45it/s] Rendering prompts:  88%|████████▊ | 112/128 [00:01<00:00, 110.38it/s]Rendering prompts: 100%|██████████| 128/128 [00:01<00:00, 107.99it/s]
+Processed prompts:   0%|          | 0/128 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]INFO 09-10 15:28:34 [loggers.py:310] Engine 000: Avg prompt throughput: 3841.2 tokens/s, Avg generation throughput: 13.2 tokens/s, Running: 57 reqs, Waiting: 71 reqs, GPU KV cache usage: 38.6%, Prefix cache hit rate: 0.0%
+INFO 09-10 15:28:52 [loggers.py:310] Engine 000: Avg prompt throughput: 1835.5 tokens/s, Avg generation throughput: 15.2 tokens/s, Running: 89 reqs, Waiting: 39 reqs, GPU KV cache usage: 60.3%, Prefix cache hit rate: 0.0%
+INFO 09-10 15:29:03 [loggers.py:310] Engine 000: Avg prompt throughput: 742.2 tokens/s, Avg generation throughput: 8.0 tokens/s, Running: 97 reqs, Waiting: 31 reqs, GPU KV cache usage: 65.8%, Prefix cache hit rate: 0.0%
+INFO 09-10 15:29:18 [loggers.py:310] Engine 000: Avg prompt throughput: 1121.7 tokens/s, Avg generation throughput: 13.7 tokens/s, Running: 113 reqs, Waiting: 15 reqs, GPU KV cache usage: 76.6%, Prefix cache hit rate: 0.0%
+INFO 09-10 15:29:28 [loggers.py:310] Engine 000: Avg prompt throughput: 2447.3 tokens/s, Avg generation throughput: 609.4 tokens/s, Running: 128 reqs, Waiting: 0 reqs, GPU KV cache usage: 86.8%, Prefix cache hit rate: 0.0%
+Processed prompts:   1%|          | 1/128 [01:14<2:38:04, 74.68s/it, est. speed input: 13.71 toks/s, output: 1.71 toks/s]Processed prompts:   2%|▏         | 2/128 [01:14<1:04:44, 30.83s/it, est. speed input: 27.38 toks/s, output: 3.42 toks/s]INFO 09-10 15:29:38 [loggers.py:310] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 866.1 tokens/s, Running: 112 reqs, Waiting: 0 reqs, GPU KV cache usage: 75.9%, Prefix cache hit rate: 0.0%
+Processed prompts:   7%|▋         | 9/128 [01:14<08:55,  4.50s/it, est. speed input: 122.95 toks/s, output: 15.37 toks/s]Processed prompts:  13%|█▎        | 17/128 [01:15<03:29,  1.89s/it, est. speed input: 231.78 toks/s, output: 28.97 toks/s]Processed prompts:  20%|█▉        | 25/128 [01:15<01:47,  1.04s/it, est. speed input: 340.17 toks/s, output: 42.52 toks/s]Processed prompts:  26%|██▌       | 33/128 [01:15<01:00,  1.57it/s, est. speed input: 448.16 toks/s, output: 56.02 toks/s]Processed prompts:  32%|███▏      | 41/128 [01:15<00:36,  2.41it/s, est. speed input: 555.75 toks/s, output: 69.47 toks/s]Processed prompts:  38%|███▊      | 49/128 [01:15<00:22,  3.58it/s, est. speed input: 662.97 toks/s, output: 82.87 toks/s]Processed prompts:  51%|█████     | 65/128 [01:15<00:09,  6.83it/s, est. speed input: 877.73 toks/s, output: 109.72 toks/s]Processed prompts:  63%|██████▎   | 81/128 [01:15<00:04, 11.22it/s, est. speed input: 1092.03 toks/s, output: 136.50 toks/s]Processed prompts:  76%|███████▌  | 97/128 [01:16<00:01, 17.01it/s, est. speed input: 1305.73 toks/s, output: 163.22 toks/s]Processed prompts:  88%|████████▊ | 113/128 [01:16<00:00, 24.46it/s, est. speed input: 1518.82 toks/s, output: 189.85 toks/s]Processed prompts: 100%|██████████| 128/128 [01:16<00:00, 24.46it/s, est. speed input: 1720.37 toks/s, output: 215.05 toks/s]Processed prompts: 100%|██████████| 128/128 [01:16<00:00,  1.68it/s, est. speed input: 1720.37 toks/s, output: 215.05 toks/s]
+(EngineCore pid=33021) INFO 09-10 15:29:39 [core.py:1313] [shutdown] EngineCore: trigger received signal=SIGTERM
+(EngineCore pid=33021) INFO 09-10 15:29:39 [core.py:1432] [shutdown] EngineCore: start mode=abort timeout=0s
+(EngineCore pid=33021) INFO 09-10 15:29:39 [core.py:1463] [shutdown] EngineCore: request processing complete; starting resource teardown
+(EngineCore pid=33021) INFO 09-10 15:29:39 [core.py:1326] [shutdown] EngineCore: exiting busy loop
+(EngineCore pid=33021) WARNING 09-10 15:29:40 [interface.py:1139] Current platform hpu does not have 'empty_cache' attribute.
+WARNING 09-10 15:29:44 [utils.py:626] [shutdown] Process manager: force killing remaining processes count=1
+Throughput: 1.65 requests/s, 1903.66 total tokens/s, 211.52 output tokens/s
+Total num prompt tokens:  131072
+Total num output tokens:  16384
+s=[8192, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %76)
+  %id_1641744_model/0/linear_attn/aten__slice Unique ID:287914 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1641611_model/0/linear_attn/aten__cat Unique ID:287894, %54, %76, %42, %76)
+  %id_1641753_model/0/linear_attn/aten__mul Unique ID:287917 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641744_model/0/linear_attn/aten__slice Unique ID:287914, %id_1641750_model/0/linear_attn/hpu__strided_view Unique ID:287916)
+  %id_1641729_model/0/linear_attn/hpu__strided_view Unique ID:287911 : BFloat16(1, 8192, 1, strides=[8192, 1, 1], device=hpu:0) = hpu::strided_view[deterministic=0](%19, %45, %46, %79)
+  %id_1641723_model/0/linear_attn/aten__slice Unique ID:287909 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1641611_model/0/linear_attn/aten__cat Unique ID:287894, %54, %79, %41, %76)
+  %id_1641732_model/0/linear_attn/aten__mul Unique ID:287912 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641723_model/0/linear_attn/aten__slice Unique ID:287909, %id_1641729_model/0/linear_attn/hpu__strided_view Unique ID:287911)
+  %id_1641738_model/0/linear_attn/hpu__add Unique ID:287913 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1641716_model/0/linear_attn/aten__zero_ Unique ID:287907, %id_1641732_model/0/linear_attn/aten__mul Unique ID:287912, %76)
+  %id_1641759_model/0/linear_attn/hpu__add Unique ID:287918 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1641738_model/0/linear_attn/hpu__add Unique ID:287913, %id_1641753_model/0/linear_attn/aten__mul Unique ID:287917, %76)
+  %id_1641780_model/0/linear_attn/hpu__add Unique ID:287923 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1641759_model/0/linear_attn/hpu__add Unique ID:287918, %id_1641774_model/0/linear_attn/aten__mul Unique ID:287922, %76)
+  %id_1641801_model/0/linear_attn/hpu__add Unique ID:287928 : BFloat16(1, 8192, 2048, strides=[16777216, 2048, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1641780_model/0/linear_attn/hpu__add Unique ID:287923, %id_1641795_model/0/linear_attn/aten__mul Unique ID:287927, %76)
+  %id_1641807_model/0/linear_attn/aten__permute Unique ID:287929 : BFloat16(8192, 1, 2048, strides=[2048, 2048, 1], device=hpu:0) = aten::permute[deterministic=0](%id_1641801_model/0/linear_attn/hpu__add Unique ID:287928, %51)
+  %id_1641810_model/0/linear_attn/aten__view Unique ID:287930 : BFloat16(8192, 2048, strides=[2048, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641807_model/0/linear_attn/aten__permute Unique ID:287929, %40)
+  %id_1641871_model/0/linear_attn/aten__silu Unique ID:287942 : BFloat16(8192, 2048, strides=[2048, 1], device=hpu:0) = aten::silu[deterministic=0](%id_1641810_model/0/linear_attn/aten__view Unique ID:287930)
+  %id_1641877_model/0/linear_attn/aten__squeeze Unique ID:287943 : BFloat16(8192, 2048, strides=[2048, 1], device=hpu:0) = aten::squeeze[deterministic=0](%id_1641871_model/0/linear_attn/aten__silu Unique ID:287942, %79)
+  %id_1641880_model/0/linear_attn/aten__transpose Unique ID:287944 : BFloat16(2048, 8192, strides=[8192, 1], device=hpu:0) = aten::transpose[deterministic=0](%id_1641877_model/0/linear_attn/aten__squeeze Unique ID:287943, %79, %76)
+  %id_1641883_model/0/linear_attn/aten__mul Unique ID:287945 : BFloat16(2048, 8192, strides=[8192, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641880_model/0/linear_attn/aten__transpose Unique ID:287944, %id_1641416_model/0/linear_attn/aten__view Unique ID:287855.3)
+  %id_1641890_model/0/linear_attn/aten__slice Unique ID:287946 : BFloat16(2048, 2048, strides=[2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1641883_model/0/linear_attn/aten__mul Unique ID:287945, %81, %79, %41, %76)
+  %id_1641899_model/0/linear_attn/aten__view Unique ID:287949 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641890_model/0/linear_attn/aten__slice Unique ID:287946, %39)
+  %id_1641902_model/0/linear_attn/aten__clone Unique ID:287950 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1641899_model/0/linear_attn/aten__view Unique ID:287949, %79)
+  %id_1641893_model/0/linear_attn/aten__slice Unique ID:287947 : BFloat16(2048, 2048, strides=[2048, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1641883_model/0/linear_attn/aten__mul Unique ID:287945, %81, %41, %38, %76)
+  %id_1641910_model/0/linear_attn/aten__view Unique ID:287951 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641893_model/0/linear_attn/aten__slice Unique ID:287947, %39)
+  %id_1641913_model/0/linear_attn/aten__clone Unique ID:287952 : BFloat16(1, 2048, 16, 128, strides=[4194304, 2048, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1641910_model/0/linear_attn/aten__view Unique ID:287951, %79)
+  %id_1641896_model/0/linear_attn/aten__slice Unique ID:287948 : BFloat16(2048, 4096, strides=[4096, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1641883_model/0/linear_attn/aten__mul Unique ID:287945, %81, %38, %61, %76)
+  %id_1641921_model/0/linear_attn/aten__view Unique ID:287953 : BFloat16(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641896_model/0/linear_attn/aten__slice Unique ID:287948, %37)
+  %id_1641924_model/0/linear_attn/aten__clone Unique ID:287954 : BFloat16(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1641921_model/0/linear_attn/aten__view Unique ID:287953, %79)
+  %id_1641416_model/0/linear_attn/aten__view Unique ID:287855 : BFloat16(2048, 1, strides=[1, 1], device=hpu:0) = aten::view[deterministic=0](%13, %62)
+  %id_1641931_model/0/linear_attn/aten__view Unique ID:287955 : BFloat16(1, 2048, 1, strides=[2048, 1, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641416_model/0/linear_attn/aten__view Unique ID:287855, %36)
+  %id_1641938_model/0/linear_attn/hpu__cast Unique ID:287956 : Float(1, 2048, 1, strides=[2048, 1, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641931_model/0/linear_attn/aten__view Unique ID:287955, %68)
+  %id_1641436_model/0/linear_attn/hpu__cast Unique ID:287858 : Float(32, strides=[1], device=hpu:0) = hpu::cast[deterministic=0](%20, %68)
+  %id_1641428_model/0/linear_attn/hpu__cast Unique ID:287857 : Float(2048, 32, strides=[32, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641399_model/0/linear_attn/aten__clone Unique ID:287852, %68)
+  %id_1641441_model/0/linear_attn/hpu__add Unique ID:287859 : Float(2048, 32, strides=[32, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1641428_model/0/linear_attn/hpu__cast Unique ID:287857, %id_1641436_model/0/linear_attn/hpu__cast Unique ID:287858, %76)
+  %id_1641460_model/0/linear_attn/aten__mul Unique ID:287863 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641441_model/0/linear_attn/hpu__add Unique ID:287859, %5)
+  %id_1641464_model/0/linear_attn/aten__exp Unique ID:287864 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::exp[deterministic=0](%id_1641460_model/0/linear_attn/aten__mul Unique ID:287863)
+  %id_1641468_model/0/linear_attn/aten__log1p Unique ID:287865 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::log1p[deterministic=0](%id_1641464_model/0/linear_attn/aten__exp Unique ID:287864)
+  %id_1641472_model/0/linear_attn/aten__mul Unique ID:287866 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641468_model/0/linear_attn/aten__log1p Unique ID:287865, %5)
+  %id_1641447_model/0/linear_attn/aten__mul Unique ID:287860 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641441_model/0/linear_attn/hpu__add Unique ID:287859, %5)
+  %id_1641456_model/0/linear_attn/aten__le Unique ID:287862 : Bool(2048, 32, strides=[32, 1], device=hpu:0) = aten::le[deterministic=0](%id_1641447_model/0/linear_attn/aten__mul Unique ID:287860, %21)
+  %id_1641476_model/0/linear_attn/aten__where Unique ID:287867 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::where[deterministic=0](%id_1641456_model/0/linear_attn/aten__le Unique ID:287862, %id_1641472_model/0/linear_attn/aten__mul Unique ID:287866, %id_1641441_model/0/linear_attn/hpu__add Unique ID:287859)
+  %id_1641480_model/0/linear_attn/aten__exp Unique ID:287868 : Float(32, strides=[1], device=hpu:0) = aten::exp[deterministic=0](%22)
+  %id_1641484_model/0/linear_attn/aten__neg Unique ID:287869 : Float(32, strides=[1], device=hpu:0) = aten::neg[deterministic=0](%id_1641480_model/0/linear_attn/aten__exp Unique ID:287868)
+  %id_1641488_model/0/linear_attn/aten__mul Unique ID:287870 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641484_model/0/linear_attn/aten__neg Unique ID:287869, %id_1641476_model/0/linear_attn/aten__where Unique ID:287867)
+  %id_1641512_model/0/linear_attn/aten__unsqueeze Unique ID:287874 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_1641488_model/0/linear_attn/aten__mul Unique ID:287870, %79)
+  %id_1641947_model/0/linear_attn/aten__mul Unique ID:287957 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641512_model/0/linear_attn/aten__unsqueeze Unique ID:287874, %id_1641938_model/0/linear_attn/hpu__cast Unique ID:287956)
+  %id_1641495_model/0/linear_attn/hpu__cast Unique ID:287871 : Float(2048, 32, strides=[32, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641392_model/0/linear_attn/aten__clone Unique ID:287851, %68)
+  %id_1641500_model/0/linear_attn/aten__sigmoid Unique ID:287872 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::sigmoid[deterministic=0](%id_1641495_model/0/linear_attn/hpu__cast Unique ID:287871)
+  %id_1641507_model/0/linear_attn/hpu__cast Unique ID:287873 : BFloat16(2048, 32, strides=[32, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641500_model/0/linear_attn/aten__sigmoid Unique ID:287872, %71)
+  %id_1641515_model/0/linear_attn/aten__unsqueeze Unique ID:287875 : BFloat16(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_1641507_model/0/linear_attn/hpu__cast Unique ID:287873, %79)
+  %id_1641952_model/0/linear_attn/aten__mul Unique ID:287958 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1641515_model/0/linear_attn/aten__unsqueeze Unique ID:287875, %id_1641938_model/0/linear_attn/hpu__cast Unique ID:287956)
+  %id_1642031_model/0/linear_attn/hpu__cast Unique ID:4611686018427387995 : Float(device=hpu:0) = hpu::cast[deterministic=0](%23, %68)
+  %id_1641957_model/0/linear_attn/aten__unsqueeze Unique ID:287959 : BFloat16(1, 2048, 16, 1, 128, strides=[4194304, 2048, 128, 128, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_1641902_model/0/linear_attn/aten__clone Unique ID:287950, %57)
+  %id_1641960_model/0/linear_attn/hpu__expand Unique ID:287960 : BFloat16(1, 2048, 16, 2, 128, strides=[8388608, 4096, 256, 128, 1], device=hpu:0) = hpu::expand[deterministic=0](%id_1641957_model/0/linear_attn/aten__unsqueeze Unique ID:287959, %34, %73)
+  %id_1641963_model/0/linear_attn/aten__clone Unique ID:287961 : BFloat16(1, 2048, 16, 2, 128, strides=[8388608, 4096, 256, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1641960_model/0/linear_attn/hpu__expand Unique ID:287960, %79)
+  %id_1641969_model/0/linear_attn/aten__view Unique ID:287962 : BFloat16(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641963_model/0/linear_attn/aten__clone Unique ID:287961, %37)
+  %id_1642006_model/0/linear_attn/hpu__cast Unique ID:287967 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641969_model/0/linear_attn/aten__view Unique ID:287962, %68)
+  %id_1642013_model/0/linear_attn/aten__mul Unique ID:287968 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1642006_model/0/linear_attn/hpu__cast Unique ID:287967, %id_1642006_model/0/linear_attn/hpu__cast Unique ID:287967)
+  %id_1642017_model/0/linear_attn/aten__sum Unique ID:287969 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = aten::sum[deterministic=0](%id_1642013_model/0/linear_attn/aten__mul Unique ID:287968, %33, %35, %70)
+  %id_1642028_model/0/linear_attn/hpu__add Unique ID:287971 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1642017_model/0/linear_attn/aten__sum Unique ID:287969, %id_1642031_model/0/linear_attn/hpu__cast Unique ID:4611686018427387995, %76)
+  %id_1642042_model/0/linear_attn/aten__sqrt Unique ID:287972 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = aten::sqrt[deterministic=0](%id_1642028_model/0/linear_attn/hpu__add Unique ID:287971)
+  %id_1642046_model/0/linear_attn/aten__div Unique ID:287973 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::div[deterministic=0](%id_1642006_model/0/linear_attn/hpu__cast Unique ID:287967, %id_1642042_model/0/linear_attn/aten__sqrt Unique ID:287972)
+  %id_1642073_model/0/linear_attn/hpu__cast Unique ID:4611686018427387996 : Float(device=hpu:0) = hpu::cast[deterministic=0](%23, %68)
+  %id_1641980_model/0/linear_attn/aten__unsqueeze Unique ID:287963 : BFloat16(1, 2048, 16, 1, 128, strides=[4194304, 2048, 128, 128, 1], device=hpu:0) = aten::unsqueeze[deterministic=0](%id_1641913_model/0/linear_attn/aten__clone Unique ID:287952, %57)
+  %id_1641983_model/0/linear_attn/hpu__expand Unique ID:287964 : BFloat16(1, 2048, 16, 2, 128, strides=[8388608, 4096, 256, 128, 1], device=hpu:0) = hpu::expand[deterministic=0](%id_1641980_model/0/linear_attn/aten__unsqueeze Unique ID:287963, %34, %73)
+  %id_1641986_model/0/linear_attn/aten__clone Unique ID:287965 : BFloat16(1, 2048, 16, 2, 128, strides=[8388608, 4096, 256, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1641983_model/0/linear_attn/hpu__expand Unique ID:287964, %79)
+  %id_1641992_model/0/linear_attn/aten__view Unique ID:287966 : BFloat16(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641986_model/0/linear_attn/aten__clone Unique ID:287965, %37)
+  %id_1642053_model/0/linear_attn/hpu__cast Unique ID:287974 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1641992_model/0/linear_attn/aten__view Unique ID:287966, %68)
+  %id_1642060_model/0/linear_attn/aten__mul Unique ID:287975 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::mul[deterministic=0](%id_1642053_model/0/linear_attn/hpu__cast Unique ID:287974, %id_1642053_model/0/linear_attn/hpu__cast Unique ID:287974)
+  %id_1642064_model/0/linear_attn/aten__sum Unique ID:287976 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = aten::sum[deterministic=0](%id_1642060_model/0/linear_attn/aten__mul Unique ID:287975, %33, %35, %70)
+  %id_1642070_model/0/linear_attn/hpu__add Unique ID:287977 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = hpu::add[deterministic=0](%id_1642064_model/0/linear_attn/aten__sum Unique ID:287976, %id_1642073_model/0/linear_attn/hpu__cast Unique ID:4611686018427387996, %76)
+  %id_1642079_model/0/linear_attn/aten__sqrt Unique ID:287978 : Float(1, 2048, 32, 1, strides=[65536, 32, 1, 1], device=hpu:0) = aten::sqrt[deterministic=0](%id_1642070_model/0/linear_attn/hpu__add Unique ID:287977)
+  %id_1642088_model/0/linear_attn/aten__div Unique ID:287979 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::div[deterministic=0](%id_1642053_model/0/linear_attn/hpu__cast Unique ID:287974, %id_1642079_model/0/linear_attn/aten__sqrt Unique ID:287978)
+  %id_1642098_model/0/linear_attn/aten__view Unique ID:287982 : BFloat16(2048, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641924_model/0/linear_attn/aten__clone Unique ID:287954, %32)
+  %id_1642104_model/0/linear_attn/hpu__cast Unique ID:287983 : Float(2048, 32, 128, strides=[4096, 128, 1], device=hpu:0) = hpu::cast[deterministic=0](%id_1642098_model/0/linear_attn/aten__view Unique ID:287982, %68)
+  %id_1642109_model/0/linear_attn/aten__view Unique ID:287984 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641947_model/0/linear_attn/aten__mul Unique ID:287957, %31)
+  %id_1642117_model/0/linear_attn/aten__slice Unique ID:287986 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1642109_model/0/linear_attn/aten__view Unique ID:287984, %79, %79, %41, %76)
+  %id_1642120_model/0/linear_attn/aten__view Unique ID:287987 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642117_model/0/linear_attn/aten__slice Unique ID:287986, %30)
+  %id_1642123_model/0/linear_attn/aten__view Unique ID:287988 : Float(1, 16, 128, 32, strides=[65536, 4096, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642120_model/0/linear_attn/aten__view Unique ID:287987, %29)
+  %id_1642126_model/0/linear_attn/aten__cumsum Unique ID:287989 : Float(1, 16, 128, 32, strides=[65536, 4096, 32, 1], device=hpu:0) = aten::cumsum[deterministic=0](%id_1642123_model/0/linear_attn/aten__view Unique ID:287988, %54, %70)
+  %id_1642095_model/0/linear_attn/aten__view Unique ID:287981 : Float(2048, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642088_model/0/linear_attn/aten__div Unique ID:287979, %32)
+  %id_1642148_model/0/linear_attn/aten__slice Unique ID:287994 : Float(2048, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1642095_model/0/linear_attn/aten__view Unique ID:287981, %79, %79, %41, %76)
+  %id_1642160_model/0/linear_attn/aten__view Unique ID:287998 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642148_model/0/linear_attn/aten__slice Unique ID:287994, %37)
+  %id_1642175_model/0/linear_attn/aten__view Unique ID:288003 : Float(1, 16, 128, 32, 128, strides=[8388608, 524288, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642160_model/0/linear_attn/aten__view Unique ID:287998, %28)
+  %id_1642187_model/0/linear_attn/aten__view Unique ID:288007 : Float(16, 128, 32, 128, strides=[524288, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642175_model/0/linear_attn/aten__view Unique ID:288003, %27)
+  %id_1642190_model/0/linear_attn/aten__permute Unique ID:288008 : Float(16, 32, 128, 128, strides=[524288, 16384, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_1642187_model/0/linear_attn/aten__view Unique ID:288007, %26)
+  %id_1642193_model/0/linear_attn/aten__clone Unique ID:288009 : Float(16, 32, 128, 128, strides=[524288, 16384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1642190_model/0/linear_attn/aten__permute Unique ID:288008, %79)
+  %id_1642151_model/0/linear_attn/aten__slice Unique ID:287995 : Float(2048, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1642104_model/0/linear_attn/hpu__cast Unique ID:287983, %79, %79, %41, %76)
+  %id_1642163_model/0/linear_attn/aten__view Unique ID:287999 : Float(1, 2048, 32, 128, strides=[8388608, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642151_model/0/linear_attn/aten__slice Unique ID:287995, %37)
+  %id_1642178_model/0/linear_attn/aten__view Unique ID:288004 : Float(1, 16, 128, 32, 128, strides=[8388608, 524288, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642163_model/0/linear_attn/aten__view Unique ID:287999, %28)
+  %id_1642208_model/0/linear_attn/aten__view Unique ID:288011 : Float(16, 128, 32, 128, strides=[524288, 4096, 128, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642178_model/0/linear_attn/aten__view Unique ID:288004, %27)
+  %id_1642211_model/0/linear_attn/aten__permute Unique ID:288012 : Float(16, 32, 128, 128, strides=[524288, 16384, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_1642208_model/0/linear_attn/aten__view Unique ID:288011, %26)
+  %id_1642214_model/0/linear_attn/aten__clone Unique ID:288013 : Float(16, 32, 128, 128, strides=[524288, 16384, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1642211_model/0/linear_attn/aten__permute Unique ID:288012, %79)
+  %id_1642129_model/0/linear_attn/aten__view Unique ID:287990 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642126_model/0/linear_attn/aten__cumsum Unique ID:287989, %30)
+  %id_1642139_model/0/linear_attn/hpu__identity Unique ID:287991 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = hpu::identity[deterministic=0](%id_1642129_model/0/linear_attn/aten__view Unique ID:287990)
+  %id_1642142_model/0/linear_attn/aten__view Unique ID:287992 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642139_model/0/linear_attn/hpu__identity Unique ID:287991, %31)
+  %id_1642166_model/0/linear_attn/aten__view Unique ID:288000 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642142_model/0/linear_attn/aten__view Unique ID:287992, %30)
+  %id_1642181_model/0/linear_attn/aten__view Unique ID:288005 : Float(1, 16, 128, 32, strides=[65536, 4096, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642166_model/0/linear_attn/aten__view Unique ID:288000, %29)
+  %id_1642228_model/0/linear_attn/aten__view Unique ID:288015 : Float(16, 128, 32, strides=[4096, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642181_model/0/linear_attn/aten__view Unique ID:288005, %25)
+  %id_1642231_model/0/linear_attn/aten__permute Unique ID:288016 : Float(16, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_1642228_model/0/linear_attn/aten__view Unique ID:288015, %24)
+  %id_1642234_model/0/linear_attn/aten__clone Unique ID:288017 : Float(16, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1642231_model/0/linear_attn/aten__permute Unique ID:288016, %79)
+  %id_1642114_model/0/linear_attn/aten__view Unique ID:287985 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1641952_model/0/linear_attn/aten__mul Unique ID:287958, %31)
+  %id_1642154_model/0/linear_attn/aten__slice Unique ID:287996 : Float(2048, 32, strides=[32, 1], device=hpu:0) = aten::slice[deterministic=0](%id_1642114_model/0/linear_attn/aten__view Unique ID:287985, %79, %79, %41, %76)
+  %id_1642169_model/0/linear_attn/aten__view Unique ID:288001 : Float(1, 2048, 32, strides=[65536, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642154_model/0/linear_attn/aten__slice Unique ID:287996, %30)
+  %id_1642184_model/0/linear_attn/aten__view Unique ID:288006 : Float(1, 16, 128, 32, strides=[65536, 4096, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642169_model/0/linear_attn/aten__view Unique ID:288001, %29)
+  %id_1642247_model/0/linear_attn/aten__view Unique ID:288019 : Float(16, 128, 32, strides=[4096, 32, 1], device=hpu:0) = aten::view[deterministic=0](%id_1642184_model/0/linear_attn/aten__view Unique ID:288006, %25)
+  %id_1642253_model/0/linear_attn/aten__permute Unique ID:288020 : Float(16, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::permute[deterministic=0](%id_1642247_model/0/linear_attn/aten__view Unique ID:288019, %24)
+  %id_1642256_model/0/linear_attn/aten__clone Unique ID:288021 : Float(16, 32, 128, strides=[4096, 128, 1], device=hpu:0) = aten::clone[deterministic=0](%id_1642253_model/0/linear_attn/aten__permute Unique ID:288020, %79)
+  return (%id_1641244_aten__cat Unique ID:287825, %id_1641251_aten__cat Unique ID:287826, %id_1641274_model/aten__zero_ Unique ID:287828, %id_1641287_model/hpu__add Unique ID:287832, %id_1641305_model/0/input_layernorm/hpu__rms_norm Unique ID:287833, %id_1641326_model/0/linear_attn/aten__index_select Unique ID:287838, %id_1641361_model/0/linear_attn/aten__mul Unique ID:287843, %id_1641365_model/0/linear_attn/in_proj_qkvz/aten__linear Unique ID:287844, %id_1641371_model/0/linear_attn/in_proj_ba/aten__linear Unique ID:287845, %id_1641392_model/0/linear_attn/aten__clone Unique ID:287851, %id_1641399_model/0/linear_attn/aten__clone Unique ID:287852, %id_1641409_model/0/linear_attn/aten__zero_ Unique ID:287853, %id_1641419_model/0/linear_attn/aten__mul Unique ID:287856, %id_1641716_model/0/linear_attn/aten__zero_ Unique ID:287907, %id_1641861_model/0/linear_attn/hpu__slice_insert Unique ID:287941, %id_1641883_model/0/linear_attn/aten__mul Unique ID:287945, %id_1641902_model/0/linear_attn/aten__clone Unique ID:287950, %id_1641913_model/0/linear_attn/aten__clone Unique ID:287952, %id_1641924_model/0/linear_attn/aten__clone Unique ID:287954, %id_1641938_model/0/linear_attn/hpu__cast Unique ID:287956, %id_1641947_model/0/linear_attn/aten__mul Unique ID:287957, %id_1641952_model/0/linear_attn/aten__mul Unique ID:287958, %id_1642046_model/0/linear_attn/aten__div Unique ID:287973, %id_1642088_model/0/linear_attn/aten__div Unique ID:287979, %id_1642104_model/0/linear_attn/hpu__cast Unique ID:287983, %id_1642126_model/0/linear_attn/aten__cumsum Unique ID:287989, %id_1642193_model/0/linear_attn/aten__clone Unique ID:288009, %id_1642214_model/0/linear_attn/aten__clone Unique ID:288013, %id_1642234_model/0/linear_attn/aten__clone Unique ID:288017, %id_1642256_model/0/linear_attn/aten__clone Unique ID:288021)
+Prompt warmup processing:   2%|▏         | 1/48 [00:46<36:24, 46.48s/item, 0/48]
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330] EngineCore failed to start.
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330] Traceback (most recent call last):
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1299, in run_engine_core
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return func(*args, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1065, in __init__
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     super().__init__(
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 136, in __init__
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     kv_cache_config = self._initialize_kv_caches(vllm_config)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return func(*args, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/engine/core.py", line 324, in _initialize_kv_caches
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.model_executor.initialize_from_config(kv_cache_configs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/executor/abstract.py", line 123, in initialize_from_config
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.collective_rpc("initialize_from_config", args=(kv_cache_configs,))
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/executor/uniproc_executor.py", line 92, in collective_rpc
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     result = run_method(self.driver_worker, method, args, kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/serial_utils.py", line 510, in run_method
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return func(*args, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm/vllm/v1/worker/worker_base.py", line 325, in initialize_from_config
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.worker.initialize_from_config(kv_cache_config)  # type: ignore
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 550, in initialize_from_config
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.compile_or_warm_up_model()
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 555, in compile_or_warm_up_model
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.model_runner.warmup_model()  # type: ignore[union-attr]
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return func(*args, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 6184, in warmup_model
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.warmup_graphs(
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5448, in warmup_graphs
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self._prepare_dummy_scenario(prompt_cfg, decode_cfg)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5642, in _prepare_dummy_scenario
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self._execute_dummy_scenario(requests, scheduled_tokens)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5670, in _execute_dummy_scenario
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self.sample_tokens(None)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return func(*args, **kwargs)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 4399, in sample_tokens
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     self._execute_model_generic(
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 3625, in _execute_model_generic
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     hidden_states = self.model.forward(input_ids=token_ids,
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 890, in forward
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     return wrapped_hpugraph_forward(
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 764, in wrapped_hpugraph_forward
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     cached.graph.replayV3(input_tensor_list, cached.asynchronous)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 118, in replayV3
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330]     _hpu_C.replayV3(self.hpu_graph, tlistI, asynchronous)
+(EngineCore pid=31277) ERROR 09-10 15:12:45 [core.py:1330] RuntimeError: Neither storage attached to input tensor, not its view. Uniqueid: 287941 Strided Params Has Value: 0 Failing Graph: 
+(EngineCore pid=31277) Process EngineCore:
+(EngineCore pid=31277) Traceback (most recent call last):
+(EngineCore pid=31277)   File "/usr/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=31277)     self.run()
+(EngineCore pid=31277)   File "/usr/lib/python3.10/multiprocessing/process.py", line 108, in run
+(EngineCore pid=31277)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1334, in run_engine_core
+(EngineCore pid=31277)     raise e
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1299, in run_engine_core
+(EngineCore pid=31277)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=31277)     return func(*args, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 1065, in __init__
+(EngineCore pid=31277)     super().__init__(
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 136, in __init__
+(EngineCore pid=31277)     kv_cache_config = self._initialize_kv_caches(vllm_config)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=31277)     return func(*args, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/engine/core.py", line 324, in _initialize_kv_caches
+(EngineCore pid=31277)     self.model_executor.initialize_from_config(kv_cache_configs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/executor/abstract.py", line 123, in initialize_from_config
+(EngineCore pid=31277)     self.collective_rpc("initialize_from_config", args=(kv_cache_configs,))
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/executor/uniproc_executor.py", line 92, in collective_rpc
+(EngineCore pid=31277)     result = run_method(self.driver_worker, method, args, kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/serial_utils.py", line 510, in run_method
+(EngineCore pid=31277)     return func(*args, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm/vllm/v1/worker/worker_base.py", line 325, in initialize_from_config
+(EngineCore pid=31277)     self.worker.initialize_from_config(kv_cache_config)  # type: ignore
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 550, in initialize_from_config
+(EngineCore pid=31277)     self.compile_or_warm_up_model()
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_worker.py", line 555, in compile_or_warm_up_model
+(EngineCore pid=31277)     self.model_runner.warmup_model()  # type: ignore[union-attr]
+(EngineCore pid=31277)   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=31277)     return func(*args, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 6184, in warmup_model
+(EngineCore pid=31277)     self.warmup_graphs(
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5448, in warmup_graphs
+(EngineCore pid=31277)     self._prepare_dummy_scenario(prompt_cfg, decode_cfg)
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5642, in _prepare_dummy_scenario
+(EngineCore pid=31277)     self._execute_dummy_scenario(requests, scheduled_tokens)
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 5670, in _execute_dummy_scenario
+(EngineCore pid=31277)     self.sample_tokens(None)
+(EngineCore pid=31277)   File "/usr/local/lib/python3.10/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+(EngineCore pid=31277)     return func(*args, **kwargs)
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 4399, in sample_tokens
+(EngineCore pid=31277)     self._execute_model_generic(
+(EngineCore pid=31277)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 3625, in _execute_model_generic
+(EngineCore pid=31277)     hidden_states = self.model.forward(input_ids=token_ids,
+(EngineCore pid=31277)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 890, in forward
+(EngineCore pid=31277)     return wrapped_hpugraph_forward(
+(EngineCore pid=31277)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 764, in wrapped_hpugraph_forward
+(EngineCore pid=31277)     cached.graph.replayV3(input_tensor_list, cached.asynchronous)
+(EngineCore pid=31277)   File "/usr/local/lib/python3.10/dist-packages/habana_frameworks/torch/hpu/graphs.py", line 118, in replayV3
+(EngineCore pid=31277)     _hpu_C.replayV3(self.hpu_graph, tlistI, asynchronous)
+(EngineCore pid=31277) RuntimeError: Neither storage attached to input tensor, not its view. Uniqueid: 287941 Strided Params Has Value: 0 Failing Graph: 
+
+Traceback (most recent call last):
+  File "/usr/local/bin/vllm", line 6, in <module>
+    sys.exit(main())
+  File "/opt/src/vllm/vllm/entrypoints/cli/main.py", line 95, in main
+    args.dispatch_function(args)
+  File "/opt/src/vllm/vllm/entrypoints/cli/benchmark/latency.py", line 22, in cmd
+    main(args)
+  File "/opt/src/vllm/vllm/benchmarks/latency.py", line 88, in main
+    llm = LLM.from_engine_args(engine_args)
+  File "/opt/src/vllm/vllm/entrypoints/llm.py", line 378, in from_engine_args
+    return cls(**vars(engine_args))
+  File "/opt/src/vllm/vllm/entrypoints/llm.py", line 338, in __init__
+    self.llm_engine = LLMEngine.from_engine_args(
+  File "/opt/src/vllm/vllm/v1/engine/llm_engine.py", line 179, in from_engine_args
+    return cls(
+  File "/opt/src/vllm/vllm/v1/engine/llm_engine.py", line 105, in __init__
+    self.engine_core = EngineCoreClient.make_client(
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 103, in make_client
+    return SyncMPClient(vllm_config, executor_class, log_stats)
+  File "/opt/src/vllm/vllm/tracing/otel.py", line 178, in sync_wrapper
+    return func(*args, **kwargs)
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 786, in __init__
+    super().__init__(
+  File "/opt/src/vllm/vllm/v1/engine/core_client.py", line 573, in __init__
+    with launch_core_engines(
+  File "/usr/lib/python3.10/contextlib.py", line 142, in __exit__
+    next(self.gen)
+  File "/opt/src/vllm/vllm/v1/engine/utils.py", line 1213, in launch_core_engines
+    wait_for_engine_startup(
+  File "/opt/src/vllm/vllm/v1/engine/utils.py", line 1272, in wait_for_engine_startup
+    raise RuntimeError(
+RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {'EngineCore': 1}
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+INFO 09-10 15:32:00 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:32:00 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:32:00 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:32:00 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:32:00 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:32:00 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:32:00 [__init__.py:237] Platform plugin hpu is activated
+INFO 09-10 15:32:00 [__init__.py:237] Platform plugin hpu is activated
+WARNING 09-10 15:32:00 [platform.py:369] Pin memory is not supported on HPU.
+INFO 09-10 15:32:02 [importing.py:53] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 15:32:02 [importing.py:88] Triton not installed or not compatible; certain GPU-related functions will not be available.
+WARNING 09-10 15:32:04 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:32:04 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:32:04 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+WARNING 09-10 15:32:04 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+INFO 09-10 15:32:04 [nixl_utils.py:32] Setting UCX_RCACHE_MAX_UNRELEASED to '1024' to avoid a rare memory leak in UCX when using NIXL.
+WARNING 09-10 15:32:04 [nixl_utils.py:58] NIXL is not available
+WARNING 09-10 15:32:04 [nixl_utils.py:60] NIXL agent config is not available
+WARNING 09-10 15:32:05 [registry.py:159] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7fd6462c1840>. It is overwritten by the new one.
+INFO 09-10 15:32:05 [api_utils.py:273] non-default args: {'trust_remote_code': True, 'dtype': 'bfloat16', 'max_model_len': 2048, 'enable_prefix_caching': False, 'gpu_memory_utilization': 0.5, 'max_num_seqs': 8, 'enable_lora': None, 'reasoning_parser_plugin': '', 'enable_bf16x3_router_gemm': False, 'model': 'Qwen/Qwen3.6-35B-A3B'}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+INFO 09-10 15:32:06 [model.py:623] Resolved architecture: Qwen3_5MoeForConditionalGeneration
+INFO 09-10 15:32:06 [model.py:1788] Using max model len 2048
+WARNING 09-10 15:32:06 [platform.py:132] This is a workaround! Please check the NOTE in the get_device_total_memory definition.
+INFO 09-10 15:32:06 [scheduler.py:252] Chunked prefill is enabled with max_num_batched_tokens=8192.
+INFO 09-10 15:32:06 [vllm.py:1109] Asynchronous scheduling is enabled.
+INFO 09-10 15:32:06 [kernel.py:295] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+INFO 09-10 15:32:06 [platform.py:258] [HPU] Forcing CompilationMode.NONE compilation mode
+INFO 09-10 15:32:06 [compilation.py:329] Enabled custom fusions: norm_quant, act_quant
+[transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+INFO 09-10 15:32:23 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:32:23 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:32:23 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:32:23 [__init__.py:52] Available plugins for group vllm.platform_plugins:
+INFO 09-10 15:32:23 [__init__.py:54] - hpu -> vllm_gaudi:register
+INFO 09-10 15:32:23 [__init__.py:57] All plugins in this group will be loaded. Set `VLLM_PLUGINS` to control which plugins to load.
+INFO 09-10 15:32:23 [__init__.py:237] Platform plugin hpu is activated
+INFO 09-10 15:32:23 [__init__.py:237] Platform plugin hpu is activated
+WARNING 09-10 15:32:23 [platform.py:369] Pin memory is not supported on HPU.
+INFO 09-10 15:32:25 [importing.py:53] Triton is installed but 0 active driver(s) found (expected 1). Disabling Triton to prevent runtime errors.
+INFO 09-10 15:32:25 [importing.py:88] Triton not installed or not compatible; certain GPU-related functions will not be available.
+(EngineCore pid=58281) WARNING 09-10 15:32:26 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=58281) WARNING 09-10 15:32:26 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=58281) WARNING 09-10 15:32:26 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=58281) WARNING 09-10 15:32:26 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=58281) WARNING 09-10 15:32:27 [nixl_utils.py:58] NIXL is not available
+(EngineCore pid=58281) WARNING 09-10 15:32:27 [nixl_utils.py:60] NIXL agent config is not available
+(EngineCore pid=58281) WARNING 09-10 15:32:27 [registry.py:159] Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7ff738ce9390>. It is overwritten by the new one.
+(EngineCore pid=58281) INFO 09-10 15:32:27 [core.py:116] Initializing a V1 LLM engine (v0.26.0) with config: model='Qwen/Qwen3.6-35B-A3B', speculative_config=None, tokenizer='Qwen/Qwen3.6-35B-A3B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=True, dtype=torch.bfloat16, max_seq_len=2048, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=True, quantization=None, quantization_config=None, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=hpu, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False, jit_monitor_mode='warn', jit_monitor_verbose=False), seed=0, served_model_name=Qwen/Qwen3.6-35B-A3B, enable_prefix_caching=False, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.NONE: 0>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'hpu_backend', 'custom_ops': ['all'], 'ir_enable_torch_wrap': False, 'splitting_ops': [], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_vision_items_per_batch': 0, 'encoder_cudagraph_max_frames_per_batch': None, 'compile_sizes': None, 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.NONE: 0>, 'cudagraph_num_of_warmups': 0, 'cudagraph_capture_sizes': [], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': True, 'fuse_act_quant': True, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False, 'enable_qk_norm_rope_fusion': False, 'fuse_rope_kvcache_cat_mla': False, 'fuse_act_padding': False, 'fuse_qk_norm_rope_kvcache': False}, 'max_cudagraph_capture_size': None, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': False, 'static_all_moe_layers': []}, kernel_config=KernelConfig(ir_op_priority=IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native']), enable_flashinfer_autotune=True, enable_cutedsl_warmup=True, enable_bf16x3_router_gemm=False, moe_backend='auto', linear_backend='auto')
+(EngineCore pid=58281) Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+(EngineCore pid=58281) INFO 09-10 15:32:29 [parallel_state.py:1615] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://10.x.x.x:42377 backend=hccl
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 1
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 128
+CPU RAM       : 125 GB
+------------------------------------------------------------------------------
+(EngineCore pid=58281) INFO 09-10 15:32:32 [parallel_state.py:1946] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+fatal: not a git repository (or any parent up to mount point /)
+Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:28] Environment:
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     hw: gaudi2
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     build: 1.24.1.482
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     engine_version: v1
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     bridge_mode: eager
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     model_type: qwen3_5_moe
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     prefix_caching: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     vllm_gaudi_commit: Error getting commit hash
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:28] Features:
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     fp32_alibi_biases: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     fp32_softmax: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     fused_block_softmax_adjustment: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     fused_block_softmax: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     prompt_attn_impl: fsdpa_impl
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     skip_warmup: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     merged_prefill: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     use_contiguous_pa: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     use_bucketing: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     bucketing_strategy: exp
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     defrag: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     regional_compilation: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     dynamic_shapes_compilation: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     fullgraph_compilation: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     scale_adjustment: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     flatten_input: True
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     high_level_profiler_enabled: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     track_graph_compilation: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     per_token_kv_scaling_support: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     moe_chunk: 
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     moe_token_boundary: 
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     row_parallel_chunks: 1
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     row_parallel_chunk_threshold: 8192
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     use_dispatch_fn: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     use_hpu_aligned_scale: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     enable_fsdpa_slicing: False
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:28] User flags:
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     PT_HPU_WEIGHT_SHARING: 0
+(EngineCore pid=58281) INFO 09-10 15:32:32 [runtime.py:32]     RUNTIME_SCALE_PATCHING: 1
+(EngineCore pid=58281) INFO 09-10 15:32:32 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=58281) INFO 09-10 15:32:32 [hpu_model_runner.py:1394] GDN layers detected (30): VLLM_USE_HYBRID_CACHE=1, VLLM_USE_NAIVE_MAMBA_CACHE_SHARING=0, VLLM_COMPACT_GDN=1
+(EngineCore pid=58281) INFO 09-10 15:32:32 [hpu_model_runner.py:1522] Bucketing is ON.
+(EngineCore pid=58281) INFO 09-10 15:32:32 [hpu_worker.py:247] QUANT_CONFIG unchanged: None
+(EngineCore pid=58281) WARNING 09-10 15:32:32 [hpu_model_runner.py:1211] Setting OMP_NUM_THREADS to 128 and torch.set_num_threads to 128 for 128 available CPU cores and world size 1
+(EngineCore pid=58281) INFO 09-10 15:32:32 [hpu_model_runner.py:4741] Starting to load model Qwen/Qwen3.6-35B-A3B...
+(EngineCore pid=58281) INFO 09-10 15:32:32 [interface.py:414] Using default backend AttentionBackendEnum.TORCH_SDPA for vit attention
+(EngineCore pid=58281) INFO 09-10 15:32:32 [mm_encoder_attention.py:373] Using AttentionBackendEnum.TORCH_SDPA for MMEncoderAttention.
+(EngineCore pid=58281) INFO 09-10 15:32:32 [qwen_gdn_linear_attn.py:150] Using Triton/FLA GDN prefill kernel (requested=auto, head_k_dim=128).
+(EngineCore pid=58281) INFO 09-10 15:32:32 [platform.py:98] Using HPUAttentionV1 backend.
+(EngineCore pid=58281) INFO 09-10 15:32:33 [weight_utils.py:869] Filesystem type for checkpoints: EXT4. Checkpoint size: 66.97 GiB. Available RAM: 80.56 GiB.
+(EngineCore pid=58281) INFO 09-10 15:32:33 [weight_utils.py:892] Auto-prefetch is disabled because the filesystem (EXT4) is not a recognized network FS (NFS/Lustre). If you want to force prefetching, start vLLM with --safetensors-load-strategy=prefetch.
+(EngineCore pid=58281) Loading safetensors checkpoint shards:   0% Completed | 0/26 [00:00<?, ?it/s]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:   4% Completed | 1/26 [00:08<03:37,  8.72s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:   8% Completed | 2/26 [00:11<02:06,  5.25s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  12% Completed | 3/26 [00:18<02:23,  6.24s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  15% Completed | 4/26 [00:26<02:28,  6.76s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  19% Completed | 5/26 [00:34<02:27,  7.04s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  23% Completed | 6/26 [00:42<02:30,  7.55s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  27% Completed | 7/26 [00:45<01:53,  5.96s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  31% Completed | 8/26 [00:54<02:03,  6.86s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  35% Completed | 9/26 [00:56<01:32,  5.43s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  38% Completed | 10/26 [01:05<01:43,  6.48s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  42% Completed | 11/26 [01:07<01:17,  5.19s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  46% Completed | 12/26 [01:14<01:21,  5.86s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  50% Completed | 13/26 [01:18<01:07,  5.20s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  54% Completed | 14/26 [01:25<01:10,  5.88s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  58% Completed | 15/26 [01:29<00:57,  5.22s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  62% Completed | 16/26 [01:38<01:01,  6.19s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  65% Completed | 17/26 [01:40<00:46,  5.14s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  69% Completed | 18/26 [01:49<00:49,  6.19s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  73% Completed | 19/26 [01:51<00:35,  5.02s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  77% Completed | 20/26 [01:59<00:34,  5.72s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  81% Completed | 21/26 [02:02<00:25,  5.10s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  85% Completed | 22/26 [02:10<00:23,  5.77s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  88% Completed | 23/26 [02:17<00:18,  6.27s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  92% Completed | 24/26 [02:24<00:13,  6.64s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards:  96% Completed | 25/26 [02:31<00:06,  6.55s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards: 100% Completed | 26/26 [02:31<00:00,  4.77s/it]
+(EngineCore pid=58281) Loading safetensors checkpoint shards: 100% Completed | 26/26 [02:31<00:00,  5.84s/it]
+(EngineCore pid=58281) 
+(EngineCore pid=58281) INFO 09-10 15:35:05 [default_loader.py:430] Loading weights took 151.98 seconds
+(EngineCore pid=58281) INFO 09-10 15:35:07 [hpu_model_runner.py:4759] Loading model weights took 65.5214 GB
+(EngineCore pid=58281) INFO 09-10 15:35:08 [hpu_model_runner.py:4852] Wrapping in HPUGraph took 0.0000 GB
+(EngineCore pid=58281) INFO 09-10 15:35:08 [hpu_model_runner.py:4880] Compilation took 0.0000 GB
+(EngineCore pid=58281) INFO 09-10 15:35:08 [interface.py:635] Setting kv cache block size to 128 for CUSTOM backend.
+(EngineCore pid=58281) INFO 09-10 15:35:08 [interface.py:905] Setting attention block size to 1152 tokens to ensure that attention page size is >= mamba page size.
+(EngineCore pid=58281) INFO 09-10 15:35:08 [interface.py:929] Padding mamba page size by 9.92% to ensure that mamba page size and attention page size are exactly equal.
+(EngineCore pid=58281) INFO 09-10 15:35:09 [hpu_worker.py:404] Model profiling run took 0 B of device memory (65.55 GiB/94.62 GiB used) and -5.004 MiB of host memory (41.56 GiB/125.5 GiB used)
+(EngineCore pid=58281) INFO 09-10 15:35:09 [hpu_worker.py:432] Free device memory: 29.08 GiB, 14.54 GiB usable (gpu_memory_utilization=0.5), 1.454 GiB reserved for HPUGraphs (VLLM_GRAPH_RESERVED_MEM=0.1), 90 MiB reserved for KV cache dummy block 13 GiB reserved for usable KV cache
+(EngineCore pid=58281) INFO 09-10 15:35:09 [kv_cache_utils.py:2177] GPU KV cache size: 242,073 tokens
+(EngineCore pid=58281) INFO 09-10 15:35:09 [kv_cache_utils.py:2178] Maximum concurrency for 2,048 tokens per request: 118.20x
+(EngineCore pid=58281) INFO 09-10 15:35:09 [hpu_model_runner.py:6886] GDN compact: 3 groups, 8 base_slots, tensor_dim0=26 vs baseline=592, free_list_len=8
+(EngineCore pid=58281) INFO 09-10 15:35:10 [hpu_worker.py:546] Usable num_blocks: 591, actual allocated num_blocks (max across layers): 680960 (_PAD_BLOCK_ID=591, _PAD_SLOT_ID=75648)
+(EngineCore pid=58281) INFO 09-10 15:35:10 [hpu_worker.py:549] Initializing cache engine took 13.51 GiB of device memory (79.04 GiB/94.62 GiB used) and 748 KiB of host memory (41.55 GiB/125.5 GiB used)
+(EngineCore pid=58281) INFO 09-10 15:35:10 [exponential.py:80] Prompt bucket config (min, step, max_warmup, limit) bs:[1, 2, 1, 1], query:[128, 128, 8192, 13], blocks:[0, 1, 15, 5]
+(EngineCore pid=58281) INFO 09-10 15:35:10 [common.py:245] Generated 48 prompt buckets [bs, query, num_blocks]: [(1, 128, 0), (1, 128, 1), (1, 128, 2), (1, 128, 4), (1, 128, 8), (1, 128, 15), (1, 256, 0), (1, 256, 1), (1, 256, 2), (1, 256, 4), (1, 256, 8), (1, 256, 15), (1, 384, 0), (1, 384, 1), (1, 384, 2), (1, 384, 4), (1, 384, 8), (1, 384, 15), (1, 512, 0), (1, 512, 1), (1, 512, 2), (1, 512, 4), (1, 512, 8), (1, 512, 15), (1, 768, 0), (1, 768, 1), (1, 768, 2), (1, 768, 4), (1, 768, 8), (1, 768, 15), (1, 1024, 0), (1, 1024, 1), (1, 1024, 2), (1, 1024, 4), (1, 1024, 8), (1, 1024, 15), (1, 1536, 0), (1, 1536, 1), (1, 1536, 2), (1, 1536, 4), (1, 1536, 8), (1, 1536, 15), (1, 2048, 0), (1, 2048, 1), (1, 2048, 2), (1, 2048, 4), (1, 2048, 8), (1, 2048, 15)]
+(EngineCore pid=58281) INFO 09-10 15:35:10 [exponential.py:105] Decode bucket config (min, step, max_warmup, limit) bs:[1, 2, 8, 4], block:[1, 8, 128, 8]
+(EngineCore pid=58281) INFO 09-10 15:35:10 [common.py:245] Generated 29 decode buckets [bs, query, num_blocks]: [(1, 1, 1), (1, 1, 8), (1, 1, 16), (2, 1, 8), (2, 1, 16), (2, 1, 24), (2, 1, 32), (4, 1, 8), (4, 1, 16), (4, 1, 24), (4, 1, 32), (4, 1, 40), (4, 1, 64), (6, 1, 8), (6, 1, 16), (6, 1, 24), (6, 1, 32), (6, 1, 40), (6, 1, 64), (6, 1, 88), (6, 1, 96), (8, 1, 8), (8, 1, 16), (8, 1, 24), (8, 1, 32), (8, 1, 40), (8, 1, 64), (8, 1, 88), (8, 1, 128)]
+(EngineCore pid=58281) INFO 09-10 15:35:10 [hpu_model_runner.py:6101] Multimodal bucket : []
+(EngineCore pid=58281) [transformers] The `use_fast` parameter is deprecated and will be removed in a future version. Use `backend="torchvision"` instead of `use_fast=True`, or `backend="pil"` instead of `use_fast=False`.
+(EngineCore pid=58281) WARNING 09-10 15:35:18 [hpu_model_runner.py:5991] No multimodal warmup resolutions for this native-resolution vision tower: patch-count buckets are empty and neither VLLM_MULTIMODAL_RESOLUTIONS nor limit-mm-per-prompt width/height is set. The vision-tower graph will recompile on the first request at each resolution. Set VLLM_MULTIMODAL_RESOLUTIONS (e.g. "1024x768,864x480x1-20") to precompile your production resolutions.
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5321] Warming up sampler with batch sizes: [1, 2, 4, 6, 8] and following configs:
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=1.0, top_p=1.0, top_k=0, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.7, top_p=0.9, top_k=50, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.3, top_p=0.95, top_k=20, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=1.2, top_p=0.8, top_k=100, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.8, top_p=0.85, top_k=0, batch_changed=True
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=1.0, top_p=1.0, top_k=0, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.7, top_p=0.9, top_k=50, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.3, top_p=0.95, top_k=20, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=1.2, top_p=0.8, top_k=100, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5323] temp=0.8, top_p=0.85, top_k=0, batch_changed=False
+(EngineCore pid=58281) INFO 09-10 15:35:18 [hpu_model_runner.py:5324] Starting sampler warmup...
+(EngineCore pid=58281) INFO 09-10 15:35:23 [hpu_model_runner.py:5416] Sampler warmup completed successfully
+(EngineCore pid=58281) Prompt warmup processing:   0%|          | 0/48 [00:00<?, ?item/s]/usr/local/lib/python3.10/dist-packages/torch/_dynamo/eval_frame.py:1263: UserWarning: hpu::batch_as_strided (with implementation in ???): The output of this custom operator (1) must not also be an input to this custom operator and (2) may not alias any inputs to this custom operator or other returns. The most common way to trigger this error is if we have y = custom_op(x) and y and x are the same Tensor. Please instead return a clone of the offending output tensor(s) (e.g. return x.clone()) or refactor the custom operator to not return y. This is deprecated and will become an error in PyTorch 2.12.
+(EngineCore pid=58281)   return fn(*args, **kwargs)
+(EngineCore pid=58281) Prompt warmup processing:   0%|          | 0/48 [00:30<?, ?item/s, 0/48]Prompt warmup processing:   2%|▏         | 1/48 [00:30<23:39, 30.21s/item, 0/48]Prompt warmup processing:   2%|▏         | 1/48 [00:36<23:39, 30.21s/item, 1/48]Prompt warmup processing:   4%|▍         | 2/48 [00:36<12:31, 16.34s/item, 1/48]Prompt warmup processing:   4%|▍         | 2/48 [00:37<12:31, 16.34s/item, 2/48]Prompt warmup processing:   6%|▋         | 3/48 [00:37<06:56,  9.27s/item, 2/48]Prompt warmup processing:   6%|▋         | 3/48 [00:38<06:56,  9.27s/item, 3/48]Prompt warmup processing:   8%|▊         | 4/48 [00:38<04:21,  5.94s/item, 3/48]Prompt warmup processing:   8%|▊         | 4/48 [00:39<04:21,  5.94s/item, 4/48]Prompt warmup processing:  10%|█         | 5/48 [00:39<02:56,  4.10s/item, 4/48]Prompt warmup processing:  10%|█         | 5/48 [00:40<02:56,  4.10s/item, 5/48]Prompt warmup processing:  12%|█▎        | 6/48 [00:40<02:05,  2.99s/item, 5/48]Prompt warmup processing:  12%|█▎        | 6/48 [01:11<02:05,  2.99s/item, 6/48]Prompt warmup processing:  15%|█▍        | 7/48 [01:11<08:26, 12.36s/item, 6/48]Prompt warmup processing:  15%|█▍        | 7/48 [01:12<08:26, 12.36s/item, 7/48]Prompt warmup processing:  17%|█▋        | 8/48 [01:12<05:51,  8.78s/item, 7/48]Prompt warmup processing:  17%|█▋        | 8/48 [01:14<05:51,  8.78s/item, 8/48]Prompt warmup processing:  19%|█▉        | 9/48 [01:14<04:08,  6.38s/item, 8/48]Prompt warmup processing:  19%|█▉        | 9/48 [01:31<04:08,  6.38s/item, 9/48]Prompt warmup processing:  21%|██        | 10/48 [01:31<06:07,  9.67s/item, 9/48]Prompt warmup processing:  21%|██        | 10/48 [01:44<06:07,  9.67s/item, 10/48]Prompt warmup processing:  23%|██▎       | 11/48 [01:44<06:40, 10.83s/item, 10/48]Prompt warmup processing:  23%|██▎       | 11/48 [02:02<06:40, 10.83s/item, 11/48]Prompt warmup processing:  25%|██▌       | 12/48 [02:02<07:42, 12.84s/item, 11/48]Prompt warmup processing:  25%|██▌       | 12/48 [02:20<07:42, 12.84s/item, 12/48]Prompt warmup processing:  27%|██▋       | 13/48 [02:20<08:32, 14.63s/item, 12/48]Prompt warmup processing:  27%|██▋       | 13/48 [02:21<08:32, 14.63s/item, 13/48]Prompt warmup processing:  29%|██▉       | 14/48 [02:21<05:59, 10.56s/item, 13/48]Prompt warmup processing:  29%|██▉       | 14/48 [02:34<05:59, 10.56s/item, 14/48]Prompt warmup processing:  31%|███▏      | 15/48 [02:34<06:10, 11.22s/item, 14/48]Prompt warmup processing:  31%|███▏      | 15/48 [02:48<06:10, 11.22s/item, 15/48]Prompt warmup processing:  33%|███▎      | 16/48 [02:48<06:21, 11.93s/item, 15/48]Prompt warmup processing:  33%|███▎      | 16/48 [03:01<06:21, 11.93s/item, 16/48]Prompt warmup processing:  35%|███▌      | 17/48 [03:01<06:23, 12.36s/item, 16/48]Prompt warmup processing:  35%|███▌      | 17/48 [03:14<06:23, 12.36s/item, 17/48]Prompt warmup processing:  38%|███▊      | 18/48 [03:14<06:16, 12.54s/item, 17/48]Prompt warmup processing:  38%|███▊      | 18/48 [03:31<06:16, 12.54s/item, 18/48]Prompt warmup processing:  40%|███▉      | 19/48 [03:31<06:41, 13.85s/item, 18/48]Prompt warmup processing:  40%|███▉      | 19/48 [03:42<06:41, 13.85s/item, 19/48]Prompt warmup processing:  42%|████▏     | 20/48 [03:42<06:08, 13.15s/item, 19/48]Prompt warmup processing:  42%|████▏     | 20/48 [03:55<06:08, 13.15s/item, 20/48]Prompt warmup processing:  44%|████▍     | 21/48 [03:55<05:49, 12.94s/item, 20/48]Prompt warmup processing:  44%|████▍     | 21/48 [04:07<05:49, 12.94s/item, 21/48]Prompt warmup processing:  46%|████▌     | 22/48 [04:07<05:33, 12.81s/item, 21/48]Prompt warmup processing:  46%|████▌     | 22/48 [04:19<05:33, 12.81s/item, 22/48]Prompt warmup processing:  48%|████▊     | 23/48 [04:19<05:11, 12.46s/item, 22/48]Prompt warmup processing:  48%|████▊     | 23/48 [04:32<05:11, 12.46s/item, 23/48]Prompt warmup processing:  50%|█████     | 24/48 [04:32<05:01, 12.55s/item, 23/48]Prompt warmup processing:  50%|█████     | 24/48 [04:49<05:01, 12.55s/item, 24/48]Prompt warmup processing:  52%|█████▏    | 25/48 [04:49<05:23, 14.06s/item, 24/48]Prompt warmup processing:  52%|█████▏    | 25/48 [05:02<05:23, 14.06s/item, 25/48]Prompt warmup processing:  54%|█████▍    | 26/48 [05:02<04:59, 13.62s/item, 25/48]Prompt warmup processing:  54%|█████▍    | 26/48 [05:14<04:59, 13.62s/item, 26/48]Prompt warmup processing:  56%|█████▋    | 27/48 [05:14<04:36, 13.15s/item, 26/48]Prompt warmup processing:  56%|█████▋    | 27/48 [05:26<04:36, 13.15s/item, 27/48]Prompt warmup processing:  58%|█████▊    | 28/48 [05:26<04:16, 12.84s/item, 27/48]Prompt warmup processing:  58%|█████▊    | 28/48 [05:38<04:16, 12.84s/item, 28/48]Prompt warmup processing:  60%|██████    | 29/48 [05:38<03:59, 12.63s/item, 28/48]Prompt warmup processing:  60%|██████    | 29/48 [05:50<03:59, 12.63s/item, 29/48]Prompt warmup processing:  62%|██████▎   | 30/48 [05:50<03:44, 12.45s/item, 29/48]Prompt warmup processing:  62%|██████▎   | 30/48 [06:07<03:44, 12.45s/item, 30/48]Prompt warmup processing:  65%|██████▍   | 31/48 [06:07<03:55, 13.83s/item, 30/48]Prompt warmup processing:  65%|██████▍   | 31/48 [06:19<03:55, 13.83s/item, 31/48]Prompt warmup processing:  67%|██████▋   | 32/48 [06:19<03:28, 13.03s/item, 31/48]Prompt warmup processing:  67%|██████▋   | 32/48 [06:30<03:28, 13.03s/item, 32/48]Prompt warmup processing:  69%|██████▉   | 33/48 [06:30<03:10, 12.68s/item, 32/48]Prompt warmup processing:  69%|██████▉   | 33/48 [06:42<03:10, 12.68s/item, 33/48]Prompt warmup processing:  71%|███████   | 34/48 [06:42<02:54, 12.46s/item, 33/48]Prompt warmup processing:  71%|███████   | 34/48 [06:54<02:54, 12.46s/item, 34/48]Prompt warmup processing:  73%|███████▎  | 35/48 [06:54<02:39, 12.30s/item, 34/48]Prompt warmup processing:  73%|███████▎  | 35/48 [07:06<02:39, 12.30s/item, 35/48]Prompt warmup processing:  75%|███████▌  | 36/48 [07:06<02:26, 12.19s/item, 35/48]Prompt warmup processing:  75%|███████▌  | 36/48 [07:22<02:26, 12.19s/item, 36/48]Prompt warmup processing:  77%|███████▋  | 37/48 [07:22<02:25, 13.23s/item, 36/48]Prompt warmup processing:  77%|███████▋  | 37/48 [07:34<02:25, 13.23s/item, 37/48]Prompt warmup processing:  79%|███████▉  | 38/48 [07:34<02:08, 12.86s/item, 37/48]Prompt warmup processing:  79%|███████▉  | 38/48 [07:46<02:08, 12.86s/item, 38/48]Prompt warmup processing:  81%|████████▏ | 39/48 [07:46<01:52, 12.55s/item, 38/48]Prompt warmup processing:  81%|████████▏ | 39/48 [07:56<01:52, 12.55s/item, 39/48]Prompt warmup processing:  83%|████████▎ | 40/48 [07:56<01:34, 11.84s/item, 39/48]Prompt warmup processing:  83%|████████▎ | 40/48 [08:08<01:34, 11.84s/item, 40/48]Prompt warmup processing:  85%|████████▌ | 41/48 [08:08<01:23, 11.88s/item, 40/48]Prompt warmup processing:  85%|████████▌ | 41/48 [08:20<01:23, 11.88s/item, 41/48]Prompt warmup processing:  88%|████████▊ | 42/48 [08:20<01:10, 11.83s/item, 41/48]Prompt warmup processing:  88%|████████▊ | 42/48 [08:36<01:10, 11.83s/item, 42/48]Prompt warmup processing:  90%|████████▉ | 43/48 [08:36<01:06, 13.32s/item, 42/48]Prompt warmup processing:  90%|████████▉ | 43/48 [08:47<01:06, 13.32s/item, 43/48]Prompt warmup processing:  92%|█████████▏| 44/48 [08:47<00:50, 12.58s/item, 43/48]Prompt warmup processing:  92%|█████████▏| 44/48 [08:59<00:50, 12.58s/item, 44/48]Prompt warmup processing:  94%|█████████▍| 45/48 [08:59<00:36, 12.28s/item, 44/48]Prompt warmup processing:  94%|█████████▍| 45/48 [09:10<00:36, 12.28s/item, 45/48]Prompt warmup processing:  96%|█████████▌| 46/48 [09:10<00:24, 12.05s/item, 45/48]Prompt warmup processing:  96%|█████████▌| 46/48 [09:22<00:24, 12.05s/item, 46/48]Prompt warmup processing:  98%|█████████▊| 47/48 [09:22<00:11, 11.92s/item, 46/48]Prompt warmup processing:  98%|█████████▊| 47/48 [09:32<00:11, 11.92s/item, 47/48]Prompt warmup processing: 100%|██████████| 48/48 [09:32<00:00, 11.47s/item, 47/48]Prompt warmup processing: 100%|██████████| 48/48 [09:32<00:00, 11.93s/item, 47/48]
+(EngineCore pid=58281) INFO 09-10 15:44:56 [hpu_model_runner.py:5174] Graph/Prompt captured:48 used_mem:595 MiB
+(EngineCore pid=58281) Decode warmup processing:   0%|          | 0/29 [00:00<?, ?item/s]/usr/local/lib/python3.10/dist-packages/torch/_dynamo/variables/functions.py:2202: UserWarning: Dynamo detected a call to a `functools.lru_cache`-wrapped function at 'hpu_model_runner.py:7643'. Dynamo ignores the cache wrapper and directly traces the wrapped function. Silent incorrectness is only a *potential* risk, not something we have observed. Enable TORCH_LOGS=+dynamo for a DEBUG stack trace.
+(EngineCore pid=58281) 
+(EngineCore pid=58281) This call originates from:
+(EngineCore pid=58281)   File "/opt/src/vllm-gaudi/vllm_gaudi/v1/worker/hpu_model_runner.py", line 7643, in _set_block_mapping
+(EngineCore pid=58281)     if not is_fake_hpu():
+(EngineCore pid=58281) 
+(EngineCore pid=58281)   torch._dynamo.utils.warn_once(msg)
+(EngineCore pid=58281) Decode warmup processing:   0%|          | 0/29 [00:09<?, ?item/s, 0/29]Decode warmup processing:   3%|▎         | 1/29 [00:09<04:12,  9.01s/item, 0/29]Decode warmup processing:   3%|▎         | 1/29 [00:16<04:12,  9.01s/item, 1/29]Decode warmup processing:   7%|▋         | 2/29 [00:16<03:35,  7.97s/item, 1/29]Decode warmup processing:   7%|▋         | 2/29 [00:19<03:35,  7.97s/item, 2/29]Decode warmup processing:  10%|█         | 3/29 [00:19<02:32,  5.87s/item, 2/29]Decode warmup processing:  10%|█         | 3/29 [00:22<02:32,  5.87s/item, 3/29]Decode warmup processing:  14%|█▍        | 4/29 [00:22<02:02,  4.88s/item, 3/29]Decode warmup processing:  14%|█▍        | 4/29 [00:26<02:02,  4.88s/item, 4/29]Decode warmup processing:  17%|█▋        | 5/29 [00:26<01:44,  4.34s/item, 4/29]Decode warmup processing:  17%|█▋        | 5/29 [00:29<01:44,  4.34s/item, 5/29]Decode warmup processing:  21%|██        | 6/29 [00:29<01:32,  4.02s/item, 5/29]Decode warmup processing:  21%|██        | 6/29 [00:33<01:32,  4.02s/item, 6/29]Decode warmup processing:  24%|██▍       | 7/29 [00:33<01:23,  3.80s/item, 6/29]Decode warmup processing:  24%|██▍       | 7/29 [00:36<01:23,  3.80s/item, 7/29]Decode warmup processing:  28%|██▊       | 8/29 [00:36<01:17,  3.67s/item, 7/29]Decode warmup processing:  28%|██▊       | 8/29 [00:44<01:17,  3.67s/item, 8/29]Decode warmup processing:  31%|███       | 9/29 [00:44<01:37,  4.89s/item, 8/29]Decode warmup processing:  31%|███       | 9/29 [00:47<01:37,  4.89s/item, 9/29]Decode warmup processing:  34%|███▍      | 10/29 [00:47<01:21,  4.31s/item, 9/29]Decode warmup processing:  34%|███▍      | 10/29 [00:50<01:21,  4.31s/item, 10/29]Decode warmup processing:  38%|███▊      | 11/29 [00:50<01:10,  3.90s/item, 10/29]Decode warmup processing:  38%|███▊      | 11/29 [00:53<01:10,  3.90s/item, 11/29]Decode warmup processing:  41%|████▏     | 12/29 [00:53<01:01,  3.63s/item, 11/29]Decode warmup processing:  41%|████▏     | 12/29 [00:56<01:01,  3.63s/item, 12/29]Decode warmup processing:  45%|████▍     | 13/29 [00:56<00:55,  3.47s/item, 12/29]Decode warmup processing:  45%|████▍     | 13/29 [00:59<00:55,  3.47s/item, 13/29]Decode warmup processing:  48%|████▊     | 14/29 [00:59<00:51,  3.42s/item, 13/29]Decode warmup processing:  48%|████▊     | 14/29 [01:02<00:51,  3.42s/item, 14/29]Decode warmup processing:  52%|█████▏    | 15/29 [01:02<00:47,  3.38s/item, 14/29]Decode warmup processing:  52%|█████▏    | 15/29 [01:05<00:47,  3.38s/item, 15/29]Decode warmup processing:  55%|█████▌    | 16/29 [01:05<00:43,  3.33s/item, 15/29]Decode warmup processing:  55%|█████▌    | 16/29 [01:09<00:43,  3.33s/item, 16/29]Decode warmup processing:  59%|█████▊    | 17/29 [01:09<00:42,  3.52s/item, 16/29]Decode warmup processing:  59%|█████▊    | 17/29 [01:12<00:42,  3.52s/item, 17/29]Decode warmup processing:  62%|██████▏   | 18/29 [01:12<00:36,  3.32s/item, 17/29]Decode warmup processing:  62%|██████▏   | 18/29 [01:15<00:36,  3.32s/item, 18/29]Decode warmup processing:  66%|██████▌   | 19/29 [01:15<00:31,  3.18s/item, 18/29]Decode warmup processing:  66%|██████▌   | 19/29 [01:18<00:31,  3.18s/item, 19/29]Decode warmup processing:  69%|██████▉   | 20/29 [01:18<00:27,  3.09s/item, 19/29]Decode warmup processing:  69%|██████▉   | 20/29 [01:21<00:27,  3.09s/item, 20/29]Decode warmup processing:  72%|███████▏  | 21/29 [01:21<00:24,  3.02s/item, 20/29]Decode warmup processing:  72%|███████▏  | 21/29 [01:24<00:24,  3.02s/item, 21/29]Decode warmup processing:  76%|███████▌  | 22/29 [01:24<00:20,  2.97s/item, 21/29]Decode warmup processing:  76%|███████▌  | 22/29 [01:27<00:20,  2.97s/item, 22/29]Decode warmup processing:  79%|███████▉  | 23/29 [01:27<00:18,  3.01s/item, 22/29]Decode warmup processing:  79%|███████▉  | 23/29 [01:30<00:18,  3.01s/item, 23/29]Decode warmup processing:  83%|████████▎ | 24/29 [01:30<00:14,  2.95s/item, 23/29]Decode warmup processing:  83%|████████▎ | 24/29 [01:32<00:14,  2.95s/item, 24/29]Decode warmup processing:  86%|████████▌ | 25/29 [01:32<00:11,  2.85s/item, 24/29]Decode warmup processing:  86%|████████▌ | 25/29 [01:35<00:11,  2.85s/item, 25/29]Decode warmup processing:  90%|████████▉ | 26/29 [01:35<00:08,  2.74s/item, 25/29]Decode warmup processing:  90%|████████▉ | 26/29 [01:45<00:08,  2.74s/item, 26/29]Decode warmup processing:  93%|█████████▎| 27/29 [01:45<00:09,  4.90s/item, 26/29]Decode warmup processing:  93%|█████████▎| 27/29 [01:47<00:09,  4.90s/item, 27/29]Decode warmup processing:  97%|█████████▋| 28/29 [01:47<00:04,  4.12s/item, 27/29]Decode warmup processing:  97%|█████████▋| 28/29 [01:53<00:04,  4.12s/item, 28/29]Decode warmup processing: 100%|██████████| 29/29 [01:53<00:00,  4.69s/item, 28/29]Decode warmup processing: 100%|██████████| 29/29 [01:53<00:00,  3.91s/item, 28/29]
+(EngineCore pid=58281) INFO 09-10 15:46:50 [hpu_model_runner.py:5174] Graph/Decode captured:29 used_mem:0 B
+(EngineCore pid=58281) INFO 09-10 15:46:50 [hpu_model_runner.py:6198] Running validation warmup to trigger guard specializations...
+(EngineCore pid=58281) INFO 09-10 15:46:50 [hpu_model_runner.py:6215] Validation warmup: 6 prompt buckets (seq_len=2048)
+(EngineCore pid=58281) Prompt warmup processing:   0%|          | 0/6 [00:00<?, ?item/s]Prompt warmup processing:   0%|          | 0/6 [00:27<?, ?item/s, 0/6]Prompt warmup processing:  17%|█▋        | 1/6 [00:27<02:17, 27.51s/item, 0/6]Prompt warmup processing:  17%|█▋        | 1/6 [00:29<02:17, 27.51s/item, 1/6]Prompt warmup processing:  33%|███▎      | 2/6 [00:29<00:49, 12.45s/item, 1/6]Prompt warmup processing:  33%|███▎      | 2/6 [00:31<00:49, 12.45s/item, 2/6]Prompt warmup processing:  50%|█████     | 3/6 [00:31<00:22,  7.64s/item, 2/6]Prompt warmup processing:  50%|█████     | 3/6 [00:33<00:22,  7.64s/item, 3/6]Prompt warmup processing:  67%|██████▋   | 4/6 [00:33<00:10,  5.38s/item, 3/6]Prompt warmup processing:  67%|██████▋   | 4/6 [00:35<00:10,  5.38s/item, 4/6]Prompt warmup processing:  83%|████████▎ | 5/6 [00:35<00:04,  4.13s/item, 4/6]Prompt warmup processing:  83%|████████▎ | 5/6 [00:37<00:04,  4.13s/item, 5/6]Prompt warmup processing: 100%|██████████| 6/6 [00:37<00:00,  3.38s/item, 5/6]Prompt warmup processing: 100%|██████████| 6/6 [00:37<00:00,  6.18s/item, 5/6]
+(EngineCore pid=58281) Decode warmup processing:   0%|          | 0/1 [00:00<?, ?item/s]Decode warmup processing:   0%|          | 0/1 [00:01<?, ?item/s, 0/1]Decode warmup processing: 100%|██████████| 1/1 [00:01<00:00,  1.72s/item, 0/1]Decode warmup processing: 100%|██████████| 1/1 [00:01<00:00,  1.72s/item, 0/1]
+(EngineCore pid=58281) INFO 09-10 15:47:28 [hpu_model_runner.py:6222] Validation warmup complete.
+(EngineCore pid=58281) INFO 09-10 15:47:28 [hpu_model_runner.py:6233] Warmup finished in 739 secs, allocated 639.3 MiB of device memory
+(EngineCore pid=58281) INFO 09-10 15:47:28 [core.py:347] init engine (profile, create kv cache, warmup model) took 740.17 s
+(EngineCore pid=58281) INFO 09-10 15:47:29 [vllm.py:1109] Asynchronous scheduling is enabled.
+(EngineCore pid=58281) WARNING 09-10 15:47:29 [vllm.py:1213] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+(EngineCore pid=58281) INFO 09-10 15:47:29 [kernel.py:295] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(EngineCore pid=58281) INFO 09-10 15:47:29 [compilation.py:329] Enabled custom fusions: norm_quant, act_quant
+Warmup iterations:   0%|          | 0/3 [00:00<?, ?it/s]Warming up...
+Warmup iterations:  33%|███▎      | 1/3 [00:08<00:17,  8.91s/it]INFO 09-10 15:47:39 [loggers.py:310] Engine 000: Avg prompt throughput: 25.0 tokens/s, Avg generation throughput: 28.7 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Warmup iterations:  67%|██████▋   | 2/3 [00:17<00:08,  8.97s/it]INFO 09-10 15:47:49 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 27.9 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Warmup iterations: 100%|██████████| 3/3 [00:27<00:00,  9.12s/it]Warmup iterations: 100%|██████████| 3/3 [00:27<00:00,  9.07s/it]
+Bench iterations:   0%|          | 0/10 [00:00<?, ?it/s]INFO 09-10 15:47:59 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 27.5 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  10%|█         | 1/10 [00:09<01:25,  9.48s/it]INFO 09-10 15:48:09 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 26.8 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  20%|██        | 2/10 [00:18<01:14,  9.27s/it]INFO 09-10 15:48:19 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 30.4 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  30%|███       | 3/10 [00:26<01:00,  8.64s/it]INFO 09-10 15:48:30 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 31.6 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  40%|████      | 4/10 [00:34<00:50,  8.46s/it]Bench iterations:  50%|█████     | 5/10 [00:42<00:41,  8.38s/it]INFO 09-10 15:48:40 [loggers.py:310] Engine 000: Avg prompt throughput: 25.5 tokens/s, Avg generation throughput: 31.1 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  60%|██████    | 6/10 [00:50<00:33,  8.27s/it]INFO 09-10 15:48:50 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 32.0 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  70%|███████   | 7/10 [00:59<00:25,  8.35s/it]INFO 09-10 15:49:00 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 29.4 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  80%|████████  | 8/10 [01:07<00:16,  8.35s/it]INFO 09-10 15:49:10 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 29.3 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations:  90%|█████████ | 9/10 [01:17<00:08,  8.68s/it]INFO 09-10 15:49:20 [loggers.py:310] Engine 000: Avg prompt throughput: 12.8 tokens/s, Avg generation throughput: 27.2 tokens/s, Running: 1 reqs, Waiting: 0 reqs, GPU KV cache usage: 0.7%, Prefix cache hit rate: 0.0%
+Bench iterations: 100%|██████████| 10/10 [01:26<00:00,  8.91s/it]Bench iterations: 100%|██████████| 10/10 [01:26<00:00,  8.67s/it]
+(EngineCore pid=58281) INFO 09-10 15:49:23 [core.py:1313] [shutdown] EngineCore: trigger received signal=SIGTERM
+(EngineCore pid=58281) INFO 09-10 15:49:23 [core.py:1432] [shutdown] EngineCore: start mode=abort timeout=0s
+(EngineCore pid=58281) INFO 09-10 15:49:23 [core.py:1463] [shutdown] EngineCore: request processing complete; starting resource teardown
+(EngineCore pid=58281) INFO 09-10 15:49:23 [core.py:1326] [shutdown] EngineCore: exiting busy loop
+(EngineCore pid=58281) WARNING 09-10 15:49:24 [interface.py:1139] Current platform hpu does not have 'empty_cache' attribute.
+Avg latency: 8.665350912501163 seconds
+10% percentile latency: 8.027978832904045 seconds
+25% percentile latency: 8.191092600747652 seconds
+50% percentile latency: 8.434838307501195 seconds
+75% percentile latency: 9.337349066752722 seconds
+90% percentile latency: 9.42112377129888 seconds
+99% percentile latency: 9.474394525332537 seconds
+WARNING 09-10 15:49:28 [utils.py:626] [shutdown] Process manager: force killing remaining processes count=1

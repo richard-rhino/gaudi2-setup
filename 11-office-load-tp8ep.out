@@ -1,0 +1,20 @@
+=== starting server: Qwen/Qwen3-235B-A22B-Instruct-2507-FP8 TP=8 cards=all extra=[--enable-expert-parallel] max_model_len=32768 ===
+server ready after 32 min (load + warmup)
+(Worker_TP0_EP0 pid=10769) INFO 09-10 17:25:20 [hpu_model_runner.py:6233] Warmup finished in 1162 secs, allocated 3.684 GiB of device memory
+(Worker_TP1_EP1 pid=10770) INFO 09-10 17:25:20 [hpu_model_runner.py:6233] Warmup finished in 1162 secs, allocated 3.686 GiB of device memory
+(Worker_TP5_EP5 pid=10774) INFO 09-10 17:25:20 [hpu_model_runner.py:6233] Warmup finished in 1162 secs, allocated 3.683 GiB of device memory
+=== sanity: one real chat request ===
+Intel Gaudi is a deep learning accelerator designed to deliver high performance and efficiency for training and inference workloads in artificial intelligence applications.
+=== burst-64-at-once: 64 requests, concurrency inf, 1024 in / 256 out ===
+| burst-64-at-once | 64 | inf | 1024 / 256 | 1.26 | 322.29 |  | 7.13 / 12.56 | 148.88 / 174.88 | 45.5 / 50.8 |
+=== sustained-32: 128 requests, concurrency 32, 2048 in / 512 out ===
+| sustained-32 | 128 | 32 | 2048 / 512 | 0.42 | 211.82 |  | 0.68 / 9.97 | 135.76 / 147.13 | 69.7 / 91.8 |
+=== sustained-64: 192 requests, concurrency 64, 2048 in / 512 out ===
+| sustained-64 | 192 | 64 | 2048 / 512 | 0.71 | 362.96 |  | 0.91 / 19.97 | 150.61 / 173.64 | 79.0 / 108.5 |
+=== long-ctx-8: 16 requests, concurrency 8, 12288 in / 512 out ===
+| long-ctx-8 | 16 | 8 | 12288 / 512 | 0.09 | 44.85 |  | 3.97 / 29.07 | 152.63 / 195.68 | 86.4 / 123.6 |
+=== long-ctx-16: 32 requests, concurrency 16, 8192 in / 512 out ===
+| long-ctx-16 | 32 | 16 | 8192 / 512 | 0.15 | 75.64 |  | 4.86 / 36.02 | 179.26 / 221.04 | 93.5 / 146.5 |
+
+=== done: results in /home/gaudi2/setup/office-load-results-Qwen_Qwen3-235B-A22B-Instruct-2507-FP8-tp8enableexpert.md (server left running on port 8000; stop with: docker exec vllm-gaudi-stable pkill -f 'vllm serve') ===
+exit=0

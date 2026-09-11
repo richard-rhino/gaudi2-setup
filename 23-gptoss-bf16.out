@@ -1,0 +1,10 @@
+### gpt-oss-120b-bf16 TP=8
+=== server: lmsys/gpt-oss-120b-bf16 TP=8 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(Worker_TP2 pid=716700) ERROR 09-10 22:24:56 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(Worker_TP0 pid=716698) ERROR 09-10 22:24:56 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(EngineCore pid=716485) ERROR 09-10 22:24:56 [core.py:1330]     raise RuntimeError(
+(EngineCore pid=716485) ERROR 09-10 22:24:56 [core.py:1330] RuntimeError: Worker failed with error 'view size is not compatible with input tensor's size and stride (at least one dimension spans across
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+GPTOSSBF16-DONE

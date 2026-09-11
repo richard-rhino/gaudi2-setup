@@ -1,0 +1,11 @@
+### gpt-oss-120b TP=4 (4 cards)
+=== server: openai/gpt-oss-120b TP=4 extra=[] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(Worker_TP3 pid=712062) ERROR 09-10 21:54:19 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(Worker_TP0 pid=712059) ERROR 09-10 21:54:20 [multiproc_executor.py:1007] RuntimeError: view size is not compatible with input tensor's size and stride (at least one dimension spans across two contigu
+(EngineCore pid=711851) ERROR 09-10 21:54:20 [core.py:1330]     raise RuntimeError(
+(EngineCore pid=711851) ERROR 09-10 21:54:20 [core.py:1330] RuntimeError: Worker failed with error 'view size is not compatible with input tensor's size and stride (at least one dimension spans across
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+GPTOSS4-DONE
+exit=0

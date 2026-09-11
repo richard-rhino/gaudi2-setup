@@ -1,0 +1,16 @@
+=== server: Qwen/Qwen3.8-27B TP=8 extra=[] max_model_len=131072 ===
+ready after 12 min
+(Worker_TP6 pid=107712) INFO 09-10 18:34:58 [hpu_model_runner.py:6233] Warmup finished in 612 secs, allocated 593.8 MiB of device memory
+(Worker_TP0 pid=107705) INFO 09-10 18:34:59 [hpu_model_runner.py:6233] Warmup finished in 613 secs, allocated 1.375 GiB of device memory
+=== chat-10: 40 req, 10 users, 1024 in / 512 out ===
+| chat-10 | 10 | 1024 / 512 | 21.6 | 20.5 | 0.3 / 1.5 | 193.16 | 593.39 |
+=== chat-16: 48 req, 16 users, 1024 in / 512 out ===
+| chat-16 | 16 | 1024 / 512 | 21.9 | 20.7 | 0.3 / 2.2 | 311.63 | 943.03 |
+=== agentic-10-32k: 20 req, 10 users, 32768 in / 1024 out ===
+| agentic-10-32k | 10 | 32768 / 1024 | 17.3 | 13.8 | 5.5 / 25.5 | 137.19 | 4426.30 |
+=== mixed-16: 48 req, 16 users, 8192 in / 768 out ===
+| mixed-16 | 16 | 8192 / 768 | 18.4 | 16.3 | 0.8 / 9.3 | 267.04 | 3152.58 |
+=== longctx-4-100k: 4 req, 4 users, 100000 in / 512 out ===
+| longctx-4-100k | 4 | 100000 / 512 | 13.9 | 10.5 | 26.9 / 40.8 | 31.90 | 6702.01 |
+=== done -> /home/gaudi2/setup/office10-Qwen_Qwen3.8-27B-tp8--ctx131072.md (server still up on :8000) ===
+exit=0

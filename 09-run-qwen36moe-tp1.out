@@ -1,0 +1,4 @@
+=== Qwen/Qwen3.6-35B-A3B  TP=1 cards=1  (log: /home/gaudi2/setup/bench-Qwen_Qwen3.6-35B-A3B-tp1.log) ===
+| Qwen/Qwen3.6-35B-A3B | 1 (1) | 211.52 | 1903.66 | 30 | RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {' |
+
+exit=0

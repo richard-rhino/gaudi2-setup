@@ -1,0 +1,11 @@
+### 30B-A3B TP=8 ngram-spec maxseqs32
+=== server: Qwen/Qwen3-30B-A3B-Instruct-2507 TP=8 extra=[--speculative-config '{"method":"ngram","num_speculative_tokens":3,"prompt_lookup_max":4,"prompt_lookup_min":2}'] max_model_len=131072 ===
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+SERVER FAILED:
+(Worker_TP5 pid=682790) ERROR 09-10 21:51:08 [multiproc_executor.py:1007] IndexError: index 32 is out of bounds for axis 0 with size 32
+(Worker_TP0 pid=682785) ERROR 09-10 21:51:08 [multiproc_executor.py:1007] IndexError: index 32 is out of bounds for axis 0 with size 32
+(EngineCore pid=682571) ERROR 09-10 21:51:08 [core.py:1330]     raise RuntimeError(
+(EngineCore pid=682571) ERROR 09-10 21:51:08 [core.py:1330] RuntimeError: Worker failed with error 'index 32 is out of bounds for axis 0 with size 32', please check the stack trace above for the root 
+cards released, page cache dropped (driver needs contiguous low DMA memory for new contexts)
+NGRAM2-DONE
+exit=0
