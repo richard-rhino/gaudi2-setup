@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # zsh + oh-my-zsh + plugins + powerlevel10k for the current user. No sudo needed.
-# Run as yourself:  bash ~/setup/04-zsh.sh
+# Run as yourself:  bash setup/04-zsh.sh
 set -euo pipefail
 command -v zsh >/dev/null || { echo "zsh not installed yet; run 01-base.sh first"; exit 1; }
 
@@ -17,6 +17,6 @@ clone https://github.com/zsh-users/zsh-history-substring-search $ZC/plugins/zsh-
 clone https://github.com/romkatv/powerlevel10k.git             $ZC/themes/powerlevel10k
 
 [[ -f ~/.zshrc ]] && cp ~/.zshrc ~/.zshrc.bak.$(date +%s)
-cp ~/setup/zshrc ~/.zshrc
-[[ -f ~/.p10k.zsh ]] || cp ~/setup/p10k.zsh ~/.p10k.zsh
+cp "$(dirname "$0")/zshrc" ~/.zshrc
+[[ -f ~/.p10k.zsh ]] || cp "$(dirname "$0")/p10k.zsh" ~/.p10k.zsh
 echo "=== 04-zsh done === log out and back in (login shell was set by 01-base.sh), or run: exec zsh"

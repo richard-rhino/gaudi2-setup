@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tokens/s benchmarks with vLLM on Gaudi2 inside the 'vllm-gaudi-stable' container.
-# Usage: bash ~/setup/08-bench.sh [model] [tensor-parallel] [cards]
+# Usage: bash experiments/08-bench.sh [model] [tensor-parallel] [cards]
 #   bash 08-bench.sh Qwen/Qwen2.5-7B-Instruct 1 0          # one card
 #   bash 08-bench.sh Qwen/Qwen2.5-32B-Instruct 4 4,5,6,7   # four cards
 MODEL="${1:-Qwen/Qwen2.5-7B-Instruct}"; TP="${2:-1}"; CARDS="${3:-0}"; C=vllm-gaudi-stable

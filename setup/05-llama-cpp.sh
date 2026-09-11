@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # llama.cpp, CPU build. Gaudi has no llama.cpp backend, so this uses the 2x Xeon 6338 (64 cores) + 125 GB RAM.
-# Run as yourself:  bash ~/setup/05-llama-cpp.sh
+# Run as yourself:  bash setup/05-llama-cpp.sh
 set -euo pipefail
 cd ~
 [[ -d llama.cpp ]] || git clone https://github.com/ggml-org/llama.cpp

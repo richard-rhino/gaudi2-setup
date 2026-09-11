@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Benchmark a list of recent models on Gaudi2 and append results to ~/setup/bench-results.md
-# Usage: bash ~/setup/09-bench-recent.sh "MODEL TP CARDS" ["MODEL TP CARDS" ...]
+# Benchmark a list of recent models on Gaudi2 and append results to results/bench-results.md
+# Usage: bash experiments/09-bench-recent.sh "MODEL TP CARDS" ["MODEL TP CARDS" ...]
 #   bash 09-bench-recent.sh "Qwen/Qwen3.8-27B 1 0" "Qwen/Qwen3.8-27B 4 0,1,2,3" "Qwen/Qwen3.6-35B-A3B 1 4"
-C=vllm-gaudi-stable; OUT=~/setup/bench-results.md
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+C=vllm-gaudi-stable; OUT=$ROOT/results/bench-results.md
 [[ -f $OUT ]] || printf '| Model | Cards (TP) | Batched output tok/s (128 prompts, 512in/256out) | Total tok/s | Single-user tok/s | Notes |\n|---|---|---|---|---|---|\n' > $OUT
 for spec in "$@"; do
   read -r MODEL TP CARDS <<<"$spec"
-  LOG=~/setup/bench-$(echo "$MODEL" | tr '/' '_')-tp$TP.log
+  LOG=$ROOT/logs/bench/bench-$(echo "$MODEL" | tr '/' '_')-tp$TP.log
   echo "=== $MODEL  TP=$TP cards=$CARDS  (log: $LOG) ==="
   run() { docker exec -e HABANA_VISIBLE_DEVICES="$CARDS" -e PT_HPU_LAZY_MODE=${LAZY:-1} -e PT_HPU_ENABLE_LAZY_COLLECTIVES=true $C bash -c "cd /models && $*"; }
   run vllm bench throughput --model "$MODEL" --dtype bfloat16 --tensor-parallel-size $TP --trust-remote-code \

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Intel Gaudi 1.24.1 driver + tools on Debian 12, using Intel's Ubuntu 22.04 (jammy) apt repo.
 # That repo contains ONLY habanalabs-* packages, so it cannot clobber Debian packages.
-# Run as root:  sudo bash ~/setup/02-gaudi.sh
+# Run as root:  sudo bash setup/02-gaudi.sh
 set -euo pipefail
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
 export DEBIAN_FRONTEND=noninteractive

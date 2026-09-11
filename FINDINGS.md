@@ -2,7 +2,7 @@
 
 Host: Supermicro, 2x Xeon Gold 6338 (128 threads), 125 GB RAM, 8x Intel Gaudi2 HL-225 (96 GB HBM each, 768 GB total),
 1.7 TB SATA SSD (OS) + 2.9 TB NVMe (models). OS: Debian 12, kernel 6.1. Dates: 2026-09-09 to 2026-09-10.
-All scripts, logs and result tables live in `~/setup/`. Memory notes for future sessions are in `~/.claude/.../memory/`.
+Scripts are in `setup/` and `experiments/`, result tables in `results/`, raw logs in `logs/`.
 
 ---
 
@@ -89,7 +89,7 @@ Test: `12-office-10users.sh` (server with 128k max_model_len, tool-call parser e
 | gpt-oss-120b (MXFP4) | 8 or 4 TP | FAILED in every layout (TP=8, 2x TP=4, plain TP=4): the MXFP4 expert path crashes at the first warmup step on Gaudi2 ("view size is not compatible with input tensor size and stride"). Plugin validates it on Gaudi 3 only. The bf16 re-export (lmsys/gpt-oss-120b-bf16) fails with the same error, so the fault is in the gpt-oss attention path on HPU, not the 4-bit format. gpt-oss is out on Gaudi2 with plugin v0.26.0. | | | | | | |
 | Qwen3-Coder-Next (eager) | 8 TP | ABORTED twice: eager-mode warmup projected 19 h at 128k and 14 h at 32k (~7 min per prompt bucket). Same GDN family as Qwen3.8; not viable until the plugin's fast path works for it. | | | | | | |
 | Qwen3-30B-A3B, 2x(TP=4) replicas (lazy) | 8 | 17.6 | 17.2 | - | - | - | 0.3 s | 13 min |
-| Qwen3-30B-A3B TP=8, max-num-seqs 16 | 8 | 28.2 | 29.8 | (see office10-*.md) | | | 0.2 s | 11 min |
+| Qwen3-30B-A3B TP=8, max-num-seqs 16 | 8 | 28.2 | 29.8 | (see results/office10-*.md) | | | 0.2 s | 11 min |
 | Qwen3-30B-A3B TP=8 + n-gram speculative decoding | 8 | FAILED in warmup both at max-num-seqs 16 and 32 ("IndexError: index N is out of bounds for axis 0 with size N", N = max-num-seqs): off-by-one in the plugin's experimental spec-decode warmup. Dead end on v0.26.0. | | | | | | |
 | Qwen3-30B-A3B, 4x(TP=2) replicas | 8 | skipped: 2x(TP=4) was already slower per user than TP=8, so fewer cards per replica is the wrong direction here | | | | | | |
 Observations so far:

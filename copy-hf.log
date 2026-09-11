@@ -1,8 +1,0 @@
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--Qwen--Qwen2.5-0.5B-Instruct/trees/7ae557604adf67be50417f59c2c2f167def9a775.json' for reading: Permission denied
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--Qwen--Qwen2.5-7B-Instruct/trees/a09a35458c702b33eeacc393d103063234e8bc28.json' for reading: Permission denied
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--Qwen--Qwen2.5-32B-Instruct/trees/5ede1c97bbab6ce5cda5812749b4c0bdf79b18dd.json' for reading: Permission denied
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--Qwen--Qwen3.8-27B/trees/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0.json' for reading: Permission denied
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--Qwen--Qwen3.6-35B-A3B/trees/995ad96eacd98c81ed38be0c5b274b04031597b0.json' for reading: Permission denied
-cp: cannot open '/home/gaudi2/.cache/huggingface/./hub/models--google--gemma-4-31b-it/trees/842da3794eaa0b77d5f08bae87a17459d91ff475.json' for reading: Permission denied
-exit=1
-254G	/mnt/nvme/huggingface

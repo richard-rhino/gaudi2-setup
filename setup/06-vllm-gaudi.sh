@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # vLLM on Gaudi2 using Intel's PyTorch container + the vllm-gaudi plugin.
 # Needs 02-gaudi.sh and 03-docker.sh done, and your user in the docker group.
-# Run as yourself:  bash ~/setup/06-vllm-gaudi.sh
+# Run as yourself:  bash setup/06-vllm-gaudi.sh
 set -euo pipefail
 IMG=vault.habana.ai/gaudi-docker/1.24.1/ubuntu22.04/habanalabs/pytorch-installer-2.11.0:latest
 NAME=vllm-gaudi
@@ -16,7 +16,7 @@ if ! docker ps --format '{{.Names}}' | grep -qx "$NAME"; then
     -v ~/models:/models -v ~/.cache/huggingface:/root/.cache/huggingface \
     "$IMG" sleep infinity
 fi
-docker cp ~/setup/06-in-container.sh "$NAME":/root/install-vllm.sh
+docker cp "$(dirname "$0")/06-in-container.sh" "$NAME":/root/install-vllm.sh
 docker exec "$NAME" bash /root/install-vllm.sh
 
 echo

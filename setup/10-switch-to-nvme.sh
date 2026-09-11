@@ -15,6 +15,6 @@ mk() { docker run -d --name "$1" --runtime=habana --restart unless-stopped --uli
 mk vllm-gaudi-stable $IMG
 mk vllm-gaudi-gemma $IMG
 docker exec vllm-gaudi-gemma pip install -q "transformers==5.14.1" 2>&1 | grep -vE 'WARNING|resolver|requires|^$' || true
-docker cp ~/setup/vllm-serve.sh vllm-gaudi-stable:/opt/vllm-serve.sh; docker cp ~/setup/vllm-serve.sh vllm-gaudi-gemma:/opt/vllm-serve.sh
+docker cp "$(dirname "$0")/vllm-serve.sh" vllm-gaudi-stable:/opt/vllm-serve.sh; docker cp "$(dirname "$0")/vllm-serve.sh" vllm-gaudi-gemma:/opt/vllm-serve.sh
 docker ps --format '{{.Names}} {{.Status}}'
 echo "Old SATA copy kept at ~/.cache/huggingface.sata-old (delete after confirming models load from NVMe)."

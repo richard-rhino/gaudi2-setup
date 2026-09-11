@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Docker CE on Debian 12 + Habana container runtime. Run as root: sudo bash ~/setup/03-docker.sh
+# Docker CE on Debian 12 + Habana container runtime. Run as root: sudo bash setup/03-docker.sh
 set -euo pipefail
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
 export DEBIAN_FRONTEND=noninteractive
