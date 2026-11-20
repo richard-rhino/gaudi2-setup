@@ -216,6 +216,14 @@ n-gram tables, again int64 hashing), Sinkhorn hyper-connections, sqrtsoftplus ro
   an unbounded attention gather. The final kernels are mine; CPU validation of them (`test_kernels_cpu.py`) could not run
   tonight because of the crash.
 
+## 15b. Using the LAN's Nvidia-hosted models as helpers (`setup-ubuntu2404/ask-llm`)
+- DeepSeek-V4.1 drafted the torch kernel replacements (useful skeleton; one real bug in FP4 tie rounding, see 15).
+- Qwen3.8-Flash-Next (the model being ported) reviewed the Qwen port against the HF reference
+  (`results-ubuntu2404/qwen4_exp/review-by-local-qwen.md`): it found no math differences, which matches the numeric
+  validation, but the review is noisy (it labels 20+ items "CRITICAL ISSUE" and then concludes "identical" for each,
+  and it ran out of tokens). With thinking enabled it spent the whole 12k-token budget on reasoning and returned nothing.
+  Net: good for drafts and second opinions, but every claim needed checking.
+
 ## 16. Driver crash (habanalabs 1.24.2 on kernel 6.8.0-151): everything stopped at 04:49
 - Trigger: starting a vLLM run in lazy mode (`PT_HPU_LAZY_MODE=1`) on module 0 (bus 43:00.0).
 - `dmesg`: `BUG: kernel NULL pointer dereference` in `hbl_ib_eqe_work_schd` [habanalabs_ib], a second Oops, then
