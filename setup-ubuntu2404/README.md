@@ -28,3 +28,5 @@ the LAN's Nvidia-hosted models (used as helpers during the model ports).
 - **`--type pytorch` refuses to run** until `--type dependencies` has completed, including the Open MPI source build. An
   interrupted dependencies run leaves no MPI and the pytorch install fails its pre-check ("One or more dependencies were not detected").
 - The old models on the NVMe were root-owned (downloaded from Docker as root); `chown -R` the HF cache.
+
+- Firmware re-flash how-to and port 9 results: [FIRMWARE-UPDATE.md](FIRMWARE-UPDATE.md)

@@ -10,13 +10,10 @@ for b in 19 1a 43 44 b3 b4 cc cd; do echo -n "$b: "; hl-smi -i 0000:$b:00.0 -n l
 sudo dmesg | grep -E "Port [0-9]+: link (down|up)" | tail
 ```
 Healthy: only ports 8, 22, 23 DOWN (the external scale-out ports, no cables). If port 9 is still DOWN or flapping:
-- Card firmware is 1.24.0-fw-62.6.2 with driver 1.24.2. Updating the SPI firmware to the release that matches the driver
-  is Intel's first recommendation (`habanalabs-firmware-tools` is installed; see `hl-fw-loader --help` and Intel's
-  "Firmware Upgrade" page, then reboot). This was not done unattended on purpose.
+- Re-flashing the card firmware: see [FIRMWARE-UPDATE.md](FIRMWARE-UPDATE.md) (done 2026-11-20; firmware
+  `fw-62.6.2` is already what driver 1.24.2 ships, so it is a re-flash, not an upgrade).
 - Intel's qualification tool can test the NIC links: `/opt/habanalabs/qual/gaudi2/bin/hl_qual -h` (NIC/HCCL tests).
-- If one link is physically bad, it can be masked so the driver and HCCL never use it (all 24 ports minus port 9):
-  `echo "options habanalabs nic_ports_mask=0xFFFDFF" | sudo tee /etc/modprobe.d/habanalabs-ports.conf` then reboot.
-  Collectives then run on the remaining links (slower all-reduce, but stable).
+- Do NOT mask port 9 (`nic_ports_mask=0xFFFDFF`): tested 2026-11-20, HCCL hangs without it (FIRMWARE-UPDATE.md).
 
 ## 3. Avoid the trigger
 Run vLLM in the default mode (`PT_HPU_LAZY_MODE=0`, eager + torch.compile). The crash happened while starting a
