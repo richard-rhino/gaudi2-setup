@@ -20,7 +20,9 @@ vllm_gaudi HPU ops, with the model-specific pieces written in plain torch from t
 * MoE: ``Qwen3NextSparseMoeBlock`` (HPU fused MoE).
 """
 import math
+import os
 from collections.abc import Iterable
+from typing import NamedTuple, Optional
 
 import torch
 import torch.nn.functional as F
@@ -34,16 +36,28 @@ from vllm.model_executor.layers.logits_processor import LogitsProcessor
 from vllm.model_executor.layers.mamba.abstract import MambaBase
 from vllm.model_executor.layers.vocab_parallel_embedding import ParallelLMHead, VocabParallelEmbedding
 from vllm.model_executor.model_loader.weight_utils import default_weight_loader
-from vllm.model_executor.models.interfaces import HasInnerState, IsHybrid, SupportsMRoPE
+from vllm.model_executor.models.interfaces import HasInnerState, IsHybrid, SupportsMRoPE, SupportsPP
 from vllm.model_executor.models.qwen3_5 import Qwen3_5Model
 from vllm.model_executor.models.qwen3_next import Qwen3NextAttention, Qwen3NextSparseMoeBlock
-from vllm.model_executor.models.utils import AutoWeightsLoader, WeightsMapper, extract_layer_index
+from vllm.distributed import get_pp_group
+from vllm.model_executor.models.utils import (AutoWeightsLoader, PPMissingLayer, WeightsMapper,
+                                              extract_layer_index, make_layers)
+from vllm.sequence import IntermediateTensors
 from vllm.model_executor.layers.mamba.mamba_utils import MambaStateDtypeCalculator, MambaStateShapeCalculator
 
 from vllm_gaudi.models.qwen3_5 import HPUGatedDeltaNetAttention
 
 _ATTN_TYPES = ("full_attention", "indexed_attention")
 
+
+_PLE_BYPASS = os.environ.get("QWEN4_PLE_BYPASS") == "1"  # timing diagnostic, wrong outputs
+
+
+def _ple_host(vllm_config: VllmConfig) -> bool:
+    """Keep the PLE n-gram table in host RAM: QWEN4_PLE_HOST=1/0, default on with pipeline parallelism (one stage
+    would otherwise need the whole 102 GB table in HBM)."""
+    v = os.environ.get("QWEN4_PLE_HOST", "auto")
+    return vllm_config.parallel_config.pipeline_parallel_size > 1 if v == "auto" else v == "1"
 
 class GroupedGemmaRMSNorm(nn.Module):
     """RMSNorm over each ``group_size`` slice with Gemma-style ``(1 + w)`` scaling, fp32 math."""
@@ -178,13 +192,29 @@ class NGramHasher:
 class ShardedNGramEmbedding(nn.Module):
     """[padded_vocab, head_dim] table split by rows over TP ranks; checkpoint ships it as row shards."""
 
-    def __init__(self, padded_vocab: int, head_dim: int, shard_rows: int, dtype: torch.dtype):
+    def __init__(self, padded_vocab: int, head_dim: int, shard_rows: int, dtype: torch.dtype, host: bool = False):
         super().__init__()
         self.tp, self.rank = get_tensor_model_parallel_world_size(), get_tensor_model_parallel_rank()
         self.per_rank = math.ceil(padded_vocab / self.tp)
         self.start = self.rank * self.per_rank
         self.shard_rows = shard_rows
-        self.weight = nn.Parameter(torch.zeros(self.per_rank, head_dim, dtype=dtype), requires_grad=False)
+        self.host = host
+        if host:
+            # Host RAM copy (lookup-only table, 102 GB on the real model): not a parameter, so the runner never moves
+            # it to the device. _ple_prepare gathers rows on the CPU, where the n-gram ids are hashed anyway.
+            self._host_w = [torch.zeros(self.per_rank, head_dim, dtype=dtype, device="cpu")]
+        else:
+            self.weight = nn.Parameter(torch.zeros(self.per_rank, head_dim, dtype=dtype), requires_grad=False)
+
+    def table(self) -> torch.Tensor:
+        return self._host_w[0] if self.host else self.weight.data
+
+    def gather_cpu(self, ids: torch.Tensor) -> torch.Tensor:
+        """Host-mode lookup of this rank's rows (zeros for rows owned by other TP ranks)."""
+        local = ids.long() - self.start
+        mask = (local >= 0) & (local < self.per_rank)
+        out = F.embedding(torch.where(mask, local, torch.zeros_like(local)), self._host_w[0])
+        return out * mask.unsqueeze(-1).to(out.dtype) if self.tp > 1 else out
 
     def load_weights(self, weights: Iterable[tuple[str, torch.Tensor]]) -> set[str]:
         loaded = set()
@@ -193,7 +223,7 @@ class ShardedNGramEmbedding(nn.Module):
             g0, g1 = k * self.shard_rows, k * self.shard_rows + w.shape[0]
             lo, hi = max(g0, self.start), min(g1, self.start + self.per_rank)
             if lo < hi:
-                self.weight.data[lo - self.start:hi - self.start].copy_(w[lo - g0:hi - g0])
+                self.table()[lo - self.start:hi - self.start].copy_(w[lo - g0:hi - g0])
             loaded.add("weight")
         return loaded
 
@@ -212,6 +242,8 @@ class HpuPLELayer(MambaBase, nn.Module):
         nn.Module.__init__(self)
         self.H, self.hc = config.hidden_size, config.hc_count
         hc_hidden = self.H * self.hc
+        self.ple_index = ple_index
+        self.ple_slot = ple_index  # row in PLEStepInputs.ids; reset to the stage-local index under PP
         self.hasher = NGramHasher(config, ple_index)
         emb_dim = config.ple_embed_dim
         num_parts = config.split_ngram_parts
@@ -219,7 +251,8 @@ class HpuPLELayer(MambaBase, nn.Module):
         self.ple_embedding = nn.Module()
         self.ple_embedding.ngram_embedding = ShardedNGramEmbedding(self.hasher.padded_vocab,
                                                                    emb_dim // self.hasher.num_heads, shard_rows,
-                                                                   vllm_config.model_config.dtype)
+                                                                   vllm_config.model_config.dtype,
+                                                                   host=_ple_host(vllm_config))
         self.key_proj = nn.Linear(emb_dim, hc_hidden, bias=False)
         self.value_proj = nn.Linear(emb_dim, self.H, bias=False)
         eps = config.rms_norm_eps
@@ -268,59 +301,42 @@ class HpuPLELayer(MambaBase, nn.Module):
             idx = idx.index_select(0, self.cache_group_idx.view(1)).squeeze(0)
         return idx
 
-    @torch._dynamo.disable
-    def forward(self, hidden: torch.Tensor, input_ids: torch.Tensor) -> torch.Tensor:
-        """hidden [T, hc*H] -> hidden + PLE(hidden). T is the flat (possibly padded) token axis."""
+    @torch._dynamo.disable  # compiled inside the layer graph, the outputs are wrong (FINDINGS 18)
+    def forward(self, hidden: torch.Tensor, ple_in: "PLEStepInputs") -> torch.Tensor:
+        """hidden [T, hc*H] -> hidden + PLE(hidden). T is the flat (possibly padded) token axis.
+
+        Pure device code (compiled with the decoder layer): the n-gram ids, sequence lengths and new context tokens
+        were computed once for all PLE layers by ``HpuQwen4ExpModel._ple_prepare``."""
+        if _PLE_BYPASS:  # timing diagnostic only: output is WRONG with this set
+            return hidden
         orig_shape = hidden.shape
         hidden = hidden.reshape(-1, orig_shape[-1])
-        input_ids = input_ids.reshape(-1)
-        fc = get_forward_context()
-        md = fc.attn_metadata
+        md = get_forward_context().attn_metadata
         T = hidden.shape[0]
         hc_hidden = self.H * self.hc
-        if md is None or self.kv_cache is None:  # profiling / dummy run: no state, no history
-            seqs = [(0, T)]
-            ctx_cpu = [torch.full((self.ctx,), self.hasher.eos, dtype=torch.long, device="cpu")]
-            conv_hist = None
-            load = store = None
-            is_prompt = True
-            valid = None
-        else:
+        n = ple_in.lens.shape[0]
+        L = T // n
+        conv_hist = load = store = None
+        if md is not None and self.kv_cache is not None:
             is_prompt = bool(getattr(md, "is_prompt", False))
             load, store = self._slots(md, "load_indices_tensor"), self._slots(md, "store_indices_tensor")
             store = load if store is None else store
-            n = int(load.numel())
             state = self.kv_cache[1].view(self.kv_cache[1].shape[0], -1)
-            rows = state.index_select(0, load.long())[:, :self.state_numel]
-            has_init = getattr(md, "has_initial_states_p", None) if is_prompt else None
+            rows = state.index_select(0, load.long())[:, :self.hist_f32]
             keep = (load.reshape(-1) != 0)
+            has_init = getattr(md, "has_initial_states_p", None) if is_prompt else None
             if has_init is not None:
                 keep = keep & has_init.bool().view(-1)
             rows = torch.where(keep.view(-1, 1), rows, torch.zeros_like(rows))
-            conv_hist = rows[:, :self.hist_f32].contiguous().view(torch.bfloat16)[:, :self.state_len * hc_hidden]
+            conv_hist = rows.contiguous().view(torch.bfloat16)[:, :self.state_len * hc_hidden]
             conv_hist = conv_hist.reshape(n, self.state_len, hc_hidden)
-            tok_rows = rows[:, self.hist_f32:].cpu().round().long()
-            if not bool(keep.all()):
-                tok_rows = torch.where(keep.cpu().view(-1, 1), tok_rows, torch.full_like(tok_rows, self.hasher.eos))
-            ctx_cpu = list(tok_rows)
-            L = T // n
-            seqs = [(i * L, L) for i in range(n)]
-            pm = getattr(md, "padding_mask_flat", None)
-            valid = pm.view(n, L).bool() if (is_prompt and pm is not None and pm.numel() == T) else None
 
-        # ---- n-gram ids on CPU (exact int64), lookup on device
-        ids_cpu = input_ids.cpu().long()
-        lens = [L for _, L in seqs] if valid is None else valid.sum(-1).cpu().tolist()
-        all_ids = torch.zeros(T, self.hasher.num_heads, dtype=torch.long, device="cpu")
-        new_ctx = []
-        for i, (s, L) in enumerate(seqs):
-            nv = int(lens[i])
-            toks = ids_cpu[s:s + nv]
-            if nv > 0:  # warmup pads with all-padding sequences
-                all_ids[s:s + nv] = self.hasher.ids(toks, ctx_cpu[i])
-            new_ctx.append(torch.cat([ctx_cpu[i], toks])[-self.ctx:])
-        emb = self.ple_embedding.ngram_embedding(all_ids.to(torch.int32).to(hidden.device)).flatten(-2)
-
+        table = self.ple_embedding.ngram_embedding
+        if ple_in.emb is not None:  # host-mode table: rows were gathered on the CPU in _ple_prepare
+            emb = ple_in.emb[self.ple_slot]
+            emb = (tensor_model_parallel_all_reduce(emb) if table.tp > 1 else emb).flatten(-2)
+        else:
+            emb = table(ple_in.ids[self.ple_slot]).flatten(-2)
         key = self.norm_key(self.key_proj(emb)).unflatten(-1, (self.hc, self.H))
         value = self.value_proj(emb)
         query = self.norm_query(hidden).unflatten(-1, (self.hc, self.H))
@@ -328,13 +344,11 @@ class HpuPLELayer(MambaBase, nn.Module):
         gate = gate.abs().clamp_min(1e-6).sqrt() * gate.sign()
         gated = (torch.sigmoid(gate) * value.unsqueeze(-2)).flatten(-2)
         gated_normed = self.norm_conv(gated)
-        if valid is not None:
-            vm = valid.reshape(-1, 1).to(gated.dtype)
+        if ple_in.valid is not None:
+            vm = ple_in.valid.reshape(-1, 1).to(gated.dtype)
             gated, gated_normed = gated * vm, gated_normed * vm
 
         # ---- dilated causal depthwise conv per sequence, with history from the state slot
-        n = len(seqs)
-        L = seqs[0][1]
         x = gated_normed.view(n, L, hc_hidden)
         hist = conv_hist.to(x.dtype) if conv_hist is not None else x.new_zeros(n, self.state_len, hc_hidden)
         xp = torch.cat([hist, x], dim=1)  # [n, state_len + L, C]
@@ -347,17 +361,57 @@ class HpuPLELayer(MambaBase, nn.Module):
 
         # ---- write back state (last state_len valid positions + last ctx token ids)
         if store is not None:
-            lens_t = torch.tensor(lens, device=x.device)
-            gather = (lens_t.view(-1, 1) + torch.arange(self.state_len, device=x.device).view(1, -1))  # into xp
+            gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=x.device).view(1, -1)  # into xp
             new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
-            new_tok = torch.stack(new_ctx).to(torch.float32).to(x.device)
             hist_bf16 = new_hist.reshape(n, -1).to(torch.bfloat16)
             if hist_bf16.shape[1] % 2:
                 hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(n, 1)], dim=1)
-            new_rows = torch.cat([hist_bf16.contiguous().view(torch.float32), new_tok], dim=1)
+            new_rows = torch.cat([hist_bf16.contiguous().view(torch.float32), ple_in.new_tok], dim=1)
             st = self.kv_cache[1].view(self.kv_cache[1].shape[0], -1)
             st[:, :self.state_numel].index_copy_(0, store.long(), new_rows.to(st.dtype))
         return (hidden + gated + out).view(orig_shape)
+
+
+class MultiNGramHasher:
+    """All PLE layers' n-gram ids in one vectorized CPU pass (same int64 ops as ``NGramHasher``, layer axis first)."""
+
+    def __init__(self, hashers: list[NGramHasher]):
+        h0 = hashers[0]
+        self.n, self.ctx, self.hpn, self.eos = h0.n, h0.ctx, h0.heads_per_ngram, h0.eos
+        self.num_heads = h0.num_heads
+        self.mult = torch.stack([h.mult for h in hashers])  # [P, n]
+        self.sizes = torch.stack([h.sizes for h in hashers])  # [P, heads]
+        self.offsets = torch.stack([h.offsets for h in hashers])
+
+    def ids(self, tokens: torch.Tensor, context: torch.Tensor) -> torch.Tensor:
+        """tokens [L], context [ctx] (int64, cpu) -> [P, L, num_heads]"""
+        hist = torch.cat([context, tokens])
+        T = hist.shape[0]
+        pos = torch.arange(T, device="cpu")
+        eos_pos = torch.where(hist == self.eos, pos, -1)
+        prev_eos = torch.cat([torch.tensor([-1], device="cpu"), torch.cummax(eos_pos, 0).values[:-1]])
+        pos_in_seg = pos - (prev_eos + 1)
+        shifted = [hist]
+        for s in range(1, self.n):
+            src = (pos - s).clamp_min(0)
+            valid = (pos_in_seg >= s) & (pos - s >= 0)
+            shifted.append(torch.where(valid, hist[src], torch.full_like(hist, self.eos)))
+        blocks = []
+        for ngram in range(2, self.n + 1):
+            a, b = (ngram - 2) * self.hpn, (ngram - 1) * self.hpn
+            mixed = shifted[0].unsqueeze(0) * self.mult[:, 0:1]
+            for p in range(1, ngram):
+                mixed = torch.bitwise_xor(mixed, shifted[p].unsqueeze(0) * self.mult[:, p:p + 1])
+            blocks.append(torch.remainder(mixed.unsqueeze(-1), self.sizes[:, None, a:b]) + self.offsets[:, None, a:b])
+        return torch.cat(blocks, dim=-1)[:, -tokens.shape[0]:]
+
+
+class PLEStepInputs(NamedTuple):
+    ids: torch.Tensor  # [P, T, num_heads] int32 n-gram ids for every PLE layer
+    lens: torch.Tensor  # [n] valid tokens per sequence (long)
+    new_tok: torch.Tensor  # [n, ctx] fp32 last ctx token ids, written into every PLE state slot
+    valid: Optional[torch.Tensor]  # [n, L] bool prompt padding mask, or None
+    emb: Optional[torch.Tensor] = None  # [P, T, num_heads, head_dim] rows gathered on the host (host-mode table)
 
 
 class HpuQwen4ExpDecoderLayer(nn.Module):
@@ -386,9 +440,9 @@ class HpuQwen4ExpDecoderLayer(nn.Module):
         self.attn_hyper_connection = GatedResidual(config)
         self.mlp_hyper_connection = GatedResidual(config)
 
-    def forward(self, hidden: torch.Tensor, positions: torch.Tensor, input_ids: torch.Tensor) -> torch.Tensor:
+    def forward(self, hidden: torch.Tensor, positions: torch.Tensor, ple_in: PLEStepInputs) -> torch.Tensor:
         if self.ple is not None:
-            hidden = self.ple(hidden, input_ids)
+            hidden = self.ple(hidden, ple_in)
         x, hyper, inj = self.attn_hyper_connection(hidden)
         if self.layer_type == "linear_attention":
             out = self.linear_attn(hidden_states=x)
@@ -405,25 +459,95 @@ class HpuQwen4ExpModel(nn.Module):
         super().__init__()
         config = vllm_config.model_config.hf_text_config
         self.config = config
-        self.embed_tokens = VocabParallelEmbedding(config.vocab_size, config.hidden_size)
-        self.layers = nn.ModuleList([
-            HpuQwen4ExpDecoderLayer(vllm_config, config.layer_types[i], prefix=f"{prefix}.layers.{i}")
-            for i in range(config.num_hidden_layers)
-        ])
-        self.hyper_connection_mixer = GatedResidual(config, use_combine=False)
-        for layer in self.layers:
-            if layer.ple is not None:
-                layer.ple.check_capacity()
+        pp = get_pp_group()
+        # Pipeline parallel: each stage builds only its own decoder layers (PPMissingLayer elsewhere); the
+        # hyper-connection streams [*, hc * hidden] travel between stages as IntermediateTensors.
+        self.embed_tokens = (VocabParallelEmbedding(config.vocab_size, config.hidden_size)
+                             if pp.is_first_rank else PPMissingLayer())
+        self.start_layer, self.end_layer, self.layers = make_layers(
+            config.num_hidden_layers,
+            lambda prefix: HpuQwen4ExpDecoderLayer(vllm_config, config.layer_types[extract_layer_index(prefix)],
+                                                   prefix=prefix),
+            prefix=f"{prefix}.layers")
+        self.hyper_connection_mixer = (GatedResidual(config, use_combine=False)
+                                       if pp.is_last_rank else PPMissingLayer())
+        local = self.layers[self.start_layer:self.end_layer]
+        self.ple_layers = [layer.ple for layer in local if layer.ple is not None]  # plain list, not children
+        for j, p in enumerate(self.ple_layers):
+            p.check_capacity()
+            p.ple_slot = j
+        self.ple_hasher = MultiNGramHasher([p.hasher for p in self.ple_layers]) if self.ple_layers else None
 
-    def forward(self, input_ids, positions, inputs_embeds=None) -> torch.Tensor:
-        h = inputs_embeds if inputs_embeds is not None else self.embed_tokens(input_ids)
-        h = h.repeat(*([1] * (h.dim() - 1)), self.config.hc_count)  # HPU passes [B, L] or [T] inputs
-        for layer in self.layers:
-            h = layer(h, positions, input_ids)
+    @torch.no_grad()
+    def _ple_prepare(self, input_ids: torch.Tensor) -> Optional[PLEStepInputs]:
+        """Once per forward (eager): read the context tokens from the first PLE layer's state slot (all PLE layers
+        store the same tokens), hash on the CPU for every PLE layer at once and ship the ids to the device.
+        Two host syncs per step in total instead of ~3 per PLE layer."""
+        if self.ple_hasher is None:
+            return None
+        hs, p0 = self.ple_hasher, self.ple_layers[0]
+        dev = input_ids.device
+        ids_flat = input_ids.reshape(-1)
+        T = ids_flat.shape[0]
+        md = get_forward_context().attn_metadata
+        valid = None
+        if md is None or p0.kv_cache is None:  # profiling / dummy run
+            n = 1
+            ctx_cpu = torch.full((1, hs.ctx), hs.eos, dtype=torch.long)
+            lens = [T]
+        else:
+            is_prompt = bool(getattr(md, "is_prompt", False))
+            load = p0._slots(md, "load_indices_tensor")
+            n = int(load.numel())
+            L = T // n
+            state = p0.kv_cache[1].view(p0.kv_cache[1].shape[0], -1)
+            tok = state.index_select(0, load.long())[:, p0.hist_f32:p0.state_numel]
+            keep = (load.reshape(-1) != 0)
+            has_init = getattr(md, "has_initial_states_p", None) if is_prompt else None
+            if has_init is not None:
+                keep = keep & has_init.bool().view(-1)
+            tok = torch.where(keep.view(-1, 1), tok, torch.full_like(tok, float(hs.eos)))
+            pm = getattr(md, "padding_mask_flat", None)
+            if is_prompt and pm is not None and pm.numel() == T:
+                valid = pm.view(n, L).bool()
+                lens_dev = valid.sum(-1).to(tok.dtype).view(-1, 1)
+                packed = torch.cat([tok, lens_dev], dim=1).cpu()  # one sync for tokens + lengths
+                ctx_cpu, lens = packed[:, :-1].round().long(), packed[:, -1].long().tolist()
+            else:
+                ctx_cpu, lens = tok.cpu().round().long(), [L] * n
+        L = T // n
+        ids_cpu = ids_flat.cpu().long()
+        all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
+        new_tok = torch.empty(n, hs.ctx, dtype=torch.float32)
+        for i in range(n):
+            nv = int(lens[i])
+            toks = ids_cpu[i * L:i * L + nv]
+            if nv > 0:  # warmup pads with all-padding sequences
+                all_ids[:, i * L:i * L + nv] = hs.ids(toks, ctx_cpu[i]).to(torch.int32)
+            new_tok[i] = torch.cat([ctx_cpu[i], toks])[-hs.ctx:].to(torch.float32)
+        emb = None
+        if self.ple_layers[0].ple_embedding.ngram_embedding.host:
+            emb = torch.stack([p.ple_embedding.ngram_embedding.gather_cpu(all_ids[j])
+                               for j, p in enumerate(self.ple_layers)]).to(dev, non_blocking=True)
+        return PLEStepInputs(all_ids.to(dev, non_blocking=True), torch.tensor(lens, dtype=torch.long).to(dev),
+                             new_tok.to(dev), valid, emb)
+
+    def forward(self, input_ids, positions, inputs_embeds=None, intermediate_tensors=None):
+        pp = get_pp_group()
+        if pp.is_first_rank:
+            h = inputs_embeds if inputs_embeds is not None else self.embed_tokens(input_ids)
+            h = h.repeat(*([1] * (h.dim() - 1)), self.config.hc_count)  # HPU passes [B, L] or [T] inputs
+        else:
+            h = intermediate_tensors["hidden_states"]
+        ple_in = self._ple_prepare(input_ids)
+        for layer in self.layers[self.start_layer:self.end_layer]:
+            h = layer(h, positions, ple_in)
+        if not pp.is_last_rank:
+            return IntermediateTensors({"hidden_states": h})
         return self.hyper_connection_mixer(h)
 
 
-class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, SupportsMRoPE):
+class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, SupportsMRoPE, SupportsPP):
     """Text-only HPU implementation registered under the upstream multimodal architecture name."""
 
     packed_modules_mapping = {
@@ -449,14 +573,22 @@ class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, Su
         self.config = vllm_config.model_config.hf_config  # runner reads .architectures from the top-level config
         self.vllm_config = vllm_config
         self.model = HpuQwen4ExpModel(vllm_config=vllm_config, prefix="model")
-        self.lm_head = ParallelLMHead(config.vocab_size, config.hidden_size, prefix="lm_head")
-        self.logits_processor = LogitsProcessor(config.vocab_size)
+        if get_pp_group().is_last_rank:
+            self.lm_head = ParallelLMHead(config.vocab_size, config.hidden_size, prefix="lm_head")
+            self.logits_processor = LogitsProcessor(config.vocab_size)
+        else:
+            self.lm_head = PPMissingLayer()
+
+    def make_empty_intermediate_tensors(self, batch_size: int, dtype: torch.dtype, device: torch.device):
+        c = self.vllm_config.model_config.hf_text_config
+        return IntermediateTensors({"hidden_states": torch.zeros(batch_size, c.hc_count * c.hidden_size,
+                                                                 dtype=dtype, device=device)})
 
     def embed_input_ids(self, input_ids: torch.Tensor) -> torch.Tensor:
         return self.model.embed_tokens(input_ids)
 
     def forward(self, input_ids, positions, intermediate_tensors=None, inputs_embeds=None, **kwargs):
-        return self.model(input_ids, positions, inputs_embeds)
+        return self.model(input_ids, positions, inputs_embeds, intermediate_tensors)
 
     def compute_logits(self, hidden_states: torch.Tensor) -> torch.Tensor | None:
         return self.logits_processor(self.lm_head, hidden_states)

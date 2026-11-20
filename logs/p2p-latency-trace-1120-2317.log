@@ -1,0 +1,164 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1120 23:17:51.879000 1929200 torch/distributed/run.py:874] 
+W1120 23:17:51.879000 1929200 torch/distributed/run.py:874] *****************************************
+W1120 23:17:51.879000 1929200 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1120 23:17:51.879000 1929200 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
+23:18:02 n=  625 p50=    872us p90=   1030us max=   23.5ms
+23:18:03 n=  942 p50=    840us p90=    946us max=    2.3ms
+23:18:04 n=  913 p50=    924us p90=   1043us max=    1.4ms
+23:18:05 n=  959 p50=    826us p90=    937us max=    2.1ms
+23:18:06 n=  895 p50=    941us p90=   1014us max=    1.3ms
+23:18:07 n=  913 p50=    902us p90=    989us max=    1.7ms
+23:18:08 n=  925 p50=    850us p90=   1026us max=    2.1ms
+23:18:09 n=  957 p50=    828us p90=    921us max=    3.3ms
+23:18:10 n=  888 p50=    951us p90=   1027us max=    2.7ms
+23:18:11 n=  890 p50=    940us p90=   1000us max=    1.5ms
+23:18:12 n=  856 p50=    956us p90=   1065us max=    8.4ms
+23:18:13 n=  905 p50=    894us p90=   1021us max=    1.5ms
+23:18:14 n=  871 p50=    887us p90=   1121us max=    7.4ms
+23:18:15 n=  905 p50=    870us p90=   1023us max=    7.2ms
+23:18:16 n=  938 p50=    818us p90=    927us max=    4.6ms
+23:18:17 n=  920 p50=    850us p90=    949us max=    2.1ms
+23:18:18 n=  927 p50=    827us p90=    986us max=    6.4ms
+23:18:19 n=  946 p50=    811us p90=    992us max=    5.3ms
+23:18:20 n= 1014 p50=    771us p90=    881us max=    2.2ms
+23:18:21 n= 1000 p50=    785us p90=    928us max=    1.6ms
+23:18:22 n=  936 p50=    848us p90=    953us max=    1.6ms
+23:18:23 n=  971 p50=    820us p90=    915us max=    2.1ms
+23:18:24 n=  996 p50=    799us p90=    894us max=    1.8ms
+23:18:25 n= 1023 p50=    786us p90=    862us max=    1.2ms
+23:18:26 n=  991 p50=    806us p90=    905us max=    1.5ms
+23:18:27 n=  956 p50=    835us p90=    943us max=    1.4ms
+23:18:28 n= 1002 p50=    798us p90=    905us max=    1.9ms
+23:18:29 n= 1003 p50=    797us p90=    899us max=    1.2ms
+23:18:30 n= 1024 p50=    768us p90=    887us max=    1.8ms
+23:18:31 n= 1019 p50=    776us p90=    893us max=    1.4ms
+23:18:32 n= 1034 p50=    758us p90=    885us max=    1.2ms
+23:18:33 n= 1005 p50=    799us p90=    913us max=    1.2ms
+23:18:34 n=  965 p50=    827us p90=    992us max=    1.2ms
+23:18:35 n=  967 p50=    813us p90=    933us max=    1.2ms
+23:18:36 n= 1021 p50=    785us p90=    854us max=    1.1ms
+23:18:37 n=  997 p50=    809us p90=    892us max=    1.7ms
+23:18:38 n=  982 p50=    827us p90=    936us max=    1.2ms
+23:18:39 n=  999 p50=    783us p90=    897us max=    2.5ms
+23:18:40 n= 1018 p50=    776us p90=    850us max=    1.6ms
+23:18:41 n=  972 p50=    817us p90=    926us max=    1.7ms
+23:18:42 n= 1065 p50=    735us p90=    816us max=    1.1ms
+23:18:43 n= 1049 p50=    755us p90=    834us max=    1.2ms
+23:18:44 n= 1036 p50=    770us p90=    861us max=    1.1ms
+23:18:45 n= 1021 p50=    768us p90=    869us max=    1.6ms
+23:18:46 n=  997 p50=    805us p90=    888us max=    1.0ms
+23:18:47 n= 1026 p50=    764us p90=    866us max=    1.6ms
+23:18:48 n= 1005 p50=    781us p90=    869us max=    2.3ms
+23:18:49 n= 1001 p50=    773us p90=    895us max=    1.3ms
+23:18:50 n= 1015 p50=    795us p90=    852us max=    1.2ms
+23:18:51 n=  915 p50=    914us p90=    977us max=    1.3ms
+23:18:52 n=  966 p50=    804us p90=    953us max=    1.1ms
+23:18:53 n=  950 p50=    849us p90=    967us max=    1.4ms
+23:18:54 n= 1026 p50=    763us p90=    858us max=    1.1ms
+23:18:55 n= 1011 p50=    771us p90=    863us max=    1.3ms
+23:18:56 n= 1024 p50=    776us p90=    849us max=    1.2ms
+23:18:57 n= 1048 p50=    753us p90=    835us max=    1.4ms
+23:18:58 n= 1038 p50=    749us p90=    856us max=    1.2ms
+23:18:59 n= 1026 p50=    768us p90=    875us max=    1.2ms
+23:19:00 n= 1034 p50=    770us p90=    859us max=    1.8ms
+23:19:01 n= 1022 p50=    755us p90=    891us max=    2.5ms
+23:19:02 n=  892 p50=    930us p90=   1011us max=    1.4ms
+23:19:03 n=  982 p50=    792us p90=    963us max=    1.3ms
+23:19:04 n=  974 p50=    816us p90=    966us max=    1.5ms
+23:19:05 n=  965 p50=    820us p90=    923us max=    2.2ms
+23:19:06 n=  968 p50=    816us p90=    918us max=    1.1ms
+23:19:07 n=  952 p50=    827us p90=    928us max=    1.9ms
+23:19:08 n=  969 p50=    817us p90=    911us max=    1.3ms
+23:19:09 n=  917 p50=    821us p90=   1117us max=    1.4ms
+23:19:10 n=  976 p50=    790us p90=    883us max=    1.5ms
+23:19:11 n=  982 p50=    795us p90=    896us max=    1.9ms
+23:19:12 n=  964 p50=    804us p90=    926us max=    1.1ms
+23:19:13 n= 1019 p50=    763us p90=    851us max=    1.4ms
+23:19:14 n=  986 p50=    784us p90=    872us max=    1.2ms
+23:19:15 n=  998 p50=    797us p90=    879us max=    1.1ms
+23:19:16 n=  966 p50=    828us p90=    936us max=    1.4ms
+23:19:17 n=  938 p50=    841us p90=    961us max=    1.2ms
+23:19:18 n=  876 p50=    937us p90=   1049us max=    1.4ms
+23:19:19 n=  939 p50=    864us p90=    976us max=    1.2ms
+23:19:20 n=  954 p50=    846us p90=    936us max=    1.3ms
+23:19:21 n=  960 p50=    838us p90=    907us max=    1.4ms
+23:19:22 n=  973 p50=    820us p90=    893us max=    1.8ms
+23:19:23 n=  877 p50=    985us p90=   1055us max=    1.4ms
+23:19:24 n=  934 p50=    873us p90=   1004us max=    3.2ms
+23:19:25 n=  889 p50=    944us p90=   1019us max=    1.4ms
+23:19:26 n=  981 p50=    815us p90=    933us max=    1.3ms
+23:19:27 n=  943 p50=    821us p90=   1038us max=    1.3ms
+23:19:28 n=  971 p50=    812us p90=    912us max=    3.0ms
+23:19:29 n=  990 p50=    807us p90=    909us max=    1.2ms
+23:19:30 n=  987 p50=    812us p90=    929us max=    1.3ms
+23:19:31 n=  957 p50=    823us p90=    945us max=    1.2ms
+23:19:32 n=  975 p50=    823us p90=    924us max=    1.7ms
+23:19:33 n=  931 p50=    842us p90=   1044us max=    1.4ms
+23:19:34 n=  879 p50=    886us p90=    963us max=    1.4ms
+23:19:35 n=  935 p50=    837us p90=    931us max=    1.3ms
+23:19:36 n=  941 p50=    857us p90=    946us max=    1.4ms
+23:19:37 n=  896 p50=    907us p90=   1133us max=    1.3ms
+23:19:38 n=  882 p50=    931us p90=   1113us max=    1.6ms
+23:19:39 n=  920 p50=    864us p90=   1003us max=    1.4ms
+23:19:40 n=  988 p50=    804us p90=    931us max=    1.9ms
+23:19:41 n= 1008 p50=    766us p90=    869us max=    1.8ms
+23:19:42 n=  993 p50=    785us p90=    882us max=    1.7ms
+23:19:43 n=  924 p50=    880us p90=    944us max=    1.3ms
+23:19:44 n=  918 p50=    889us p90=   1005us max=    1.4ms
+23:19:45 n=  873 p50=    906us p90=    945us max=    1.3ms
+23:19:46 n=  874 p50=    930us p90=    975us max=    2.2ms
+23:19:47 n=  846 p50=    968us p90=   1035us max=    2.1ms
+23:19:48 n=  824 p50=    994us p90=   1104us max=    1.5ms
+23:19:49 n=  829 p50=    960us p90=   1115us max=    1.3ms
+23:19:50 n=  876 p50=    932us p90=    996us max=    1.4ms
+23:19:51 n=  874 p50=    929us p90=   1012us max=    1.4ms
+23:19:52 n=  861 p50=    953us p90=   1035us max=    1.4ms
+23:19:53 n=  938 p50=    856us p90=    984us max=    2.7ms
+23:19:54 n=  896 p50=    933us p90=   1012us max=    1.5ms
+23:19:55 n=  891 p50=    910us p90=   1019us max=    2.7ms
+23:19:56 n= 1021 p50=    749us p90=    851us max=    1.2ms
+23:19:57 n=  936 p50=    765us p90=   1076us max=    1.3ms
+23:19:58 n=  931 p50=    797us p90=   1049us max=    1.3ms
+23:19:59 n=  953 p50=    836us p90=    998us max=    1.2ms
+23:20:00 n=  984 p50=    818us p90=    896us max=    1.4ms
+23:20:01 n=  983 p50=    811us p90=    945us max=    1.2ms
