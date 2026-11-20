@@ -1,0 +1,9 @@
+=== Qwen/Qwen2.5-0.5B-Instruct tp=1 cards=0 lazy=1 2026-11-20T04:16:11+00:00
+=== batch throughput (128 prompts, 512 in / 256 out) ===
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=163212) WARNING 11-20 04:16:42 [interface.py:376] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Throughput: 28.22 requests/s, 21674.55 total tokens/s, 7224.85 output tokens/s
+=== single user latency (batch 1, 128 in / 256 out) ===
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+(EngineCore pid=169462) WARNING 11-20 04:20:01 [interface.py:376] Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Avg latency: 1.41 s  =>  ~182 tokens/s for one user

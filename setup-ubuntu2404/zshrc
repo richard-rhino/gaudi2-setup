@@ -1,0 +1,47 @@
+# --- basic zsh config ---
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt share_history hist_ignore_dups hist_ignore_space hist_reduce_blanks
+
+# Misc
+setopt autocd interactive_comments no_beep
+bindkey -e                                   # emacs keybindings (ctrl-a/e/r etc.)
+
+# Completion
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select                       # arrow-key menu
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'   # case-insensitive
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+bindkey '^[[Z' reverse-menu-complete                     # shift-tab
+
+# Up/down search history by what you've typed so far
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+
+# Simple prompt:  user@host ~/dir (venv) %
+autoload -Uz colors && colors
+PROMPT='%F{green}%n@%m%f %F{blue}%~%f %# '
+
+# Aliases
+alias ls='ls --color=auto'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+
+# PATH
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+
+# Gaudi / vLLM
+export HF_HOME=/models/huggingface
+alias vllm-env='source ~/vllm-venv/bin/activate'
+
+# Plugins from apt (fish-style suggestions + syntax highlighting; must be last)
+[[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

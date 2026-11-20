@@ -1,0 +1,5 @@
+# Ubuntu's zsh doesn't read /etc/profile.d; load the Intel Gaudi env (GC_KERNEL_PATH, MPI, etc.)
+for f in /etc/profile.d/habanalabs*.sh(N); do
+  emulate sh -c ". $f"
+done
+unset f
