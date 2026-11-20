@@ -137,3 +137,99 @@ The user chose Qwen3.8-27B over the faster 30B-A3B ("doesn't meet the requiremen
 goes to the reasoning field. The compose file now takes all of these from `.env`.
 Also learned while the 30B was live: Open WebUI injects its built-in knowledge tools (search/query/view_knowledge_*) into
 every chat; Qwen3-30B-A3B called them ~300 times in a loop for a plain story prompt. Disable them per model or globally.
+
+---
+# Second server (Ubuntu 24.04), 2026-11-20: porting Qwen3.8-Flash-Next and DeepSeek-V4.1-Flash
+
+## 13. Setup on Ubuntu 24.04 (supported OS)
+Host: 8x Gaudi2 HL-225, 2x Xeon 8380 (160 threads), 503 GB RAM, 2.9 TB NVMe. Gaudi SW 1.24.2, Intel PyTorch 2.13,
+vLLM 0.34.0rc0 (commit pinned by vllm-gaudi) + vllm-gaudi main (0.27.0rc1.dev199), all native in a venv (no Docker).
+Scripts and the pitfall list are in `setup-ubuntu2404/README.md`. On a supported OS the install is much simpler than on Debian
+(no driver patch), but it still cost time: a kernel bump left the new kernel on the in-tree driver, the installer
+mangles absolute venv paths, and **Ubuntu's zsh does not read /etc/profile.d**, so without `zshenv` every HPU op fails
+with "Graph compile failed".
+Smoke test (Qwen2.5-0.5B, 1 card, same script as section 4): **7,225 output tok/s batched** (Debian/plugin 0.26: 3,700),
+182 tok/s single user.
+
+## 14. Qwen3.8-Flash-Next (`Qwen4ExpForConditionalGeneration`) on Gaudi2
+Architecture: 48 layers, 36 Gated DeltaNet + 12 "QSA" (indexed sparse) attention, 4-stream hyper-connections,
+a 102 GB hashed n-gram embedding (PLE) at layer 2, 512 experts top-10 (+ shared), MTP, vision tower. 360 GB bf16.
+Upstream vLLM has it only as `nvidia/` (Triton, CuTe) and `amd/` (Triton, aiter) backends; on the HPU (an out-of-tree
+platform) it falls through to the NVIDIA code and dies at the first kernel. The plugin does not support it.
+
+**Approach.** A self-contained text-only port (`ports/qwen4_exp/qwen4_exp.py`, 491 lines, plus ~20 lines of plugin
+integration; `vllm-gaudi-patches/`) built from generic vLLM layers + plugin HPU ops, with the model-specific parts
+written in plain torch from the HF reference (`transformers.models.qwen4_exp`, pure torch, which made this tractable):
+| Component | How |
+|---|---|
+| Gated DeltaNet (36 layers) | reused the plugin's `HPUGatedDeltaNetAttention` (sigmoid output gate) |
+| QSA attention (12 layers) | **dense** gated attention (`Qwen3NextAttention`). The indexer keeps every visible token while a query sees <= 512 complete 4-token blocks, so dense is exact up to ~2k context and a superset beyond. |
+| MoE 512x top-10 + shared | reused `Qwen3NextSparseMoeBlock` (HPU fused MoE) |
+| Hyper-connections | ~30 lines of torch |
+| PLE n-gram embedding | hashing on **CPU** (see below); 102 GB table vocab-sharded over TP ranks (12.8 GB/card at TP=8) |
+| PLE dilated short conv + token context state | per-request state stored in a slot that **borrows the GDN state spec**, so the runner allocates/indexes it like a 37th GDN layer (no runner changes beyond naming). History packed as raw bf16 in the fp32 slot: fits up to TP=16. |
+
+**Gaudi gaps found on the way** (repros in `ports/qwen4_exp/tests/`):
+- **int64 arithmetic is silently wrong on HPU.** `t*m` (t<2^18, m~2^45, product <2^63), `bitwise_xor` and `remainder`
+  return wrong values for 4096/4096 elements with no error; int64 `gather` fails to compile. The PLE n-gram hash needs
+  exact int64, so a naive port would run and generate text while looking up garbage embedding rows. Fix: hash on the CPU.
+- `torch.cummax`, `torch.linalg.solve_triangular`, `scatter` into bool tensors: "Graph compile failed". Replacements:
+  log-step running max; an exact matmul-only inverse for unit-lower-triangular matrices ((I+N)^-1 = prod (I+(-N)^(2^k)),
+  6 matmuls for 64-wide chunks); int8 scatter.
+- Debugging: with the default async eager pipeline the error surfaces at a *later* op; `PT_HPU_EAGER_PIPELINE_ENABLE=0`
+  gives the real one.
+
+**Plugin integration bugs found:** transformers 5.8+ renames `full_attention` -> `indexed_attention`, so the plugin
+counted **0 attention layers** for KV-cache planning; the HPU runner passes **2-D `[batch, seq]` input_ids** (models must
+not assume flat tokens); models are built under a default-device=hpu context, so CPU-side tables need explicit
+`device="cpu"`; the runner reads `model.config.architectures`, so the top-level config must be exposed; hybrid
+architectures are an allow-list in the runner and platform.
+
+**Validation** (tiny random-weight Qwen4Exp with every architecture feature, vs HF on CPU; details and tables in
+`results-ubuntu2404/qwen4_exp/VALIDATION.md`): prefill and 32-step decode agree to bf16 noise (mean |dlogprob|
+0.001-0.003) at 7-300 token prompts, TP=1 and TP=2, eager and torch.compile+HPU-graph modes. Dense-vs-sparse QSA costs
+0.011-0.026 mean |dlogprob| once the context exceeds the indexer budget (measured with a 64-token budget).
+
+**Status: the real 360 GB checkpoint has not run yet.** bf16 needs TP=8 (all 8 cards) and the driver crashed before
+that (section 16). Everything is downloaded and ready.
+
+## 15. DeepSeek-V4.1-Flash-1017: feasibility and preparation
+Much more work than Qwen: there is no transformers implementation of V4.1, and upstream vLLM's two backends (CUDA:
+FlashMLA, DeepGEMM, TileLang, CuTe; ROCm: aiter, flydsl, Triton) share an abstract attention layer with direct
+`torch.ops._C` and `torch.cuda` calls. It needs HPU backends for three new KV-cache types (sliding-window MLA,
+compressed MLA, indexer; plus a circular-buffer compressor state the plugin cannot allocate), engram (two 98 GB
+n-gram tables, again int64 hashing), Sinkhorn hyper-connections, sqrtsoftplus routing and FP4 experts.
+- **FP4 experts on Gaudi2 (no FP4 hardware).** Measured on the real checkpoint (`ports/deepseek_v41/scale_spread.py`,
+  483 sampled expert scale tensors, 1.5M rows): the E8M0 scale spread within a row is median 1, p99 2, **max 5**
+  (log2). Converting to Gaudi2 E4M3 (max 240) with a per-row scale 2^(max-5) is exact while the spread is <= 13, so
+  **FP4 -> per-channel FP8 is bit-exact for 100% of sampled rows** and can use the HPU's native FP8 MoE path.
+  (The plugin's block-FP8 MoE path instead dequantizes every expert to bf16 on every forward.)
+- **Memory:** FP8 experts 544 GB + attention ~20 GB + engram 197 GB = ~761 GB vs 768 GB HBM. Engram has to live in host
+  RAM (only gathers), or the experts stay FP4-packed (272 GB) and are decoded on the fly.
+- **Plan "Track A"**: run DeepSeek's own reference (`inference/model.py`, which already supports 8-way model parallel)
+  on the HPUs with its 6 TileLang kernels replaced by torch (`ports/deepseek_v41/kernel_torch.py`: exact fp32 FP8/FP4
+  grid rounding, no fp8 dtypes on the device, LUT byte decoders), validate against the Nvidia server, then measure.
+  A vLLM port is the step after.
+- A local LLM (DeepSeek-V4.1 on the Nvidia node) drafted the torch kernels (`kernel_helper.py`). Review found it
+  mathematically right except **FP4 round-half ties** (argmin breaks ties downward: 0.75->0.5, 1.75->1.5, 3.5->3.0
+  instead of RNE 1.0/2.0/4.0, which matters because power-of-two scales make exact ties common), plus fp32 GEMMs and
+  an unbounded attention gather. The final kernels are mine; CPU validation of them (`test_kernels_cpu.py`) could not run
+  tonight because of the crash.
+
+## 16. Driver crash (habanalabs 1.24.2 on kernel 6.8.0-151): everything stopped at 04:49
+- Trigger: starting a vLLM run in lazy mode (`PT_HPU_LAZY_MODE=1`) on module 0 (bus 43:00.0).
+- `dmesg`: `BUG: kernel NULL pointer dereference` in `hbl_ib_eqe_work_schd` [habanalabs_ib], a second Oops, then
+  `watchdog: BUG: soft lockup - CPU#72 stuck` in `gaudi2_cn_phy_link_status_work -> do_fw_tuning` [habanalabs_cn]
+  that never ends.
+- The vLLM process is stuck in D state in `hbl_cn_eq_dispatcher_register_cq` holding 97.5 GB on that card, and every
+  new process that calls `sched_setaffinity` (the HPU runtime, OpenMP init, even `taskset`) hangs in `affine_move_task`.
+  So no new PyTorch process can start, CPU-only included. kill -9 does not help. **Only a reboot recovers.**
+- Background: **internal NIC port 9** (scale-up link between cards; the external ports are 8, 22, 23) is DOWN on 5 of 8
+  cards (19, 1a, 43, 44, b3:00.0) and was flapping ("Card N Port 9: link down/up") from ~15 min after boot. The crash is
+  the IB driver handling a link event while a new HCCL context is being created. Card firmware is 1.24.0-fw-62.6.2
+  (driver 1.24.2). Kernel 6.8.0-151 was pulled in by apt (`linux-headers-generic`); 6.8.0-53 also has the DKMS driver.
+- Lazy mode is the legacy path (this plugin defaults to `PT_HPU_LAZY_MODE=0`, eager + torch.compile, which works).
+
+## 17. Next steps
+See `setup-ubuntu2404/AFTER-CRASH.md`: reboot, check port 9, optional firmware update, Intel's NIC link test, then run
+the real Qwen3.8-Flash-Next at TP=8 (correctness vs the Nvidia node, then the section 8 benchmarks), then DeepSeek Track A.

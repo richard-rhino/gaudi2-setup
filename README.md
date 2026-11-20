@@ -1,4 +1,10 @@
-# Gaudi2 server setup (Debian 12)
+# Gaudi2 server setup (Debian 12) + second server (Ubuntu 24.04): new-model ports
+
+**Ubuntu 24.04 server (2026-11-20):** setup in [setup-ubuntu2404/](setup-ubuntu2404/README.md), the Qwen3.8-Flash-Next
+HPU port in [ports/qwen4_exp/](ports/qwen4_exp/), DeepSeek-V4.1 preparation in [ports/deepseek_v41/](ports/deepseek_v41/),
+results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md sections 13-17](FINDINGS.md), and
+[recovery steps after the driver crash](setup-ubuntu2404/AFTER-CRASH.md). The rest of this README is the Debian server.
+
 
 Order:
 1. `sudo bash setup/01-base.sh`     base packages, zsh login shell, deps for Habana packages. Reboot if it tells you to.

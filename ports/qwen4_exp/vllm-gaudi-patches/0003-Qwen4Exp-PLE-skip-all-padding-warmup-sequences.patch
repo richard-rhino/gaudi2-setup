@@ -1,0 +1,27 @@
+From aff04c7a08a818e542ae6f88840fd7294fa521c5 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Fri, 20 Nov 2026 04:59:29 +0000
+Subject: [PATCH 3/3] Qwen4Exp PLE: skip all-padding warmup sequences
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vllm_gaudi/models/qwen4_exp.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index a41d748e..725fe83d 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -316,7 +316,8 @@ class HpuPLELayer(MambaBase, nn.Module):
+         for i, (s, L) in enumerate(seqs):
+             nv = int(lens[i])
+             toks = ids_cpu[s:s + nv]
+-            all_ids[s:s + nv] = self.hasher.ids(toks, ctx_cpu[i])
++            if nv > 0:  # warmup pads with all-padding sequences
++                all_ids[s:s + nv] = self.hasher.ids(toks, ctx_cpu[i])
+             new_ctx.append(torch.cat([ctx_cpu[i], toks])[-self.ctx:])
+         emb = self.ple_embedding.ngram_embedding(all_ids.to(torch.int32).to(hidden.device)).flatten(-2)
+ 
+-- 
+2.43.0
+

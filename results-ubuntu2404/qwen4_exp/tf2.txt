@@ -1,0 +1,4 @@
+len=   7 top1 agree=6/6  first_mismatch_pos=None  mean|dlogprob|=0.003 max=0.007
+len=  33 top1 agree=29/32  first_mismatch_pos=7  mean|dlogprob|=0.003 max=0.010
+len= 130 top1 agree=125/129  first_mismatch_pos=63  mean|dlogprob|=0.002 max=0.012
+len= 300 top1 agree=285/299  first_mismatch_pos=9  mean|dlogprob|=0.002 max=0.018

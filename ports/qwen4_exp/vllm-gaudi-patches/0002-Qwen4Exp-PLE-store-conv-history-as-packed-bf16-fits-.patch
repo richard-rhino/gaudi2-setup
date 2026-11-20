@@ -1,0 +1,56 @@
+From 291cfe50b27ed90035045f60a7289654de6f64fb Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Fri, 20 Nov 2026 04:43:50 +0000
+Subject: [PATCH 2/3] Qwen4Exp PLE: store conv history as packed bf16 (fits
+ TP<=16 on the real model)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vllm_gaudi/models/qwen4_exp.py | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index 231f4c1f..a41d748e 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -231,9 +231,11 @@ class HpuPLELayer(MambaBase, nn.Module):
+         self.state_len = (self.kernel - 1) * self.dil
+         self.conv1d = nn.Conv1d(hc_hidden, hc_hidden, self.kernel, groups=hc_hidden, dilation=self.dil, bias=False)
+         self.ctx = self.hasher.ctx
+-        # state slot layout in the (fp32) GDN ssm-state tensor of this layer: [conv history | token ids]
++        # State slot = this layer's (fp32) GDN-spec ssm-state row: [conv history as raw bf16 pairs | token ids fp32].
++        # bf16 history is bit-exact (the activations are bf16) and needs half the fp32 elements.
+         self._gdn = [gdn]  # list: keep out of nn.Module children
+-        self.state_numel = self.state_len * hc_hidden + self.ctx
++        self.hist_f32 = (self.state_len * hc_hidden + 1) // 2
++        self.state_numel = self.hist_f32 + self.ctx
+         self.cache_group_idx = None
+         self.kv_cache = None
+         self.prefix = prefix
+@@ -295,8 +297,9 @@ class HpuPLELayer(MambaBase, nn.Module):
+             if has_init is not None:
+                 keep = keep & has_init.bool().view(-1)
+             rows = torch.where(keep.view(-1, 1), rows, torch.zeros_like(rows))
+-            conv_hist = rows[:, :self.state_len * hc_hidden].view(n, self.state_len, hc_hidden)
+-            tok_rows = rows[:, self.state_len * hc_hidden:].cpu().round().long()
++            conv_hist = rows[:, :self.hist_f32].contiguous().view(torch.bfloat16)[:, :self.state_len * hc_hidden]
++            conv_hist = conv_hist.reshape(n, self.state_len, hc_hidden)
++            tok_rows = rows[:, self.hist_f32:].cpu().round().long()
+             if not bool(keep.all()):
+                 tok_rows = torch.where(keep.cpu().view(-1, 1), tok_rows, torch.full_like(tok_rows, self.hasher.eos))
+             ctx_cpu = list(tok_rows)
+@@ -347,7 +350,10 @@ class HpuPLELayer(MambaBase, nn.Module):
+             gather = (lens_t.view(-1, 1) + torch.arange(self.state_len, device=x.device).view(1, -1))  # into xp
+             new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
+             new_tok = torch.stack(new_ctx).to(torch.float32).to(x.device)
+-            new_rows = torch.cat([new_hist.reshape(n, -1).float(), new_tok], dim=1)
++            hist_bf16 = new_hist.reshape(n, -1).to(torch.bfloat16)
++            if hist_bf16.shape[1] % 2:
++                hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(n, 1)], dim=1)
++            new_rows = torch.cat([hist_bf16.contiguous().view(torch.float32), new_tok], dim=1)
+             st = self.kv_cache[1].view(self.kv_cache[1].shape[0], -1)
+             st[:, :self.state_numel].index_copy_(0, store.long(), new_rows.to(st.dtype))
+         return (hidden + gated + out).view(orig_shape)
+-- 
+2.43.0
+
