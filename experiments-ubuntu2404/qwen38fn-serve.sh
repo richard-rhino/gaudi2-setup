@@ -4,9 +4,14 @@
 set -euo pipefail
 source ~/vllm-venv/bin/activate
 export HF_HOME=/models/huggingface PT_HPU_LAZY_MODE=0 PT_HPU_ENABLE_LAZY_COLLECTIVES=true
-export VLLM_ENGINE_READY_TIMEOUT_S=7200
+export VLLM_ENGINE_READY_TIMEOUT_S=14400
+# Full warmup = 90 prompt + 75 decode shapes at ~63 s each (~3 h). SKIP=1 compiles each shape on first use instead.
+[ "${SKIP:-1}" = 1 ] && export VLLM_SKIP_WARMUP=true
 MAXLEN=${MAXLEN:-32768}
+# PROFILE=<dir>: enable the torch profiler (CPU + HPU activity); drive it with POST /start_profile and /stop_profile
+PROF=(); [ -n "${PROFILE:-}" ] && { export VLLM_TORCH_PROFILER_DIR="$PROFILE"
+  PROF=(--profiler-config "{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$PROFILE\"}"); }
 vllm serve Qwen/Qwen3.8-Flash-Next --served-model-name qwen38fn \
   --tensor-parallel-size 8 --dtype bfloat16 --max-model-len "$MAXLEN" --max-num-seqs ${SEQS:-32} \
   --limit-mm-per-prompt '{"image":0,"video":0}' --no-enable-prefix-caching \
-  --gpu-memory-utilization ${MEM:-0.85} --port 8000 2>&1 | tee ~/gaudi2-setup/logs/serve-qwen38fn-$(date +%m%d-%H%M).log
+  --gpu-memory-utilization ${MEM:-0.85} --port 8000 "${PROF[@]}" 2>&1 | tee ~/gaudi2-setup/logs/serve-qwen38fn-$(date +%m%d-%H%M).log

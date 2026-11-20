@@ -18,7 +18,7 @@ Healthy: only ports 8, 22, 23 DOWN (the external scale-out ports, no cables). If
 ## 3. Avoid the trigger
 Run vLLM in the default mode (`PT_HPU_LAZY_MODE=0`, eager + torch.compile). The crash happened while starting a
 lazy-mode (`PT_HPU_LAZY_MODE=1`) HCCL context during link flaps. Always stop vLLM with the server's own shutdown or
-`setup/stop-vllm.sh`; an orphaned worker pins the card memory.
+`setup-ubuntu2404/stop-vllm.sh`; an orphaned worker pins the card memory.
 
 ## 4. Resume the model work
 1. Qwen3.8-Flash-Next at TP=8: `bash experiments-ubuntu2404/qwen38fn-serve.sh` then
