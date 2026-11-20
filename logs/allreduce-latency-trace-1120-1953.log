@@ -1,0 +1,113 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1120 19:53:44.332000 1911891 torch/distributed/run.py:874] 
+W1120 19:53:44.332000 1911891 torch/distributed/run.py:874] *****************************************
+W1120 19:53:44.332000 1911891 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1120 19:53:44.332000 1911891 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
+19:53:54 n= 2697 p50=    233us p90=    289us max=  299.6ms
+19:53:55 n= 4198 p50=    228us p90=    248us max=    2.6ms
+19:53:56 n= 3993 p50=    232us p90=    299us max=    1.3ms
+19:53:57 n= 4398 p50=    219us p90=    240us max=    2.5ms
+19:54:13 n= 1945 p50=    221us p90=    242us max=16144.6ms
+19:54:14 n=   28 p50=   4387us p90= 146032us max=  266.4ms
+19:54:15 n= 1913 p50=    222us p90=    247us max=   67.6ms
+19:54:16 n= 4413 p50=    221us p90=    240us max=    2.3ms
+19:54:17 n= 4152 p50=    231us p90=    269us max=    1.4ms
+19:54:18 n= 4251 p50=    230us p90=    253us max=    1.1ms
+19:54:19 n= 4459 p50=    219us p90=    235us max=    0.8ms
+19:54:20 n= 4246 p50=    229us p90=    256us max=    1.0ms
+19:54:21 n= 4430 p50=    221us p90=    238us max=    0.9ms
+19:54:22 n= 4304 p50=    225us p90=    253us max=    1.3ms
+19:54:23 n= 4160 p50=    222us p90=    292us max=    0.8ms
+19:54:24 n= 4503 p50=    217us p90=    234us max=    1.6ms
+19:54:25 n= 4430 p50=    220us p90=    238us max=    0.8ms
+19:54:26 n= 3898 p50=    231us p90=    318us max=    1.6ms
+19:54:27 n= 4241 p50=    225us p90=    261us max=    2.1ms
+19:54:37 n= 2653 p50=    225us p90=    245us max= 8849.5ms
+19:54:40 n=    1 p50=3239208us p90=3239208us max= 3239.2ms
+19:54:41 n= 1576 p50=    224us p90=    259us max=   76.0ms
+19:54:42 n= 3627 p50=    225us p90=    242us max=   65.7ms
+19:54:43 n= 4350 p50=    224us p90=    245us max=    1.0ms
+19:54:44 n= 4218 p50=    217us p90=    304us max=    1.4ms
+19:54:45 n= 3678 p50=    282us p90=    324us max=    1.2ms
+19:54:46 n= 3853 p50=    245us p90=    307us max=    1.3ms
+19:54:47 n= 4197 p50=    233us p90=    258us max=    0.9ms
+19:54:48 n= 4191 p50=    226us p90=    289us max=    1.4ms
+19:54:49 n= 4022 p50=    235us p90=    310us max=    0.9ms
+19:54:50 n= 4018 p50=    235us p90=    293us max=    0.9ms
+19:54:51 n= 4296 p50=    228us p90=    248us max=    0.9ms
+19:54:52 n= 3988 p50=    247us p90=    267us max=    1.3ms
+19:54:53 n= 3947 p50=    252us p90=    270us max=    0.9ms
+19:54:54 n= 3958 p50=    250us p90=    267us max=    0.8ms
+19:54:55 n= 3960 p50=    248us p90=    269us max=    0.8ms
+19:54:56 n= 3778 p50=    260us p90=    287us max=    0.9ms
+19:54:57 n= 3909 p50=    251us p90=    283us max=    1.1ms
+19:54:58 n= 3819 p50=    260us p90=    276us max=    1.0ms
+19:55:03 n= 2654 p50=    237us p90=    260us max= 4154.4ms
+19:55:08 n=  163 p50=    267us p90=   6077us max= 3964.3ms
+19:55:11 n=    2 p50=3199413us p90=3199413us max= 3199.4ms
+19:55:12 n= 1916 p50=    231us p90=    273us max=   74.6ms
+19:55:13 n= 4226 p50=    232us p90=    256us max=    1.2ms
+19:55:14 n= 4198 p50=    238us p90=    258us max=    0.8ms
+19:55:15 n= 4327 p50=    226us p90=    245us max=    0.8ms
+19:55:16 n= 4364 p50=    224us p90=    240us max=    0.8ms
+19:55:17 n= 4443 p50=    220us p90=    236us max=    0.8ms
+19:55:18 n= 4541 p50=    215us p90=    230us max=    0.8ms
+19:55:19 n= 4431 p50=    221us p90=    237us max=    0.9ms
+19:55:20 n= 4192 p50=    227us p90=    273us max=    1.0ms
+19:55:21 n= 4326 p50=    226us p90=    241us max=    1.9ms
+19:55:22 n= 4303 p50=    228us p90=    242us max=    0.9ms
+W1120 20:03:40.948000 1911891 torch/distributed/elastic/agent/server/api.py:753] Received 15 death signal, shutting down workers
+W1120 20:03:40.953000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911958 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911959 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911960 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911961 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911962 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911963 closing signal SIGTERM
+W1120 20:03:40.956000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911964 closing signal SIGTERM
+W1120 20:03:40.957000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911965 closing signal SIGTERM
+W1120 20:04:10.483000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911958 closing signal SIGTERM
+W1120 20:04:10.483000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911959 closing signal SIGTERM
+W1120 20:04:10.484000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911960 closing signal SIGTERM
+W1120 20:04:10.484000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911961 closing signal SIGTERM
+W1120 20:04:10.484000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911962 closing signal SIGTERM
+W1120 20:04:10.484000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911964 closing signal SIGTERM
+W1120 20:04:10.484000 1911891 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 1911965 closing signal SIGTERM

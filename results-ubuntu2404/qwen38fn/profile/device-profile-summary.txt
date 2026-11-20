@@ -1,0 +1,203 @@
+kernel events 1183808 span 21382.2 ms
+busy time per engine (ms):
+      106.9  VLLM::Worker_TP0 / 6050
+      105.5  VLLM::Worker_TP0 / 6060
+      102.9  VLLM::Worker_TP0 / 6070
+      102.8  VLLM::Worker_TP0 / 6080
+       56.1  VLLM::Worker_TP0 / 7039
+       50.7  VLLM::Worker_TP0 / 7029
+       44.9  VLLM::Worker_TP0 / 7021
+       43.6  VLLM::Worker_TP0 / 7024
+       43.4  VLLM::Worker_TP0 / 7022
+       43.0  VLLM::Worker_TP0 / 7023
+       42.6  VLLM::Worker_TP0 / 7028
+       42.4  VLLM::Worker_TP0 / 7026
+       42.1  VLLM::Worker_TP0 / 7025
+       42.1  VLLM::Worker_TP0 / 7038
+       41.6  VLLM::Worker_TP0 / 7037
+       41.4  VLLM::Worker_TP0 / 7036
+       41.0  VLLM::Worker_TP0 / 7031
+       41.0  VLLM::Worker_TP0 / 7034
+       40.2  VLLM::Worker_TP0 / 7044
+       40.1  VLLM::Worker_TP0 / 7045
+       40.0  VLLM::Worker_TP0 / 7030
+       39.8  VLLM::Worker_TP0 / 7035
+       39.6  VLLM::Worker_TP0 / 7032
+       39.0  VLLM::Worker_TP0 / 7033
+       38.2  VLLM::Worker_TP0 / 7040
+       37.9  VLLM::Worker_TP0 / 7041
+       34.9  VLLM::Worker_TP0 / 7042
+       34.3  VLLM::Worker_TP0 / 7043
+        7.0  VLLM::Worker_TP0 / 4052
+        6.7  VLLM::Worker_TP0 / 4062
+        6.3  VLLM::Worker_TP0 / 4063
+        6.0  VLLM::Worker_TP0 / 4053
+        5.2  VLLM::Worker_TP0 / 4072
+top kernel names by summed duration (ms, count):
+      482.6   40320  router_stage#_i#
+      399.9  270384  GEMM
+       74.6   17520  router_stage#_fwd_bf#
+       40.9  131912  mult_fwd_f#
+       33.1   18837  gather_fwd_f#
+       31.2   30786  DmaTranspose
+       29.7    3600  generate_bitonic_chunks_f#
+       23.5   85572  constant_i#
+       19.4    1152  gather_elements_fwd_bf#
+       16.4   18288  BatchGemm
+       15.2   41184  fused_kernel_#x#DD#C#E_#_f#
+       14.9    6444  div_mod_i#
+       14.5    3696  weighted_sum_reduction_fwd_bf#
+       14.4    5052  reduce_arg_max_stage#_fwd_f#
+       14.0   34497  mult_fwd_bf#
+       13.4    6048  fused_kernel_#x#B#FC#_#_bf#
+       12.4     866  memcpy_f#
+       11.0    2305  fused_kernel_#xEAB#E#_#_f#
+       10.5    6664  gather_fwd_bf#
+        9.5   10658  index_copy_fwd_f#
+        9.3    6912  scatter_nd_onnx_fwd_bf#
+        8.8   79700  fused_kernel_#x#C#F#D_#_bf#
+        7.4    4504  cast_bf#_to_f#
+        7.0    4992  reduce_sum_fwd_f#
+        6.3    8064  fused_kernel_#xA#D#_#_bf#
+        5.9    1728  div_f#
+        5.8    1540  memcpy_bf#
+        5.6   69984  sub_fwd_f#
+        5.5   21364  reduce_mean_fwd_bf#
+        4.9    7920  fused_kernel_#x#AF#E#_#B_f#
+        4.9     288  broadcast_nd_fwd_u#
+        4.9    6996  gather_nd_mxnet_fwd_bf#
+        4.5    6912  fused_kernel_#xA#CB#_#_f#
+        3.3    2664  fused_kernel_#x#D#_#_bf#
+        2.6    1679  add_bf#
+        2.6    1979  reduce_mean_fwd_f#
+        2.5     792  fused_kernel_#xADE#F#A#_#_f#
+        2.3    2164  mult_f#
+        2.3    1227  add_f#
+        2.3    3457  fused_kernel_#xE#C#_#_f#
+top hpu_op (graph launches) by duration:
+    49947.0    5700  synchronizeEvent (accel0)
+    11043.8    4244  enqueueWithExternalEventsExt (accel0)
+     8075.7       1  enqueueWithExternalEvents recipeHandle 0x7492cc10e440 recipeSeqNum 163
+      963.1       1  enqueueWithExternalEvents recipeHandle 0x7492e0024b30 recipeSeqNum 160
+      505.1    1773  compileGraph
+      279.9       1  enqueueWithExternalEvents recipeHandle 0x7492cc045510 recipeSeqNum 163
+      208.9       1  enqueueWithExternalEvents recipeHandle 0x7492d01a9000 recipeSeqNum 164
+      170.4     528  enqueueWithExternalEvents recipeHandle 0x748bb3f9a2e0 recipeSeqNum 134
+      138.9       1  enqueueWithExternalEvents recipeHandle 0x7492d416dd70 recipeSeqNum 163
+      131.1       1  enqueueWithExternalEvents recipeHandle 0x7492d81208f0 recipeSeqNum 161
+      125.3       1  enqueueWithExternalEvents recipeHandle 0x7492dc1606f0 recipeSeqNum 162
+       99.9       1  enqueueWithExternalEvents recipeHandle 0x7492dc0fd510 recipeSeqNum 164
+       99.8       1  enqueueWithExternalEvents recipeHandle 0x7492d40d5770 recipeSeqNum 163
+       97.9    1176  hcclAllReduce
+       77.0       1  profilingProlog (accel6)
+       72.0       1  enqueueWithExternalEvents recipeHandle 0x7492d8016b40 recipeSeqNum 162
+       71.6    1773  destroyGraph
+       64.1       1  enqueueWithExternalEvents recipeHandle 0x7492e00ad370 recipeSeqNum 163
+       59.5       1  enqueueWithExternalEvents recipeHandle 0x7492c4177300 recipeSeqNum 164
+       52.2  296820  DmaMemcpy
+       47.5    1773  recipeDestroy
+       46.6       1  enqueueWithExternalEvents recipeHandle 0x7492cc185110 recipeSeqNum 164
+       39.9       1  enqueueWithExternalEvents recipeHandle 0x7492cc160dc0 recipeSeqNum 163
+       33.7     528  enqueueWithExternalEvents recipeHandle 0x748b79ed54c0 recipeSeqNum 134
+       31.3       1  enqueueWithExternalEvents recipeHandle 0x7492d4097850 recipeSeqNum 161
+compileGraph example args: {'EventName': 'compileGraph', 'recipeHandle': '128174039310768', 'eventHandle': '0x0', 'hidden': 1, 'dataType': '', 'streamHandle': '0x0', 'recipeName': '.graph_dumps/15878', 'recipeId': 0}
+compile total ms 505.115192
+  611    165.4ms  ?
+  213     62.0ms  TorchDynamo Cache Lookup
+  188     48.5ms  Torch-Compiled Region: 13/1
+  171     45.1ms  Torch-Compiled Region: 4/4
+   85     31.2ms  aten::_copy_from
+   76     25.4ms  Torch-Compiled Region: 4/6
+   55     11.9ms  Torch-Compiled Region: 11/1
+   43      9.5ms  Torch-Compiled Region: 4/7
+   42     16.4ms  Torch-Compiled Region: 4/5
+   33     11.3ms  aten::mul
+   33      9.2ms  aten::add
+   21      6.1ms  Pregraph bytecode
+   14      5.3ms  aten::empty
+   13      4.1ms  aten::cat
+   13      5.7ms  aten::view
+   12      2.5ms  Torch-Compiled Region: 5/0
+   10      3.2ms  aten::empty_strided
+   10      2.5ms  Torch-Compiled Region: 4/0
+    9      2.3ms  Torch-Compiled Region: 7/0
+    6      2.2ms  aten::ne
+    6      1.3ms  Torch-Compiled Region: 10/0
+    6      1.5ms  Torch-Compiled Region: 8/0
+    6      1.9ms  c10d::allreduce_
+    6      2.8ms  aten::pow
+    6      1.8ms  aten::mean
+top cpu ops by total dur:
+     8336.6ms    903  aten::to
+     8335.6ms    584  aten::_to_copy
+     8333.5ms    910  aten::copy_
+     8331.4ms    532  aten::_copy_from
+      803.6ms    385  Torch-Compiled Region: 4/4
+      312.4ms    911  TorchDynamo Cache Lookup
+      268.6ms    132  Torch-Compiled Region: 4/6
+       90.9ms     11  Torch-Compiled Region: 4/5
+       90.0ms     35  Torch-Compiled Region: 4/0
+       42.1ms     36  Torch-Compiled Region: 11/1
+       36.0ms     36  Torch-Compiled Region: 5/0
+       31.0ms     11  Torch-Compiled Region: 13/1
+       25.7ms    863  Pregraph bytecode
+       25.1ms     36  Torch-Compiled Region: 6/0
+       23.2ms   1164  _c10d_functional::all_reduce_
+       20.9ms     36  Torch-Compiled Region: 7/0
+       17.4ms    575  aten::add
+       16.3ms    638  aten::mul
+       15.7ms   1176  c10d::allreduce_
+       15.4ms     12  Torch-Compiled Region: 4/7
+       10.5ms     48  aten::ne
+        8.3ms    930  aten::view
+        7.6ms    863  AOTDispatcher Runtime Wrapper Prologue
+        7.0ms   1176  _c10d_functional::wait_tensor
+        6.3ms     36  Torch-Compiled Region: 8/0
+idle gaps total 21188 ms in 78212 gaps
+idle by gap size (us bucket: ms): {100: 77, 1000: 383, 10000: 1830, 100000: 1327, 1000000000.0: 17571}
+  8075.9ms after fused_kernel_0xF8B63544_2A_bf16 before mult_fwd_bf16
+  7500.8ms after fused_kernel_0x3F05E723_2_bf16 before tile_fwd_bf16
+  1069.0ms after index_copy_fwd_f32 before mult_fwd_bf16
+   210.8ms after index_copy_fwd_f32 before mult_fwd_bf16
+   205.6ms after fused_kernel_0x76E1853C_8B_bf16 before GEMM
+   146.3ms after fused_kernel_0xF8B63544_2A_bf16 before mult_fwd_bf16
+   131.4ms after fused_kernel_0xF8B63544_2A_bf16 before mult_fwd_bf16
+   127.1ms after index_copy_fwd_bf16 before GEMM
+   104.0ms after index_copy_fwd_f32 before mult_fwd_bf16
+    97.4ms after index_copy_fwd_bf16 before GEMM
+    74.5ms after fused_kernel_0xF8B63544_2A_bf16 before mult_fwd_bf16
+    74.2ms after fused_kernel_0x1D115225_64_bf16 before GEMM
+[('generate_bitonic_chunks_f32', 3600)]
+hcclAllReduce host dur us p50/max 77.097 229.392
+synchronizeEvent n 5700 p50 3.672 p99 49923.806 max 8077122.358 sum ms 49946.981155
+  1412.2ms n=  422 avg=  3.35ms  ('fused_kernel_0x1D115225_64_bf16', 'GEMM')
+   606.0ms n=   26 avg= 23.31ms  ('fused_kernel_0xF8B63544_2A_bf16', 'mult_fwd_bf16')
+   572.5ms n=   28 avg= 20.45ms  ('index_copy_fwd_f32', 'mult_fwd_bf16')
+   472.1ms n=  125 avg=  3.78ms  ('index_copy_fwd_f32', 'GEMM')
+   349.7ms n=   12 avg= 29.14ms  ('fused_kernel_0x76E1853C_8B_bf16', 'GEMM')
+   311.9ms n=   11 avg= 28.35ms  ('index_copy_fwd_bf16', 'GEMM')
+   136.6ms n=   36 avg=  3.79ms  ('GEMM', 'GEMM')
+    72.6ms n=    8 avg=  9.07ms  ('mult_fwd_bf16', 'MMEH_WB1_MON_TS_BIT1')
+    59.8ms n=   11 avg=  5.44ms  ('where_fwd_f32', 'fused_kernel_0x564AFA1E_')
+    37.2ms n=    5 avg=  7.44ms  ('fused_kernel_0x2C10BBF1_48_bf16', 'tile_fwd_bf16')
+    24.5ms n=    3 avg=  8.15ms  ('memcpy_i32', 'memcpy_i32')
+     8.8ms n=    4 avg=  2.20ms  ('GEMM', 'cast_i64_to_i32')
+     6.3ms n=    4 avg=  1.57ms  ('index_copy_fwd_f32', 'constant_i64')
+     4.8ms n=    1 avg=  4.77ms  ('cast_i64_to_i32', 'mult_fwd_bf16')
+     3.9ms n=    1 avg=  3.94ms  ('gather_fwd_f32', 'cast_i64_to_i32')
+host activity during 1ms-1s device gaps:
+    1442.6ms synchronizeEvent (accel0)
+     309.5ms run
+     257.7ms launch_recipe
+     210.8ms enqueueWithExternalEvents recipeHandle 0x7492d01a9000 recipe
+     189.1ms launch
+     166.2ms TorchDynamo Cache Lookup
+     146.3ms enqueueWithExternalEvents recipeHandle 0x7492d416dd70 recipe
+     127.1ms enqueueWithExternalEvents recipeHandle 0x7492dc1606f0 recipe
+     127.1ms enqueueWithExternalEventsExt (accel0)
+     104.0ms enqueueWithExternalEvents recipeHandle 0x7492d40d5770 recipe
+      88.4ms NONE (host idle/python)
+      83.6ms LaunchRecipe
+      70.6ms aten::mul
+      68.9ms enqueueWithExternalEvents recipeHandle 0x748bb3f9a2e0 recipe
+      68.3ms enqueueWithExternalEvents recipeHandle 0x7492e00ad370 recipe
