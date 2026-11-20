@@ -2,7 +2,7 @@
 
 ## 1. Reboot
 `sudo reboot`. Nothing else clears the stuck CPU (soft lockup) and the D-state process. Model downloads resume where they
-stopped: `~/setup/dl-retry.sh deepseek-ai/DeepSeek-V4.1-Flash-1017 ~/setup/logs/dl-deepseek.log` (Qwen3.8-Flash-Next is complete).
+stopped, but both checkpoints finished overnight (Qwen3.8-Flash-Next 131/131 shards, DeepSeek-V4.1-Flash-1017 48/48, 06:05 UTC).
 
 ## 2. Check the internal links (port 9 was DOWN on 5 of 8 cards and flapping)
 ```
