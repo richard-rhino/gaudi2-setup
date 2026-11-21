@@ -8,6 +8,8 @@ export VLLM_ENGINE_READY_TIMEOUT_S=14400
 # Full warmup = 90 prompt + 75 decode shapes at ~63 s each (~3 h). SKIP=1 compiles each shape on first use instead.
 [ "${SKIP:-1}" = 1 ] && export VLLM_SKIP_WARMUP=true
 MAXLEN=${MAXLEN:-32768}
+# Small decode batches: compute only the routed experts instead of the fused op over all 512 (FINDINGS 18).
+export VLLM_HPU_MOE_GATHER_BF16=${MOE_GATHER:-1}
 # TP x PP must be 8. PP=8 TP=1 avoids per-layer all-reduces (the internal NIC links stall them, FINDINGS 18).
 TP=${TP:-8}; PP=${PP:-1}
 # PROFILE=<dir>: enable the torch profiler (CPU + HPU activity); drive it with POST /start_profile and /stop_profile

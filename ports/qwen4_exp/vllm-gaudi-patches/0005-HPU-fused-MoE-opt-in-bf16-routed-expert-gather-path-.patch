@@ -1,0 +1,77 @@
+From 56e7f165d4cb0f56b3f5c211e80f9de6a75c6249 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sat, 21 Nov 2026 00:12:30 +0000
+Subject: [PATCH] HPU fused MoE: opt-in bf16 routed-expert gather path for
+ small batches (VLLM_HPU_MOE_GATHER_BF16)
+
+---
+ vllm_gaudi/ops/hpu_fused_moe.py | 39 +++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/vllm_gaudi/ops/hpu_fused_moe.py b/vllm_gaudi/ops/hpu_fused_moe.py
+index 04d82fd4..7be09f32 100644
+--- a/vllm_gaudi/ops/hpu_fused_moe.py
++++ b/vllm_gaudi/ops/hpu_fused_moe.py
+@@ -285,6 +285,41 @@ def _gather_swigluoai_moe(
+     return acc
+ 
+ 
++# bf16 silu MoE, routed-expert gather for small batches. The Habana fused op reads every local expert's weights
++# each call (~2.3 ms per layer for 512 experts x 2560 x 640 on Gaudi2, flat from 1 to 4 tokens); gathering only
++# the routed experts costs ~0.1 ms per token (0.14 ms at 1 token). Used while tokens * top_k <= ratio * local
++# experts. Opt-in: VLLM_HPU_MOE_GATHER_BF16=1, VLLM_HPU_MOE_GATHER_BF16_RATIO (default 0.4).
++_MOE_GATHER_BF16 = os.environ.get("VLLM_HPU_MOE_GATHER_BF16", "0").lower() in ("1", "true")
++_MOE_GATHER_BF16_RATIO = float(os.environ.get("VLLM_HPU_MOE_GATHER_BF16_RATIO", "0.4"))
++
++
++def _use_gather_silu_bf16(layer, x: torch.Tensor, topk_ids: torch.Tensor, activation) -> bool:
++    if not _MOE_GATHER_BF16 or activation != "silu" or getattr(layer, "w13_bias", None) is not None:
++        return False
++    w13 = getattr(layer, "w13_weight", None)
++    if w13 is None or w13.dtype != torch.bfloat16:
++        return False
++    return x.shape[0] * topk_ids.shape[-1] <= _MOE_GATHER_BF16_RATIO * w13.shape[0]
++
++
++def _gather_silu_bf16_moe(layer, x: torch.Tensor, topk_ids: torch.Tensor, topk_weights: torch.Tensor) -> torch.Tensor:
++    """silu(x W1) * (x W3) W2 over the routed experts only, one (token, k) pair per bmm row. Same per-rank partial as
++    the fused op (pre all-reduce under TP; experts of other EP ranks contribute zero)."""
++    w13, w2 = layer.w13_weight, layer.w2_weight  # [E_local, 2I, H], [E_local, H, I]
++    e_local, d = w13.shape[0], w13.shape[1] // 2
++    tokens, k = topk_ids.shape
++    local = topk_ids.reshape(-1).long() - int(layer.moe_config.ep_rank * layer.local_num_experts)
++    in_range = (local >= 0) & (local < e_local)
++    local = torch.where(in_range, local, torch.zeros_like(local))
++    xk = x.repeat_interleave(k, 0).unsqueeze(-1)  # [T*K, H, 1]
++    h = torch.bmm(w13.index_select(0, local), xk).squeeze(-1)  # [T*K, 2I]
++    a = torch.nn.functional.silu(h[:, :d]) * h[:, d:]
++    o = torch.bmm(w2.index_select(0, local), a.unsqueeze(-1)).squeeze(-1)  # [T*K, H]
++    wt = topk_weights.reshape(-1).float()
++    wt = torch.where(in_range, wt, torch.zeros_like(wt))
++    return (o.float() * wt.unsqueeze(-1)).view(tokens, k, -1).sum(1).to(x.dtype)
++
++
+ def _swigluoai_moe(
+     layer,
+     x: torch.Tensor,
+@@ -578,6 +613,8 @@ class HPUUnquantizedFusedMoEMethod(UnquantizedFusedMoEMethod):
+                 beta=self.swiglu_beta,
+                 limit=self.swiglu_limit,
+             )
++        elif _use_gather_silu_bf16(layer, x, topk_ids, activation):
++            output = _gather_silu_bf16_moe(layer, x, topk_ids, topk_weights)
+         else:
+             output = layer.moe_op(
+                 x,
+@@ -671,6 +708,8 @@ class HPUUnquantizedFusedMoEMethod(UnquantizedFusedMoEMethod):
+                 beta=self.swiglu_beta,
+                 limit=self.swiglu_limit,
+             )
++        elif _use_gather_silu_bf16(layer, x, topk_ids, activation):
++            output = _gather_silu_bf16_moe(layer, x, topk_ids, topk_weights)
+         else:
+             output = layer.moe_op(
+                 x,
+-- 
+2.43.0
+
