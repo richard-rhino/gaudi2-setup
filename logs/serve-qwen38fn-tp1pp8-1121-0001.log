@@ -1085,3 +1085,140 @@ INFO:     127.0.0.1:60004 - "POST /v1/completions HTTP/1.1" 200 OK
 INFO:     127.0.0.1:52800 - "POST /v1/completions HTTP/1.1" 200 OK
 (APIServer pid=2521633) INFO 11-21 00:12:18 [loggers.py:335] Engine 000: Avg prompt throughput: 1.4 tokens/s, Avg generation throughput: 26.2 tokens/s, Running: 1 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.1%
 (APIServer pid=2521633) INFO 11-21 00:12:28 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 1.7 tokens/s, Running: 0 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.0%
+(APIServer pid=2521633) INFO 11-21 00:12:38 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.0%
+INFO:     127.0.0.1:53968 - "POST /tokenize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53978 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53978 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53978 - "POST /v1/completions HTTP/1.1" 200 OK
+(Worker_PP7 pid=2522130) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP4 pid=2522129) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP5 pid=2522126) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP1 pid=2522127) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP0 pid=2522120) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP2 pid=2522124) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP3 pid=2522128) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+(Worker_PP6 pid=2522125) WARNING 11-21 00:12:49 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 1280, 0) was not warmed-up!
+INFO:     127.0.0.1:53982 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53998 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54002 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54010 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54018 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54030 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54032 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54040 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54046 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54052 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54064 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54070 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54080 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54094 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54108 - "POST /v1/completions HTTP/1.1" 200 OK
+(EngineCore pid=2521880) INFO 11-21 00:13:50 [shm_broadcast.py:878] No available shared memory broadcast block found in 60 seconds. This typically happens when some processes are hanging or doing some time-consuming work (e.g. compilation, weight/kv cache quantization).
+(EngineCore pid=2521880) INFO 11-21 00:14:50 [shm_broadcast.py:878] No available shared memory broadcast block found in 60 seconds. This typically happens when some processes are hanging or doing some time-consuming work (e.g. compilation, weight/kv cache quantization).
+(Worker_PP6 pid=2522125) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP4 pid=2522129) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP1 pid=2522127) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP3 pid=2522128) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP5 pid=2522126) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP2 pid=2522124) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP0 pid=2522120) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(Worker_PP7 pid=2522130) WARNING 11-21 00:15:15 [hpu_model_runner.py:4095] Configuration: ('prompt', 1, 128, 8) was not warmed-up!
+(APIServer pid=2521633) INFO 11-21 00:15:18 [loggers.py:335] Engine 000: Avg prompt throughput: 102.4 tokens/s, Avg generation throughput: 0.1 tokens/s, Running: 15 reqs, Waiting: 1 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:15:28 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 15 reqs, Waiting: 1 reqs, HPU KV cache usage: 1.0%
+(EngineCore pid=2521880) INFO 11-21 00:16:15 [shm_broadcast.py:764] No available shared memory broadcast block found in 60 seconds. This typically happens when some processes are hanging or doing some time-consuming work (e.g. compilation, weight/kv cache quantization).
+(Worker_PP1 pid=2522127) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP6 pid=2522125) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP2 pid=2522124) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP3 pid=2522128) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP4 pid=2522129) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP5 pid=2522126) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP0 pid=2522120) WARNING 11-21 00:16:30 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(Worker_PP7 pid=2522130) WARNING 11-21 00:16:31 [hpu_model_runner.py:4095] Configuration: ('decode', 2, 1, 32) was not warmed-up!
+(APIServer pid=2521633) INFO 11-21 00:16:38 [loggers.py:335] Engine 000: Avg prompt throughput: 1331.1 tokens/s, Avg generation throughput: 1.4 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:16:48 [loggers.py:335] Engine 000: Avg prompt throughput: 204.8 tokens/s, Avg generation throughput: 61.2 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:16:58 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 153.8 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:17:08 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 98.4 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+INFO:     127.0.0.1:53978 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53982 - "GET /metrics HTTP/1.1" 200 OK
+(APIServer pid=2521633) INFO 11-21 00:17:18 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 94.7 tokens/s, Running: 0 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.0%
+INFO:     127.0.0.1:53796 - "POST /tokenize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53810 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53810 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53810 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53826 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53828 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53840 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53854 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53876 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53882 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53896 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53902 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53918 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53920 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53922 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53928 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53936 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53948 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=2521633) INFO 11-21 00:17:28 [loggers.py:335] Engine 000: Avg prompt throughput: 921.5 tokens/s, Avg generation throughput: 1.1 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(Worker_PP4 pid=2522129) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP6 pid=2522125) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP5 pid=2522126) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP2 pid=2522124) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP1 pid=2522127) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP3 pid=2522128) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP0 pid=2522120) WARNING 11-21 00:17:28 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(Worker_PP7 pid=2522130) WARNING 11-21 00:17:29 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 32) was not warmed-up!
+(APIServer pid=2521633) INFO 11-21 00:17:38 [loggers.py:335] Engine 000: Avg prompt throughput: 716.8 tokens/s, Avg generation throughput: 60.3 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:17:48 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 149.0 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:17:58 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 147.7 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+INFO:     127.0.0.1:53810 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53826 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53828 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53840 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53854 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53876 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53882 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53896 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53902 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53918 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53920 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53922 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53928 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53936 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53948 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=2521633) INFO 11-21 00:18:08 [loggers.py:335] Engine 000: Avg prompt throughput: 1638.2 tokens/s, Avg generation throughput: 57.6 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:18:18 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 150.7 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:18:28 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 160.8 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+INFO:     127.0.0.1:53810 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53826 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53828 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53840 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53854 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53866 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53876 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53882 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53896 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53902 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53918 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53920 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53922 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53928 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53936 - "POST /v1/completions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53948 - "POST /v1/completions HTTP/1.1" 200 OK
+(APIServer pid=2521633) INFO 11-21 00:18:38 [loggers.py:335] Engine 000: Avg prompt throughput: 511.9 tokens/s, Avg generation throughput: 92.8 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(Worker_PP5 pid=2522126) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP3 pid=2522128) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP4 pid=2522129) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP1 pid=2522127) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP6 pid=2522125) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP2 pid=2522124) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP0 pid=2522120) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(Worker_PP7 pid=2522130) WARNING 11-21 00:18:40 [hpu_model_runner.py:4095] Configuration: ('decode', 4, 1, 64) was not warmed-up!
+(APIServer pid=2521633) INFO 11-21 00:18:48 [loggers.py:335] Engine 000: Avg prompt throughput: 1126.4 tokens/s, Avg generation throughput: 123.2 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+(APIServer pid=2521633) INFO 11-21 00:18:58 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 163.2 tokens/s, Running: 16 reqs, Waiting: 0 reqs, HPU KV cache usage: 1.0%
+INFO:     127.0.0.1:53810 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53826 - "GET /metrics HTTP/1.1" 200 OK
+(APIServer pid=2521633) INFO 11-21 00:19:08 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 122.4 tokens/s, Running: 0 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.0%
+(APIServer pid=2521633) INFO 11-21 00:19:18 [loggers.py:335] Engine 000: Avg prompt throughput: 0.0 tokens/s, Avg generation throughput: 0.0 tokens/s, Running: 0 reqs, Waiting: 0 reqs, HPU KV cache usage: 0.0%

@@ -7,7 +7,7 @@ results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md 
 
 Current state: Qwen3.8-Flash-Next runs on all 8 cards with pipeline parallelism (PP=8), output agrees with the Nvidia
 reference, single-user decode ~27 tok/s, 16 users 123 tok/s aggregate ([FINDINGS 18](FINDINGS.md)). TP=8 runs at only
-~3 tok/s because the internal NIC links stall all-reduces. The rest of this README is the Debian server.
+~3 tok/s because the internal NIC links stall all-reduces (details: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md)). The rest of this README is the Debian server.
 
 
 Order:

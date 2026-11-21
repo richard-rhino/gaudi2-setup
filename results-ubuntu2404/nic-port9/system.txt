@@ -1,0 +1,86 @@
+Sat Nov 21 07:58:48 PM UTC 2026
+6.8.0-151-generic
+ 19:58:48 up 1 day,  4:19,  3 users,  load average: 24.27, 22.19, 15.20
+Supermicro
+SYS-820GH-TNR2
+X12DPG-OA6-GD2
+BIOS 2.3 04/14/2025
+Firmware Revision         : 1.07
+IPMI Version              : 2.0
+--
+Aux Firmware Rev Info     : 
+    0x05
+Driver Version				: 1.24.2-52a555d
+Nic Driver Version			: 1.24.2-52a555d
+	Product Name			: HL-225
+	Serial Number			: AO05032528
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:19:00.0
+	Product Name			: HL-225
+	Serial Number			: AO02023865
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:b3:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032509
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:43:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032486
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:1a:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032504
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:b4:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032524
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:44:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032479
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:cc:00.0
+	Product Name			: HL-225
+	Serial Number			: AO05032480
+	Firmware [FIT] Version		: Linux gaudi2 5.10.248-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 #1 SMP PREEMPT Tue Mar 31 23:23:10 IDT 2026 aarch64 GNU/Linux
+	Firmware [SPI] Version		: BTL version Preboot version hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:07:42)
+	Firmware [UBOOT] Version	: U-Boot 2026.01-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:22:38 +0300) build#: 152
+	Firmware [OS] Version		: Zephyr 3.7.1-hl-gaudi2-1.24.0-fw-62.6.2-sec-11 (Mar 31 2026 - 23:06:48)
+	CPLD Version			: Version: 0x10, Timestamp(epoch): 0x653fb250 [Mon Oct 30 13:40:32 2023]
+		Bus Id			: 0000:cd:00.0
+habanalabs-dkms 1.24.2-481
+habanalabs-firmware 1.24.2-481
+habanalabs-firmware-odm 1.24.2-481
+habanalabs-firmware-tools 1.24.2-481
+habanalabs-graph 1.24.2-481
+habanalabs-qual 1.24.2-481
+habanalabs-rdma-core 1.24.2-481
+habanalabs-thunk 1.24.2-481

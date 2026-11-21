@@ -245,6 +245,10 @@ n-gram tables, again int64 hashing), Sinkhorn hyper-connections, sqrtsoftplus ro
   (`experiments-ubuntu2404/allreduce_latency.py`). **Internal port 9 keeps flapping on every card**, about 90 link
   up/down events per minute while serving.
 - Masking port 9 (`nic_ports_mask=0xFFFDFF`) makes HCCL hang. Do not mask internal ports.
+- Full write-up with per-card counts, FEC counters and what was tried: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md).
+  Summary: only port 9 goes down (~299k events in 28 h, 72% on card 0 / 43:00.0). It looks like port 9 is the
+  card k <-> k+4 link. 33 internal ports have >1,000 uncorrectable FEC codewords. BIOS 2.3 / BMC 01.07.05 / card fw
+  62.6.2 are all the latest.
 - Lazy mode (`PT_HPU_LAZY_MODE=1`) triggered the crash in section 16. Everything below uses eager + torch.compile.
 
 ## 18. Qwen3.8-Flash-Next on the real checkpoint: correctness and speed (2026-11-20/21)

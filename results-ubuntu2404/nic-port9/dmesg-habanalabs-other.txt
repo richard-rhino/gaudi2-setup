@@ -1,0 +1,1 @@
+[Sat Nov 21 06:00:04 2026] habanalabs 0000:cc:00.0: Received unexpected user error interrupt
