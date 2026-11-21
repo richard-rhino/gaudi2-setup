@@ -1,0 +1,6 @@
+run 0: TTFT 139.51 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 16.0 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.2 tok/s
+run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 16.5 tok/s
+run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.2 tok/s
+run 1: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.1 tok/s
+run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 16.3 tok/s

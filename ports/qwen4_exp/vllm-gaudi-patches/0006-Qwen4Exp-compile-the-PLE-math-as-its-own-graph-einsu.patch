@@ -1,0 +1,334 @@
+From b09281d44065b21a3e837d6029cffa6f2de1b2cf Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sat, 21 Nov 2026 21:58:05 +0000
+Subject: [PATCH] Qwen4Exp: compile the PLE math as its own graph (einsum
+ around an HPU miscompile); pin worker i to module i (VLLM_HPU_MODULE_ORDER ->
+ HLS_MODULE_ID); opt-in PP stage / PLE timing
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ vllm_gaudi/__init__.py                   |   1 +
+ vllm_gaudi/models/qwen4_exp.py           | 127 ++++++++++++++++++-----
+ vllm_gaudi/patches.py                    |  38 +++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py |  26 +++++
+ 4 files changed, 168 insertions(+), 24 deletions(-)
+
+diff --git a/vllm_gaudi/__init__.py b/vllm_gaudi/__init__.py
+index baf1f79d..f04f6eab 100755
+--- a/vllm_gaudi/__init__.py
++++ b/vllm_gaudi/__init__.py
+@@ -94,6 +94,7 @@ def register_utils():
+     from vllm_gaudi import patches as _hpu_patches
+ 
+     _hpu_patches.patch_hf3fs_mock_client()
++    _hpu_patches.patch_worker_module_order()
+ 
+ 
+ def register_ops():
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index a0c3c02c..a0da8c1c 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -21,6 +21,7 @@ vllm_gaudi HPU ops, with the model-specific pieces written in plain torch from t
+ """
+ import math
+ import os
++import time
+ from collections.abc import Iterable
+ from typing import NamedTuple, Optional
+ 
+@@ -142,6 +143,25 @@ def _nth_prime_after(start: int, count: int) -> int:
+     return p
+ 
+ 
++from vllm_gaudi.extension.logger import logger as _init_gaudi_logger
++
++logger = _init_gaudi_logger()
++_PLE_TIMING = os.getenv("VLLM_PP_STAGE_TIMING", "0") == "1"
++_LAYER_TIMING = os.getenv("QWEN4_LAYER_TIMING", "0") == "1"  # per-layer device events (adds ~0.4 ms per layer)
++_ple_tacc: dict = {}
++
++
++def _ple_tick(name, t0):
++    """VLLM_PP_STAGE_TIMING=1: accumulate host time of the PLE prep phases, log means every 100 calls."""
++    t1 = time.perf_counter()
++    n, v = _ple_tacc.get(name, (0, 0.0))
++    _ple_tacc[name] = (n + 1, v + t1 - t0)
++    if name == "total" and (n + 1) % 100 == 0:
++        logger.info("PLE prep host ms: %s", {k: round(1e3 * v / c, 3) for k, (c, v) in _ple_tacc.items()})
++        _ple_tacc.clear()
++    return t1
++
++
+ class NGramHasher:
+     """CPU implementation of HF ``Qwen4ExpTextNGramEmbedding`` id computation (bit-exact)."""
+ 
+@@ -235,6 +255,45 @@ class ShardedNGramEmbedding(nn.Module):
+         return tensor_model_parallel_all_reduce(out) if self.tp > 1 else out
+ 
+ 
++_PLE_COMPILE = os.environ.get("QWEN4_PLE_COMPILE", "1") == "1"
++_ple_math_fn = None
++
++
++def _ple_math(self, hidden, emb, hist, vm, n: int, L: int):
++    """Pure PLE math (no state I/O, no in-place ops): returns (gated, conv out, padded conv input xp)."""
++    hc_hidden = self.H * self.hc
++    T = hidden.shape[0]
++    key = self.norm_key(self.key_proj(emb)).unflatten(-1, (self.hc, self.H))
++    value = self.value_proj(emb)
++    query = self.norm_query(hidden).unflatten(-1, (self.hc, self.H))
++    gate = (key * query).sum(-1, keepdim=True) / math.sqrt(self.H)
++    gate = gate.abs().clamp_min(1e-6).sqrt() * gate.sign()
++    # einsum, not sigmoid(gate) * value.unsqueeze(-2): fused with the sqrt/sign chain above, the HPU graph compiler
++    # gets that broadcast multiply wrong for T >= ~128 (~bf16-exact here; repro: ports/qwen4_exp/ple_compile_repro.py)
++    gated = torch.einsum("tk,th->tkh", torch.sigmoid(gate.squeeze(-1)), value).flatten(-2)
++    gated_normed = self.norm_conv(gated)
++    if vm is not None:
++        gated, gated_normed = gated * vm, gated_normed * vm
++    # dilated causal depthwise conv per sequence, with history from the state slot
++    x = gated_normed.view(n, L, hc_hidden)
++    xp = torch.cat([hist, x], dim=1)  # [n, state_len + L, C]
++    w = self.conv1d.weight.view(hc_hidden, self.kernel)  # w[:, j] multiplies x[t - (K-1-j)*dil]
++    out = x.new_zeros(n, L, hc_hidden)
++    for j in range(self.kernel):
++        off = j * self.dil
++        out = out + xp[:, off:off + L] * w[:, j]
++    return gated, F.silu(out).view(T, hc_hidden), xp
++
++
++def _ple_math_compiled():
++    """QWEN4_PLE_COMPILE=1 (default): the math as its own graph. Compiling the whole PLE forward inside the decoder
++    layer gave wrong outputs (FINDINGS 18); state loads/stores (bitcast views, index_copy_) stay eager."""
++    global _ple_math_fn
++    if _ple_math_fn is None:
++        _ple_math_fn = torch.compile(_ple_math, backend="hpu_backend", dynamic=False)
++    return _ple_math_fn
++
++
+ class HpuPLELayer(MambaBase, nn.Module):
+     """Per-Layer Embedding with a per-request state slot borrowed from the GDN state spec."""
+ 
+@@ -337,31 +396,14 @@ class HpuPLELayer(MambaBase, nn.Module):
+             emb = (tensor_model_parallel_all_reduce(emb) if table.tp > 1 else emb).flatten(-2)
+         else:
+             emb = table(ple_in.ids[self.ple_slot]).flatten(-2)
+-        key = self.norm_key(self.key_proj(emb)).unflatten(-1, (self.hc, self.H))
+-        value = self.value_proj(emb)
+-        query = self.norm_query(hidden).unflatten(-1, (self.hc, self.H))
+-        gate = (key * query).sum(-1, keepdim=True) / math.sqrt(self.H)
+-        gate = gate.abs().clamp_min(1e-6).sqrt() * gate.sign()
+-        gated = (torch.sigmoid(gate) * value.unsqueeze(-2)).flatten(-2)
+-        gated_normed = self.norm_conv(gated)
+-        if ple_in.valid is not None:
+-            vm = ple_in.valid.reshape(-1, 1).to(gated.dtype)
+-            gated, gated_normed = gated * vm, gated_normed * vm
+-
+-        # ---- dilated causal depthwise conv per sequence, with history from the state slot
+-        x = gated_normed.view(n, L, hc_hidden)
+-        hist = conv_hist.to(x.dtype) if conv_hist is not None else x.new_zeros(n, self.state_len, hc_hidden)
+-        xp = torch.cat([hist, x], dim=1)  # [n, state_len + L, C]
+-        w = self.conv1d.weight.view(hc_hidden, self.kernel)  # w[:, j] multiplies x[t - (K-1-j)*dil]
+-        out = x.new_zeros(n, L, hc_hidden)
+-        for j in range(self.kernel):
+-            off = j * self.dil
+-            out = out + xp[:, off:off + L] * w[:, j]
+-        out = F.silu(out).view(T, hc_hidden)
++        hist = conv_hist.to(hidden.dtype) if conv_hist is not None else hidden.new_zeros(n, self.state_len, hc_hidden)
++        vm = ple_in.valid.reshape(-1, 1).to(hidden.dtype) if ple_in.valid is not None else None
++        math_fn = _ple_math_compiled() if _PLE_COMPILE else _ple_math
++        gated, out, xp = math_fn(self, hidden, emb, hist, vm, n, L)
+ 
+         # ---- write back state (last state_len valid positions + last ctx token ids)
+         if store is not None:
+-            gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=x.device).view(1, -1)  # into xp
++            gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=hidden.device).view(1, -1)  # into xp
+             new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
+             hist_bf16 = new_hist.reshape(n, -1).to(torch.bfloat16)
+             if hist_bf16.shape[1] % 2:
+@@ -487,6 +529,7 @@ class HpuQwen4ExpModel(nn.Module):
+             return None
+         hs, p0 = self.ple_hasher, self.ple_layers[0]
+         dev = input_ids.device
++        t_start = t = time.perf_counter() if _PLE_TIMING else 0.0
+         ids_flat = input_ids.reshape(-1)
+         T = ids_flat.shape[0]
+         md = get_forward_context().attn_metadata
+@@ -515,8 +558,12 @@ class HpuQwen4ExpModel(nn.Module):
+                 ctx_cpu, lens = packed[:, :-1].round().long(), packed[:, -1].long().tolist()
+             else:
+                 ctx_cpu, lens = tok.cpu().round().long(), [L] * n
++        if _PLE_TIMING:
++            t = _ple_tick("state_to_cpu", t)
+         L = T // n
+         ids_cpu = ids_flat.cpu().long()
++        if _PLE_TIMING:
++            t = _ple_tick("ids_to_cpu", t)
+         all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
+         new_tok = torch.empty(n, hs.ctx, dtype=torch.float32)
+         for i in range(n):
+@@ -525,12 +572,33 @@ class HpuQwen4ExpModel(nn.Module):
+             if nv > 0:  # warmup pads with all-padding sequences
+                 all_ids[:, i * L:i * L + nv] = hs.ids(toks, ctx_cpu[i]).to(torch.int32)
+             new_tok[i] = torch.cat([ctx_cpu[i], toks])[-hs.ctx:].to(torch.float32)
++        if _PLE_TIMING:
++            t = _ple_tick("hash", t)
+         emb = None
+         if self.ple_layers[0].ple_embedding.ngram_embedding.host:
+             emb = torch.stack([p.ple_embedding.ngram_embedding.gather_cpu(all_ids[j])
+                                for j, p in enumerate(self.ple_layers)]).to(dev, non_blocking=True)
+-        return PLEStepInputs(all_ids.to(dev, non_blocking=True), torch.tensor(lens, dtype=torch.long).to(dev),
+-                             new_tok.to(dev), valid, emb)
++        if _PLE_TIMING:
++            t = _ple_tick("gather_h2d", t)
++        out = PLEStepInputs(all_ids.to(dev, non_blocking=True), torch.tensor(lens, dtype=torch.long).to(dev),
++                            new_tok.to(dev), valid, emb)
++        if _PLE_TIMING:
++            _ple_tick("other_h2d", t)
++            _ple_tick("total", t_start)
++        return out
++
++    def _layer_events(self, ev):
++        """VLLM_PP_STAGE_TIMING=1: device ms of [PLE prep, layer start..end) for single-token decode, every 100."""
++        pend = self.__dict__.setdefault("_ev_pend", [])
++        pend.append(ev)
++        if len(pend) < 100:
++            return
++        pend[-1][-1].synchronize()
++        n = len(pend[0]) - 1
++        means = [sum(e[i].elapsed_time(e[i + 1]) for e in pend) / len(pend) for i in range(n)]
++        pend.clear()
++        logger.info("stage layers %d-%d device ms: prep %.2f, layers %s", self.start_layer, self.end_layer, means[0],
++                    [round(m, 2) for m in means[1:]])
+ 
+     def forward(self, input_ids, positions, inputs_embeds=None, intermediate_tensors=None):
+         pp = get_pp_group()
+@@ -539,9 +607,20 @@ class HpuQwen4ExpModel(nn.Module):
+             h = h.repeat(*([1] * (h.dim() - 1)), self.config.hc_count)  # HPU passes [B, L] or [T] inputs
+         else:
+             h = intermediate_tensors["hidden_states"]
++        if _LAYER_TIMING:
++            ev = [torch.hpu.Event(enable_timing=True)]
++            ev[0].record()
+         ple_in = self._ple_prepare(input_ids)
++        if _LAYER_TIMING:
++            ev.append(torch.hpu.Event(enable_timing=True))
++            ev[-1].record()
+         for layer in self.layers[self.start_layer:self.end_layer]:
+             h = layer(h, positions, ple_in)
++            if _LAYER_TIMING:
++                ev.append(torch.hpu.Event(enable_timing=True))
++                ev[-1].record()
++        if _LAYER_TIMING and input_ids.numel() == 1:
++            self._layer_events(ev)
+         if not pp.is_last_rank:
+             return IntermediateTensors({"hidden_states": h})
+         return self.hyper_connection_mixer(h)
+diff --git a/vllm_gaudi/patches.py b/vllm_gaudi/patches.py
+index 6993c5e2..8c6d19ec 100644
+--- a/vllm_gaudi/patches.py
++++ b/vllm_gaudi/patches.py
+@@ -2004,3 +2004,41 @@ def patch_hf3fs_mock_client():
+     initialized during platform registration.
+     """
+     _patch_hf3fs_mock_client_for_cpu_only()
++
++
++def patch_worker_module_order():
++    """VLLM_HPU_MODULE_ORDER="0,1,...,7": start local worker i with HLS_MODULE_ID=<i-th entry> (sysfs module_id).
++
++    Without it every worker opens whichever card is free first, so the rank -> card mapping (and with PP, which
++    physical links the stage-to-stage hops use) changes from start to start. The PyTorch bridge opens the card named
++    by HLS_MODULE_ID; HABANA_VISIBLE_MODULES only reaches it through initialize_distributed_hpu(), which vLLM does not
++    call. The worker opens the device before init_device, so the variable is set when the process is spawned."""
++    order = [m.strip() for m in os.environ.get("VLLM_HPU_MODULE_ORDER", "").split(",") if m.strip()]
++    if not order:
++        return
++    from vllm.v1.executor import multiproc_executor as mpe
++
++    import threading
++
++    orig = mpe.WorkerProc.make_worker_process
++    if getattr(orig, "_hpu_module_order", False):
++        return
++    lock = threading.Lock()  # workers may be started from several threads; os.environ is process-wide
++
++    def make_worker_process(*args, **kwargs):
++        local_rank = kwargs.get("local_rank", args[1] if len(args) > 1 else None)
++        if local_rank is None or local_rank >= len(order):
++            return orig(*args, **kwargs)
++        with lock:
++            prev = os.environ.get("HLS_MODULE_ID")
++            os.environ["HLS_MODULE_ID"] = order[local_rank]
++            try:
++                return orig(*args, **kwargs)
++            finally:
++                if prev is None:
++                    os.environ.pop("HLS_MODULE_ID", None)
++                else:
++                    os.environ["HLS_MODULE_ID"] = prev
++
++    make_worker_process._hpu_module_order = True
++    mpe.WorkerProc.make_worker_process = staticmethod(make_worker_process)
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 783b71d7..19bd6cb9 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -137,6 +137,7 @@ from vllm_gaudi.extension.logger import logger as init_logger
+ from vllm.model_executor.models.bert import _encode_token_type_ids
+ 
+ logger = init_logger()
++_PP_STAGE_TIMING = os.getenv('VLLM_PP_STAGE_TIMING', '0') == '1'
+ 
+ 
+ def is_interleaved(config: Any) -> bool:
+@@ -4132,7 +4133,12 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         if pp.world_size > 1:
+             # Pipeline parallel: every stage runs the same scheduler output with the same bucketing, so the
+             # forward passes line up one-to-one; a blocking p2p send/recv per pass keeps them paired.
++            if _PP_STAGE_TIMING:
++                _pp_ev = [torch.hpu.Event(enable_timing=True) for _ in range(3)]
++                _pp_ev[0].record()
+             additional_kwargs["intermediate_tensors"] = None if pp.is_first_rank else self._pp_recv(token_ids)
++            if _PP_STAGE_TIMING:
++                _pp_ev[1].record()
+         with self.profiler.record_event('internal', model_event_name):
+             hidden_states = self.model.forward(input_ids=token_ids,
+                                                positions=position_ids,
+@@ -4142,6 +4148,9 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                                model_mm_kwargs=model_mm_kwargs,
+                                                lora_mask=lora_mask,
+                                                **additional_kwargs)
++        if pp.world_size > 1 and _PP_STAGE_TIMING:
++            _pp_ev[2].record()
++            self._pp_stage_timing(token_ids, _pp_ev)
+         if isinstance(hidden_states, IntermediateTensors):  # non-last PP stage: hand over, no logits here
+             for k in sorted(hidden_states.tensors):
+                 pp.send(hidden_states[k].reshape(-1, hidden_states[k].shape[-1]).contiguous())
+@@ -4167,6 +4176,23 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         return non_flattened_hidden_states, aux_hidden_states, \
+             hidden_states, logits
+ 
++    def _pp_stage_timing(self, token_ids, events):
++        """VLLM_PP_STAGE_TIMING=1: log this PP stage's device time per input shape (recv wait, forward), from
++        events, so nothing is synchronized on the hot path; resolved every 100 passes."""
++        pend = self.__dict__.setdefault("_pp_events", [])
++        pend.append((tuple(token_ids.shape), events))
++        if len(pend) < 100:
++            return
++        pend[-1][1][2].synchronize()
++        agg = {}
++        for key, (e0, e1, e2) in pend:
++            n, w, f = agg.get(key, (0, 0.0, 0.0))
++            agg[key] = (n + 1, w + e0.elapsed_time(e1), f + e1.elapsed_time(e2))
++        pend.clear()
++        for key, (n, w, f) in agg.items():
++            logger.info("PP stage %d shape %s: %d passes, recv %.2f ms, forward %.2f ms (device events)",
++                        get_pp_group().rank_in_group, key, n, w / n, f / n)
++
+     def _pp_recv(self, token_ids):
+         """Receive the previous stage's IntermediateTensors for a forward pass over ``token_ids``."""
+         if self._pp_template is None:
+-- 
+2.43.0
+

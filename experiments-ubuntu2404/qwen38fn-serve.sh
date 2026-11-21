@@ -10,6 +10,8 @@ export VLLM_ENGINE_READY_TIMEOUT_S=14400
 MAXLEN=${MAXLEN:-32768}
 # Small decode batches: compute only the routed experts instead of the fused op over all 512 (FINDINGS 18).
 export VLLM_HPU_MOE_GATHER_BF16=${MOE_GATHER:-1}
+# Pin rank i to module i: consecutive PP hops never use the flapping port-9 pairs (k <-> k+4), see setup-ubuntu2404/NIC-LINK-FLAPPING.md
+export VLLM_HPU_MODULE_ORDER=${MODULE_ORDER-0,1,2,3,4,5,6,7}
 # TP x PP must be 8. PP=8 TP=1 avoids per-layer all-reduces (the internal NIC links stall them, FINDINGS 18).
 TP=${TP:-8}; PP=${PP:-1}
 # PROFILE=<dir>: enable the torch profiler (CPU + HPU activity); drive it with POST /start_profile and /stop_profile

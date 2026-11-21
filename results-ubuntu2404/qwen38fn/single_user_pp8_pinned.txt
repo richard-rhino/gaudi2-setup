@@ -1,0 +1,12 @@
+run 0: TTFT 254.45 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 13.6 tok/s
+run 1: TTFT 82.91 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.7 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.8 tok/s
+run 0: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.8 tok/s
+run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.9 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.9 tok/s
+run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.0 tok/s
+run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.0 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.1 tok/s
+run 0: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.3 tok/s
+run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.0 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.8 tok/s

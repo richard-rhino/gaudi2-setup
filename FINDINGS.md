@@ -310,9 +310,50 @@ at batch 1.
 Patches: `ports/qwen4_exp/vllm-gaudi-patches/0004-*` (PP, host PLE table, batched PLE prep, profiler) and `0005-*`
 (gather MoE).
 
-## 19. Next steps
-- Qwen: find the remaining ~30 ms per token at batch 1 (device profile under PP), warm up the common decode shapes so
-  benchmarks are not hit by compiles, then the full section 8 benchmark set.
+## 19. PP=8 decode: from ~27 to ~32 tok/s, and steady (2026-11-21)
+**Where the time went.** `VLLM_PP_STAGE_TIMING=1` (vllm-gaudi patch) records HPU events around each stage's recv and
+forward and logs means every 100 passes. Nothing is synchronized, so the timing does not change the schedule. A
+first version that called `torch.hpu.synchronize()` around the recv hung the first request for 5 minutes. Batch-1
+decode before the fixes:
+
+| PP stage | 0 | 1-6 | 7 |
+|---|---|---|---|
+| device ms per token | **~16** | ~2.6 each | ~5 (incl. hyper-connection mixer) |
+
+The other ranks are idle most of the time (py-spy: waiting on the shm RPC queue). The last rank spends 91% in the
+`.cpu()` of the sampled token, so the pipeline is a serial chain of device time.
+
+**Stage 0 = the one PLE layer.** The model has a single PLE layer (`ple_layer_ids=[2]`), and stage 0 holds it.
+Per-layer events (`QWEN4_LAYER_TIMING=1`): the PLE layer took ~10.4 ms against ~0.9 ms for a normal layer, plus
+~2.8 ms of host prep (1.6 ms of that is the `.cpu()` of the conv state, 0.5 ms hashing). The PLE forward ran eager
+(`@torch._dynamo.disable`), i.e. ~40 separately launched small ops, because compiling it inside the decoder-layer
+graph gave wrong outputs (section 18).
+
+**The miscompile, narrowed down** (`ports/qwen4_exp/ple_compile_repro.py`): `sigmoid(gate) * value.unsqueeze(-2)`
+is wrong at T=128 (max error 3.7 on values of size 3.4) when `gate` comes from the in-graph
+`abs().clamp_min().sqrt() * sign()` chain. Each op alone is fine, `gate` passed in from outside is fine, and decode
+shapes (T=1) are fine. That is why decode looked right but prompt logprobs were off by 4-9. Writing the same product
+as `einsum("tk,th->tkh", ...)`, `bmm` or a `cat` of 4 products gives correct results. The PLE math is now its own
+compiled graph (`_ple_math`, einsum form). State loads and stores (bitcast views, `index_copy_`) stay eager.
+`QWEN4_PLE_COMPILE=0` restores the old path. PLE layer: 10.4 -> 3.5 ms. Correctness vs deb-ai is unchanged
+(`results-ubuntu2404/qwen38fn/compare_vs_deb-ai-pp8-gather-plecompile.txt`: prompt |dlogprob| mean 0.02-0.15; greedy
+output is identical for as long as in the earlier runs).
+
+**The 16-vs-29 tok/s runs were the port-9 links.** Workers open whichever card is free first, so the PP rank -> card
+order is random on each start. Timing showed the slow windows always add ~28-44 ms per token on the hops between card
+pairs k <-> k+4, which port 9 connects (details: `setup-ubuntu2404/NIC-LINK-FLAPPING.md`).
+`VLLM_HPU_MODULE_ORDER=0,1,...,7` (vllm-gaudi patch, set by `qwen38fn-serve.sh`) spawns worker i with
+`HLS_MODULE_ID=i`. `HABANA_VISIBLE_MODULES` does not work for this; see the NIC page. With that order no hop uses a
+port-9 pair: 11 of 11 warm single-user runs gave **31.7-32.3 tok/s**
+(`results-ubuntu2404/qwen38fn/single_user_pp8_pinned.txt`).
+
+Batch-1 device time per token now: stage 0 ~9 ms, stages 1-6 ~2.6 ms, stage 7 ~4.6 ms, ~0.1 ms per hop, ~31 ms in
+total. What is left on stage 0: the PLE layer at 3.5 ms (vs ~0.9 for a normal layer) and the host prep at ~2.4 ms.
+The prep could drop most of its 1.6 ms sync by keeping the last 2 context tokens per request on the host.
+
+## 20. Next steps
+- Qwen: done (section 19), ~32 tok/s steady. Left: the full section 8 set (section 19), warm up the common prefill
+  shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
 - Hardware: run `hl_qual` NIC tests and open a support case for the port 9 flapping. With healthy links, TP=8 + gather
   MoE should be compared against PP=8.
 - DeepSeek-V4.1-Flash Track A (section 15): CPU kernels validated; next `generate_hpu.py --selftest`, FP4->FP8

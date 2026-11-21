@@ -89,6 +89,30 @@ Card index, bus and module (driver "Card N" = Module ID):
   the 3 ports to that peer, so a bad link stalls just one hop. All-reduce and all-gather use every link at once, so one
   bad link stalls all of them. (Which physical card each PP rank lands on is not verified.)
 
+## Effect on pipeline parallelism, and the workaround (2026-11-21)
+
+Point-to-point traffic is affected too, but only on the port-9 pairs. vLLM workers open whichever card is free
+first, so the PP rank -> card mapping changes on every start. One start, timed per stage with device events
+(`VLLM_PP_STAGE_TIMING=1`):
+
+| PP rank | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| Card (module) | 6 | 4 | **7** | **3** | 2 | 0 | **5** | **1** |
+
+In 3 of 17 windows of 100 decode steps, hop 2->3 (card 7->3) added ~28 ms per token and hop 6->7 (card 5->1)
+added ~44 ms. All other hops added nothing. Both are k <-> k+4 (port 9) pairs. Those windows are the slow runs
+(16 tok/s instead of 29).
+
+Workaround: `VLLM_HPU_MODULE_ORDER=0,1,2,3,4,5,6,7` (vllm-gaudi patch; `qwen38fn-serve.sh` sets it). Each worker
+is spawned with `HLS_MODULE_ID=<i>`, so rank i runs on module i (the `module_id` in
+`/sys/class/accel/accelN/device/module_id`, the same as the driver's "Card N"). The PP chain then never uses a port-9
+pair and crosses between the two halves of the baseboard once (3->4).
+
+Two things that do not work:
+- `HABANA_VISIBLE_MODULES`. The bridge only turns it into `HLS_MODULE_ID` inside `initialize_distributed_hpu()`, which
+  vLLM does not call. Without `HLS_MODULE_ID` the device is opened "by type", i.e. the first free card.
+- Setting the variable inside the worker's `init_device`. The worker has already opened the device by then.
+
 ## What was tried
 
 | Attempt | Result |
