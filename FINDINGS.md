@@ -190,8 +190,8 @@ architectures are an allow-list in the runner and platform.
 0.001-0.003) at 7-300 token prompts, TP=1 and TP=2, eager and torch.compile+HPU-graph modes. Dense-vs-sparse QSA costs
 0.011-0.026 mean |dlogprob| once the context exceeds the indexer budget (measured with a 64-token budget).
 
-**Status: the real 360 GB checkpoint has not run yet.** bf16 needs TP=8 (all 8 cards) and the driver crashed before
-that (section 16). Everything is downloaded and ready.
+**Status:** the real 360 GB checkpoint runs, first at TP=8 and now faster with pipeline parallelism (PP=8). See
+section 18.
 
 ## 15. DeepSeek-V4.1-Flash-1017: feasibility and preparation
 Much more work than Qwen: there is no transformers implementation of V4.1, and upstream vLLM's two backends (CUDA:
@@ -238,6 +238,78 @@ n-gram tables, again int64 hashing), Sinkhorn hyper-connections, sqrtsoftplus ro
   (driver 1.24.2). Kernel 6.8.0-151 was pulled in by apt (`linux-headers-generic`); 6.8.0-53 also has the DKMS driver.
 - Lazy mode is the legacy path (this plugin defaults to `PT_HPU_LAZY_MODE=0`, eager + torch.compile, which works).
 
-## 17. Next steps
-See `setup-ubuntu2404/AFTER-CRASH.md`: reboot, check port 9, optional firmware update, Intel's NIC link test, then run
-the real Qwen3.8-Flash-Next at TP=8 (correctness vs the Nvidia node, then the section 8 benchmarks), then DeepSeek Track A.
+## 17. After the reboot: firmware re-flash and the internal NIC links (2026-11-20)
+- Re-flashed all 8 cards with `hl-fw-loader` (guide: `setup-ubuntu2404/FIRMWARE-UPDATE.md`). The package ships the
+  same firmware the cards already had (`1.24.0-fw-62.6.2`), so the version did not change.
+- 8-card 128 MB all-reduce went from 2-3 GB/s before the flash to 39-42 GB/s after it, and later 199 GB/s
+  (`experiments-ubuntu2404/allreduce_latency.py`). **Internal port 9 keeps flapping on every card**, about 90 link
+  up/down events per minute while serving.
+- Masking port 9 (`nic_ports_mask=0xFFFDFF`) makes HCCL hang. Do not mask internal ports.
+- Lazy mode (`PT_HPU_LAZY_MODE=1`) triggered the crash in section 16. Everything below uses eager + torch.compile.
+
+## 18. Qwen3.8-Flash-Next on the real checkpoint: correctness and speed (2026-11-20/21)
+Serve script: `experiments-ubuntu2404/qwen38fn-serve.sh` (`TP=`, `PP=`, `MOE_GATHER=`). Stop with
+`setup-ubuntu2404/stop-vllm.sh` (SIGINT is ignored during warmup). Reference: deb-ai (Nvidia, same model, MTP
+speculative decoding), light single-user requests only.
+
+**Correctness** (`experiments-ubuntu2404/compare_vs_nvidia.py`, 4 prompts of 45-3414 chars): mean prompt-token
+|dlogprob| against deb-ai is 0.02-0.18 in every configuration below. Greedy text agrees for 113-294 characters (the
+code prompt for all 201). Divergences are near-ties ("Italy" vs "Australia" after "The capital of Japan is Tokyo.").
+Results: `results-ubuntu2404/qwen38fn/compare_vs_deb-ai*.txt`.
+
+**Speed, step by step** (single user, 256 output tokens, `single_user_speed.py`; 16 users = `vllm bench serve`
+random 1024 in / 256 out, concurrency 16, after a warm pass):
+| Configuration | Single-user decode | 16 users, aggregate | TPOT at 16 users |
+|---|---|---|---|
+| TP=8 | 2.6-3.4 tok/s | not measured (compile stalls) | ~200-390 ms ITL |
+| PP=8, TP=1 | 9.6-14.9 tok/s | 36.5 tok/s | 428 ms |
+| PP=8 + routed-expert gather MoE | **~27 tok/s** (14-27, see below) | **123 tok/s** (peak 169) | 120 ms |
+| deb-ai (Nvidia, MTP spec decode) | 139-148 tok/s | not tested (shared box) | |
+
+Why each step helped:
+1. **TP=8 is bound by the network, not compute.** A device profile of 12 decode steps (needed a profiler fix, below)
+   shows the matrix engines busy ~105 ms in total, i.e. ~10 ms of compute per step out of ~300 ms. The rest is waiting
+   for the ~98 all-reduces per step. A decode-sized (5 KiB) 8-card all-reduce takes ~220 us at p50, but stalls for
+   **4-16 s every 10-30 s** and hung for good after ~90 s (`experiments-ubuntu2404/allreduce_latency_trace.py`,
+   `logs/allreduce-latency-trace-*.log`). That matches the flapping port 9 links (section 17).
+2. **Pipeline parallelism avoids the all-reduces.** A chain of point-to-point sends through all 8 cards (one PP decode
+   step) takes ~0.8 ms with no stall in 120 s (`p2p_latency_trace.py`). vllm-gaudi had no real PP path, so the port
+   adds one: the model builds only its stage's layers (`make_layers`), the HPU runner does a blocking send/recv of the
+   hyper-connection hidden state around each forward pass, and only the last stage samples (the scheduler sends the
+   tokens back to the other stages). The 102 GB PLE table does not fit on one card, so with PP it lives in **host RAM**:
+   rows are gathered on the CPU, where the n-gram ids are already hashed. KV cache grows from 3.3M to 10.5M tokens.
+3. **The fused MoE kernel reads all 512 experts.** `torch.ops.hpu.mixture_of_experts` costs 2.1-2.8 ms per layer at
+   1-4 tokens on one card, flat in the token count. 48 layers x ~2.3 ms is ~110 ms per token, which was the PP=8
+   decode time. Gathering only the routed experts' weights (`index_select` + `bmm`) costs 0.14 ms at 1 token, about
+   0.1 ms per token, with the same error against an fp32 reference (`experiments-ubuntu2404/moe_gather_bench.py`).
+   It is used while tokens x top_k <= 0.4 x experts (about 20 tokens); larger batches keep the fused op. Opt-in env
+   `VLLM_HPU_MOE_GATHER_BF16=1` (patch 0005). The fused op itself failed (`synNodeCreateWithId ... moe_fwd_bf16`) at
+   16 tokens when called without the plugin's chunk-size arguments.
+
+Remaining gap: ~37 ms per token while device compute should now be a few ms per stage. Single-user runs vary between
+14 and 27 tok/s; first-use compiles of new shapes are the likely cause (warmup is skipped because a full warmup is
+~90+75 shapes x ~63 s, about 3 h, longer than the engine-ready timeout). Under PP the last stage spends most of its
+time waiting for the sampled tokens and the other stages wait for the next step, i.e. the pipeline is latency-bound
+at batch 1.
+
+**Other findings on the way:**
+- **Compiled PLE gives wrong outputs.** With the PLE layer compiled inside the decoder-layer graph, generated text turned
+  repetitive and prompt logprobs were off by 4-8. The same code under `@torch._dynamo.disable` is correct. It stays
+  disabled (it runs once per step, at layer 2 only).
+- **Profiler:** Habana's light profiler wrapper strips HPU events from `key_averages()` (SW-224979) and breaks
+  `export_chrome_trace` (wrong argument count). `hpu_worker.py` now saves `prof.profiler.kineto_results` directly,
+  which keeps the device events (~850 MB per rank for 12 steps). Python stacks are off unless
+  `VLLM_PROFILE_WITH_STACK=1`.
+- **Startup:** weights load in ~2 min. The real checkpoint has only one PLE layer (`ple_layer_ids=[2]`). vLLM pads the
+  hybrid KV layout with 11 layers ("may waste at most 29.7% KV cache").
+
+Patches: `ports/qwen4_exp/vllm-gaudi-patches/0004-*` (PP, host PLE table, batched PLE prep, profiler) and `0005-*`
+(gather MoE).
+
+## 19. Next steps
+- Qwen: find the remaining ~30 ms per token at batch 1 (device profile under PP), warm up the common decode shapes so
+  benchmarks are not hit by compiles, then the full section 8 benchmark set.
+- Hardware: run `hl_qual` NIC tests and open a support case for the port 9 flapping. With healthy links, TP=8 + gather
+  MoE should be compared against PP=8.
+- DeepSeek-V4.1-Flash Track A (section 15): CPU kernels validated; next `generate_hpu.py --selftest`, FP4->FP8
+  conversion, then an 8-card run. It will use PP for the same reason.
