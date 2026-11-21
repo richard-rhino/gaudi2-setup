@@ -1,0 +1,86 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Pin memory is not supported on HPU.
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+NIXL is not available
+NIXL agent config is not available
+[HPU] NixlBaseConnectorWorker.register_kv_caches has drifted from the vllm 61c9ef98 baseline that vllm_gaudi's _hpu_register_kv_caches was copied from (live token digest 64ebd91d6cef4b57ac0a0da4715aca01891a45b2217746afe395f8049804dac7 != baseline c28bbb0667f915b805af79c39178ffb7c312f8291c90c9318afb5e1a83625176). The HPU K/V-split override may now compute stale NIXL descriptors. Re-sync _hpu_register_kv_caches to the current upstream body, re-apply the three HPU deviations, and refresh _UPSTREAM_REGISTER_KV_CACHES_BASELINE.
+Model class <class 'vllm.model_executor.models.kimi_k25.KimiK25ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7cc9f3f16ea0>. It is overwritten by the new one.
+Model class <class 'vllm.models.kimi_k3.amd.model.KimiK3ForConditionalGeneration'> already has a multi-modal processor registered to <vllm.multimodal.registry.MultiModalRegistry object at 0x7cc9f3f16ea0>. It is overwritten by the new one.
+Namespace(subparser='bench', bench_type='serve', dispatch_function=<function BenchmarkServingSubcommand.cmd at 0x7cc6b51da8e0>, trust_remote_code=False, seed=7, num_prompts=20, dataset_name='random', no_stream=False, dataset_path=None, no_oversample=False, skip_chat_template=False, enable_multimodal_chat=False, disable_shuffle=False, custom_output_len=256, custom_ensure_client_side_data=False, spec_bench_output_len=256, spec_bench_category=None, sharegpt_output_len=None, timed_trace_chunk_hash_size=16, timed_trace_sec_multiplier=1, timed_trace_label_timestamp='timestamp', timed_trace_label_input_length='input_length', timed_trace_label_output_length='output_length', timed_trace_label_hash_ids='hash_ids', blazedit_min_distance=0.0, blazedit_max_distance=1.0, asr_max_audio_len_sec=inf, asr_min_audio_len_sec=0.0, random_input_len=24576, random_output_len=1024, random_range_ratio='0.2', random_prefix_len=0, random_batch_size=1, no_reranker=False, random_mm_base_items_per_request=1, random_mm_num_mm_items_range_ratio=0.0, random_mm_limit_mm_per_prompt={'image': 255, 'video': 1}, random_mm_bucket_config={(256, 256, 1): 0.5, (720, 1280, 1): 0.5, (720, 1280, 16): 0.0}, hf_subset=None, hf_split=None, hf_name=None, hf_output_len=None, bfcl_categories=None, prefix_repetition_prefix_len=256, prefix_repetition_suffix_len=256, prefix_repetition_num_prefixes=10, prefix_repetition_output_len=128, speed_bench_dataset_subset='qualitative', speed_bench_output_len=4096, speed_bench_category=None, label=None, backend='vllm', base_url=None, host='127.0.0.1', port=8000, endpoint='/v1/completions', header=None, max_concurrency=10, model='Qwen/Qwen3.8-Flash-Next', input_len=None, output_len=None, tokenizer=None, tokenizer_mode='auto', use_beam_search=False, logprobs=None, request_rate=inf, burstiness=1.0, probe_request_rate=0.0, disable_tqdm=True, num_warmups=0, profile=False, save_result=False, save_detailed=False, append_result=False, metadata=None, result_dir=None, result_filename=None, ignore_eos=True, self_timed=None, percentile_metrics='ttft,tpot,itl,e2el', metric_percentiles='50,90,99', goodput=None, request_id_prefix='bench-5094bb48-', top_p=None, top_k=None, min_p=None, temperature=None, frequency_penalty=None, presence_penalty=None, repetition_penalty=None, served_model_name='qwen38fn', lora_modules=None, lora_assignment='random', ramp_up_strategy=None, ramp_up_start_rps=None, ramp_up_end_rps=None, ready_check_timeout_sec=0, chat_template_kwargs=None, extra_body=None, skip_tokenizer_init=False, insecure=False, plot_timeline=False, timeline_itl_thresholds='25,50', plot_dataset_stats=False, log_config_file=None, logging_config=LoggingConfig(log_level='INFO', formatter='text', configure_logging=True, pylogging_config_file=None))
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]Fetching 13 files: 100%|██████████| 13/13 [00:00<00:00, 1388.91it/s]
+(MainProcess pid=2818046) INFO 11-21 22:55:39 [utils.py:88] Sampling input_len from [19660, 29492] and output_len from [819, 1229]
+WARNING: /tokenize unavailable (404 Not Found: either this server has no /tokenize route, or it does not serve a model named `Qwen/Qwen3.8-Flash-Next` (its served names are listed by GET /v1/models)), skipping alignment.
+WARNING: vllm bench serve no longer sets temperature==0 (greedy) in requests by default. The default will be determined on the server side and can be model/API specific. For the old behavior, include --temperature=0.
+Starting initial single prompt test run...
+Skipping endpoint ready check.
+Starting main benchmark run...
+Traffic request rate: inf
+Burstiness factor: 1.0 (Poisson process)
+Maximum request concurrency: 10
+tip: install termplotlib and gnuplot to plot the metrics
+============ Serving Benchmark Result ============
+Successful requests:                     20        
+Failed requests:                         0         
+Maximum request concurrency:             10        
+Benchmark duration (s):                  772.41    
+Total input tokens:                      499712    
+Total generated tokens:                  21312     
+Request throughput (req/s):              0.03      
+Output token throughput (tok/s):         27.59     
+Peak output token throughput (tok/s):    139.00    
+Peak concurrent requests:                12.00     
+Total token throughput (tok/s):          674.54    
+---------------Time to First Token----------------
+Mean TTFT (ms):                          130955.80 
+Median TTFT (ms):                        87815.51  
+P50 TTFT (ms):                           87815.51  
+P90 TTFT (ms):                           335709.09 
+P99 TTFT (ms):                           339250.73 
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          234.11    
+Median TPOT (ms):                        236.90    
+P50 TPOT (ms):                           236.90    
+P90 TPOT (ms):                           421.92    
+P99 TPOT (ms):                           445.42    
+---------------Inter-token Latency----------------
+Mean ITL (ms):                           233.96    
+Median ITL (ms):                         77.55     
+P50 ITL (ms):                            77.55     
+P90 ITL (ms):                            90.73     
+P99 ITL (ms):                            1013.75   
+----------------End-to-end Latency----------------
+Mean E2EL (ms):                          380032.98 
+Median E2EL (ms):                        376008.76 
+P50 E2EL (ms):                           376008.76 
+P90 E2EL (ms):                           595764.26 
+P99 E2EL (ms):                           666596.62 
+==================================================
+nanobind: leaked 4 instances!
+nanobind: leaked 64 types!
+ - leaked type "triton._C.libtriton.ir.location"
+ - leaked type "TMEM_LOAD_REDUCE_MODIFIER"
+ - leaked type "triton._C.libtriton.ir.block"
+ - leaked type "triton._C.libtriton.gluon_ir.GluonOpBuilder"
+ - leaked type "triton._C.libtriton.ir.builder"
+ - leaked type "triton._C.libtriton.nvidia.cublas.CublasLt"
+ - leaked type "triton._C.libtriton.ir.integer_attr"
+ - leaked type "ATOMIC_OP"
+ - leaked type "PROPAGATE_NAN"
+ - leaked type "METRIC_TYPE"
+ - ... skipped remainder
+nanobind: leaked 514 functions!
+ - leaked function "create_mbarrier_inval"
+ - leaked function "create_fcmpOEQ"
+ - leaked function "create_assume"
+ - leaked function ""
+ - leaked function "get_tensor_descriptor_im2col_layout_type"
+ - leaked function "create_async_tma_reduce"
+ - leaked function ""
+ - leaked function "create_ptr_to_int"
+ - leaked function "get_matrix_view"
+ - leaked function "create_amd_cluster_wait"
+ - ... skipped remainder
+nanobind: this is likely caused by a reference counting issue in the binding code.
+See https://nanobind.readthedocs.io/en/latest/refleaks.html

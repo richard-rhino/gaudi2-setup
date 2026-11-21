@@ -10,6 +10,7 @@ Storage on the device (no float8/float4/e8m0 dtypes on the HPU):
 * Engram tables: raw FP8 bytes + E8M0 scale bytes; only the looked-up rows are decoded.
 * Engram n-gram hashing: on the CPU (exact int64; Gaudi int64 arithmetic is inexact), ids sent to the device as int32.
 """
+import os
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -63,8 +64,12 @@ def _engram_embed_init(self, num_embeddings: int, dim: int):
     self.vocab_start_idx = M.rank * self.part_num_embeddings
     self.vocab_end_idx = self.vocab_start_idx + self.part_num_embeddings
     self.block_size = M.fp8_block_size
-    self.weight = nn.Parameter(torch.empty(self.part_num_embeddings, dim, dtype=_U8), requires_grad=False)
-    self.scale = nn.Parameter(torch.empty(self.part_num_embeddings, dim // self.block_size, dtype=_U8),
+    # ENGRAM_HOST=1 (default): the table stays in host RAM (47.5 GB per rank at mp=4 would not fit next to the experts);
+    # only the looked-up rows are copied to the device and decoded there.
+    self.host = os.getenv("ENGRAM_HOST", "1") == "1"
+    dev = {"device": "cpu"} if self.host else {}
+    self.weight = nn.Parameter(torch.empty(self.part_num_embeddings, dim, dtype=_U8, **dev), requires_grad=False)
+    self.scale = nn.Parameter(torch.empty(self.part_num_embeddings, dim // self.block_size, dtype=_U8, **dev),
                               requires_grad=False)
 
 
@@ -73,8 +78,14 @@ def _engram_embed_forward(self, indices: torch.Tensor) -> torch.Tensor:
     mask = (indices < self.vocab_start_idx) | (indices >= self.vocab_end_idx)
     local = torch.where(mask, torch.zeros_like(indices), indices - self.vocab_start_idx)
     flat = local.reshape(-1)
-    vals = KT.decode_e4m3(self.weight.index_select(0, flat))  # bf16 [n, dim]
-    scl = KT.decode_e8m0(self.scale.index_select(0, flat)).to(torch.bfloat16)  # [n, dim/32]
+    if self.host:
+        fc = flat.cpu().long()
+        w_rows = self.weight.index_select(0, fc).to(indices.device, non_blocking=False)
+        s_rows = self.scale.index_select(0, fc).to(indices.device, non_blocking=False)
+    else:
+        w_rows, s_rows = self.weight.index_select(0, flat), self.scale.index_select(0, flat)
+    vals = KT.decode_e4m3(w_rows)  # bf16 [n, dim]
+    scl = KT.decode_e8m0(s_rows).to(torch.bfloat16)  # [n, dim/32]
     out = (vals.unflatten(-1, (-1, self.block_size)) * scl.unsqueeze(-1)).flatten(-2)
     out = out.view(*indices.shape, self.dim).masked_fill(mask.unsqueeze(-1), 0)
     if M.world_size > 1:
@@ -112,15 +123,24 @@ def move_hash_to_cpu(model: nn.Module):
 
 
 @torch.no_grad()
-def load_checkpoint(model: nn.Module, path: str):
-    """Load a convert.py shard into the patched model (byte views for quantized tensors, fp8 linears dequantized)."""
+def load_checkpoint(model: nn.Module, path: str, rank: int = 0, mp: int = 1):
+    """Load a converted shard into the patched model (byte views for quantized tensors, fp8 linears dequantized).
+
+    `path` is either one `convert.py` file or a directory of `convert_stream.py` parts
+    (`model{rank}-mp{mp}-partNNN.safetensors`); weights and their scales may sit in different parts."""
+    import glob as _glob
+    from contextlib import ExitStack
     from safetensors import safe_open
+    files = ([path] if os.path.isfile(path) else
+             sorted(_glob.glob(os.path.join(path, f"model{rank}-mp{mp}-part*.safetensors"))) or
+             [os.path.join(path, f"model{rank}-mp{mp}.safetensors")])
     params = dict(model.named_parameters())
     buffers = dict(model.named_buffers())
     seen = set()
-    with safe_open(path, framework="pt", device="cpu") as f:
-        keys = list(f.keys())
-        for k in keys:
+    with ExitStack() as stack:
+        handles = [stack.enter_context(safe_open(fp, framework="pt", device="cpu")) for fp in files]
+        where = {k: h for h in handles for k in h.keys()}
+        for k, f in where.items():
             if k in seen:
                 continue
             t = f.get_tensor(k)
@@ -131,7 +151,7 @@ def load_checkpoint(model: nn.Module, path: str):
             if p is None:
                 raise KeyError(f"checkpoint tensor {k} has no parameter in the model")
             if getattr(p, "qtype", None) == "fp8" and t.dtype == torch.float8_e4m3fn:
-                s = f.get_tensor(k[: -len("weight")] + "scale")
+                s = where[k[: -len("weight")] + "scale"].get_tensor(k[: -len("weight")] + "scale")
                 t = KT.dequant_fp8_weight(t.view(_U8), s.view(_U8), M.fp8_block_size)
             elif p.dtype == _U8:
                 t = t.view(_U8)

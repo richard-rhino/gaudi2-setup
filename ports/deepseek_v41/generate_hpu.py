@@ -19,6 +19,9 @@ import model as M  # noqa: E402
 
 def setup(device: str):
     ws, rank = int(os.getenv("WORLD_SIZE", "1")), int(os.getenv("RANK", "0"))
+    mods = [m for m in os.getenv("DSV41_MODULES", "").split(",") if m]
+    if device == "hpu" and mods:  # pin local rank i to module mods[i] (sysfs module_id) before the card is opened
+        os.environ["HLS_MODULE_ID"] = mods[int(os.getenv("LOCAL_RANK", "0"))]
     if device == "hpu":
         import habana_frameworks.torch.core  # noqa: F401
         import habana_frameworks.torch.distributed.hccl  # noqa: F401
@@ -111,7 +114,7 @@ def main():
     cfg = json.load(open(a.config)); cfg.update(max_batch_size=1, max_seq_len=8192)
     t0 = time.time()
     model, args = build(cfg, "hpu", tok)
-    hpu_patches.load_checkpoint(model, os.path.join(a.ckpt_path, f"model{rank}-mp{ws}.safetensors"))
+    hpu_patches.load_checkpoint(model, a.ckpt_path, rank, ws)
     if rank == 0:
         print(f"model built + loaded in {time.time() - t0:.0f}s", flush=True)
     from encoding import encode_messages

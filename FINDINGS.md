@@ -351,8 +351,26 @@ Batch-1 device time per token now: stage 0 ~9 ms, stages 1-6 ~2.6 ms, stage 7 ~4
 total. What is left on stage 0: the PLE layer at 3.5 ms (vs ~0.9 for a normal layer) and the host prep at ~2.4 ms.
 The prep could drop most of its 1.6 ms sync by keeping the last 2 context tokens per request on the host.
 
+**Section 8 benchmark set, PP=8 pinned** (`experiments-ubuntu2404/office-bench.sh`, 2026-11-21). The same
+server ran the set twice. The first ("cold") pass is mostly compile time: each new prompt-length or batch bucket
+compiles for 1-4 minutes because `VLLM_SKIP_WARMUP=true`
+(`results-ubuntu2404/office-qwen38fn-pp8-pinned-cold.md`). Second pass, everything compiled
+(`results-ubuntu2404/office-qwen38fn-pp8-pinned-warm.md`):
+
+| Scenario | Users | Prompt / answer tok | Per-user tok/s p50 (p99 user) | TTFT p50 / p99 (s) | Aggregate out tok/s | Total tok/s |
+|---|---|---|---|---|---|---|
+| single | 1 | 128 / 256 | 30.9 (30.7) | 0.3 / 0.3 | 30.0 | 47 |
+| chat-10 | 10 | 1024 / 512 | 11.9 (8.9) | 0.6 / 1.8 | 105.7 | 325 |
+| chat-16 | 16 | 1024 / 512 | 10.7 (3.6) | 0.6 / 79.2 | 107.6 | 325 |
+| agentic-10-24k | 10 | 24576 / 1024 | 11.2 (9.4) | 3.7 / 19.2 | 100.2 | 2449 |
+| mixed-16 | 16 | 8192 / 768 | 9.3 (8.4) | 1.4 / 10.4 | 139.6 | 1648 |
+
+chat-16's p99 TTFT (79 s) is one more shape that still compiled in the second pass. With 10+ users the aggregate
+levels off at ~100-140 tok/s. Per decode step PP runs one micro-batch through 8 serial stages, so batching helps
+only until the gather MoE path (<= ~20 tokens) gives way to the fused op that reads all experts.
+
 ## 20. Next steps
-- Qwen: done (section 19), ~32 tok/s steady. Left: the full section 8 set (section 19), warm up the common prefill
+- Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill
   shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
 - Hardware: run `hl_qual` NIC tests and open a support case for the port 9 flapping. With healthy links, TP=8 + gather
   MoE should be compared against PP=8.
