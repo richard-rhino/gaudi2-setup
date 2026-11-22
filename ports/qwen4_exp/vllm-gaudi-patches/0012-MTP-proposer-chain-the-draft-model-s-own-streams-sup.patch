@@ -1,0 +1,94 @@
+From acd8dbf96970550538d120de6f70d922e04950e5 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 04:12:25 +0000
+Subject: [PATCH] MTP proposer: chain the draft model's own streams, support
+ mrope positions
+
+A draft model that returns (sample, streams) has each draft step start from the
+streams of the step before. Draft models returning one tensor behave as before.
+With mrope the proposer takes [3, num_tokens] positions, for text-only requests.
+
+The proposer was tested on CPU with a stub draft model. Not run on HPU.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ vllm_gaudi/v1/spec_decode/hpu_eagle.py   | 19 ++++++++++++-------
+ vllm_gaudi/v1/worker/hpu_model_runner.py |  8 +++++++-
+ 2 files changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/vllm_gaudi/v1/spec_decode/hpu_eagle.py b/vllm_gaudi/v1/spec_decode/hpu_eagle.py
+index 6b0a3177..3fb9bb9b 100644
+--- a/vllm_gaudi/v1/spec_decode/hpu_eagle.py
++++ b/vllm_gaudi/v1/spec_decode/hpu_eagle.py
+@@ -44,8 +44,10 @@ class HpuEagleProposer(EagleProposer):
+             attn_metadata=common_attn_metadata,
+         )
+ 
+-        # All MTP related method names are now unified to "mtp"
+-        if self.method == "mtp":
++        # All MTP related method names are now unified to "mtp". A draft model with hidden streams of its own
++        # (Qwen4Exp) returns (sample, streams), and each step starts from the streams of the step before.
++        reuse_target_hidden = self.method == "mtp" and not isinstance(ret_hidden_states, tuple)
++        if reuse_target_hidden:
+             last_hidden_states = ret_hidden_states
+             hidden_states = last_hidden_states
+         else:
+@@ -59,11 +61,14 @@ class HpuEagleProposer(EagleProposer):
+             draft_token_ids = logits.argmax(dim=-1)
+             return draft_token_ids.view(-1, 1)
+ 
+-        # [num_tokens, 1]
+-        target_positions = target_positions.view(-1)
++        # [num_tokens, 1], or [3, num_tokens] with mrope, where text has the same position on all three axes
++        mrope = getattr(model_runner, "uses_mrope", False)
++        if mrope:
++            target_positions = target_positions[0]
++        target_positions = target_positions.reshape(-1)
+         # [batch_size]
+         positions = target_positions[last_token_indices]
+-        if self.method == "mtp":
++        if reuse_target_hidden:
+             hidden_states = target_hidden_states.view(-1, target_hidden_states.shape[-1])
+         else:
+             hidden_states = hidden_states.view(-1, hidden_states.shape[-1])
+@@ -100,7 +105,7 @@ class HpuEagleProposer(EagleProposer):
+             # [batch_size, 1]
+             input_ids = input_ids.view(-1, 1)
+             # [batch_size, 1]
+-            input_positions = clamped_positions.view(-1, 1)
++            input_positions = clamped_positions.repeat(3, 1) if mrope else clamped_positions.view(-1, 1)
+             # [batch_size, 1, hidden_size]
+             input_hidden_states = hidden_states.view(-1, 1, hidden_states.shape[-1])
+             inputs_embeds = None
+@@ -112,7 +117,7 @@ class HpuEagleProposer(EagleProposer):
+                 inputs_embeds=inputs_embeds,
+                 attn_metadata=attn_metadata,
+             )
+-            if self.method == "mtp":
++            if reuse_target_hidden:
+                 last_hidden_states = ret_hidden_states
+                 hidden_states = ret_hidden_states
+             else:
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 270383cc..6fd40579 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -7803,7 +7803,13 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                         sampled_token_ids)
+ 
+         target_token_ids = decode_sampled_token_ids_tensor.reshape(-1, 1)[hidden_states_indices]
+-        target_positions = decode_data.position_ids[hidden_states_indices]
++        if self.uses_mrope:
++            # The drafter derives KV slots from the positions, so they must equal the token indices
++            if any(self.requests[r].mrope_position_delta for r in self.input_batch.req_ids[:num_decodes]):
++                raise NotImplementedError("Speculative decoding with mrope supports text-only requests on HPU.")
++            target_positions = decode_data.position_ids[:, hidden_states_indices]
++        else:
++            target_positions = decode_data.position_ids[hidden_states_indices]
+ 
+         if self.use_aux_hidden_state_outputs and \
+                 aux_hidden_states is not None:
+-- 
+2.43.0
+

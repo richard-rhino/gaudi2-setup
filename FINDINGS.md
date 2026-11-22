@@ -458,8 +458,8 @@ To-do, in working order:
           were replaced by plain ones. Single-token steps are identical to before (2000 random steps).
     - [x] Target model: return the pre-mixer streams, handed over through the aux hidden state path (patch 0011;
           model forward CPU-tested with stub layers, not run on HPU).
-    - [ ] Proposer: feed each draft step the previous step's multi streams, not the target's, and take 3-axis
-          mrope positions (it flattens them today).
+    - [x] Proposer: each draft step gets the previous step's multi streams, and 3-axis positions work, text only
+          (patch 0012; CPU-tested with a stub draft model, not run on HPU).
     - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
