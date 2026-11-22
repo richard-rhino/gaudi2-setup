@@ -1,0 +1,78 @@
+# PP=8 at plugin e3b40ad1, five fresh launches: batches in flight and MTP (k=3) varied separately (test-only overrides).
+# p1 = no MTP, 1 in flight; m1 = MTP, 1 in flight; p8 = stock (no MTP, 8 in flight). eq3: 8 short + 16 article prompts.
+#### p1a mtp=0 hook=queue1all ready=1 18:28:06 plugin e3b40ad1
+speed p1a        greedy   single user, warm decode tok/s [30.6, 31.8, 31.9, 31.9, 32.0, 32.2]
+speed p1a        sampled  single user, warm decode tok/s [31.2, 31.3, 31.3, 31.6, 31.6, 31.9]
+speed p1a        seeded   single user, warm decode tok/s [30.9, 31.3, 31.4, 31.6, 31.6, 31.9]
+thpt p1a        greedy   16 users, tok/s incl. TTFT, warm passes [111.2, 110.5, 110.6, 110.6, 110.9, 110.7, 111.2]
+thpt p1a        sampled  16 users, tok/s incl. TTFT, warm passes [107.8, 107.4, 107.6, 103.1, 107.5, 107.5, 107.6]
+eq3 p1a alone: 24 outputs, 0 tokens not top-1
+eq3 p1a batched: 24 outputs, 0 tokens not top-1
+eq3 p1a batched2: 24 outputs, 0 tokens not top-1
+errors 0
+decode shapes: 'decode', 1, 1, 1;'decode', 1, 1, 32;'decode', 20, 1, 32;'decode', 20, 1, 64;'decode', 2, 1, 32;'decode', 8, 1, 32
+cards released
+#### m1a mtp=3 hook=queue1 ready=1 18:51:27 plugin e3b40ad1
+speed m1a        greedy   single user, warm decode tok/s [33.0, 33.1, 35.0, 35.8, 36.4, 37.0]
+speed m1a        sampled  single user, warm decode tok/s [27.0, 27.9, 29.3, 30.1, 32.4, 34.2]
+speed m1a        seeded   single user, warm decode tok/s [24.2, 24.5, 25.2, 25.4, 30.8, 31.2]
+thpt m1a        greedy   16 users, tok/s incl. TTFT, warm passes [176.3, 184.4, 183.1, 184.0, 183.3, 50.5, 183.7]
+thpt m1a        sampled  16 users, tok/s incl. TTFT, warm passes [154.3, 150.5, 155.1, 145.6, 142.7, 146.1, 157.3]
+eq3 m1a alone: 24 outputs, 0 tokens not top-1
+eq3 m1a batched: 24 outputs, 0 tokens not top-1
+eq3 m1a batched2: 24 outputs, 0 tokens not top-1
+errors 0
+decode shapes: 'decode', 16, 1, 32;'decode', 16, 1, 64;'decode', 32, 1, 32;'decode', 32, 1, 64;'decode', 32, 1, 96;'decode', 4, 1, 32;'decode', 4, 1, 4;'decode', 48, 1, 128;'decode', 48, 1, 64;'decode', 48, 1, 96;'decode', 80, 1, 128;'decode', 80, 1, 192;'decode', 80, 1, 96;'decode', 8, 1, 32
+cards released
+#### p8a mtp=0 hook=none ready=1 19:22:14 plugin e3b40ad1
+speed p8a        greedy   single user, warm decode tok/s [31.7, 31.7, 31.9, 32.0, 32.0, 32.4]
+speed p8a        sampled  single user, warm decode tok/s [30.7, 30.8, 31.0, 31.0, 31.1, 31.2]
+speed p8a        seeded   single user, warm decode tok/s [30.8, 30.9, 30.9, 31.0, 31.0, 31.0]
+thpt p8a        greedy   16 users, tok/s incl. TTFT, warm passes [138.5, 110.3, 109.7, 110.2, 110.6, 110.5, 110.6]
+thpt p8a        sampled  16 users, tok/s incl. TTFT, warm passes [106.8, 107.1, 107.0, 106.7, 108.0, 107.2, 106.9]
+eq3 p8a alone: 24 outputs, 0 tokens not top-1
+eq3 p8a batched: 24 outputs, 0 tokens not top-1
+eq3 p8a batched2: 24 outputs, 0 tokens not top-1
+errors 0
+decode shapes: 'decode', 1, 1, 1;'decode', 1, 1, 32;'decode', 12, 1, 32;'decode', 12, 1, 64;'decode', 20, 1, 32;'decode', 20, 1, 64;'decode', 2, 1, 32;'decode', 4, 1, 32
+cards released
+#### m1b mtp=3 hook=queue1 ready=1 19:45:36 plugin e3b40ad1
+speed m1b        greedy   single user, warm decode tok/s [34.4, 34.6, 35.7, 36.2, 36.5, 36.7]
+speed m1b        sampled  single user, warm decode tok/s [26.6, 27.8, 28.7, 29.2, 32.4, 33.4]
+speed m1b        seeded   single user, warm decode tok/s [23.9, 24.1, 25.0, 25.3, 30.4, 31.4]
+thpt m1b        greedy   16 users, tok/s incl. TTFT, warm passes [179.0, 184.0, 182.7, 179.4, 181.3, 178.6, 181.3]
+thpt m1b        sampled  16 users, tok/s incl. TTFT, warm passes [145.2, 149.6, 151.2, 139.2, 140.5, 145.6, 143.3]
+eq3 m1b alone: 24 outputs, 0 tokens not top-1
+eq3 m1b batched: 24 outputs, 0 tokens not top-1
+eq3 m1b batched2: 24 outputs, 0 tokens not top-1
+errors 0
+decode shapes: 'decode', 16, 1, 32;'decode', 16, 1, 64;'decode', 32, 1, 32;'decode', 32, 1, 64;'decode', 32, 1, 96;'decode', 4, 1, 32;'decode', 4, 1, 4;'decode', 48, 1, 128;'decode', 48, 1, 64;'decode', 48, 1, 96;'decode', 80, 1, 128;'decode', 80, 1, 192;'decode', 80, 1, 96;'decode', 8, 1, 32
+cards released
+#### p1b mtp=0 hook=queue1all ready=1 20:16:46 plugin e3b40ad1
+speed p1b        greedy   single user, warm decode tok/s [32.1, 32.1, 32.2, 32.2, 32.4, 32.5]
+speed p1b        sampled  single user, warm decode tok/s [31.2, 31.6, 31.6, 31.7, 31.7, 32.0]
+speed p1b        seeded   single user, warm decode tok/s [30.5, 30.9, 31.3, 31.4, 31.9, 32.1]
+thpt p1b        greedy   16 users, tok/s incl. TTFT, warm passes [110.6, 110.8, 111.1, 111.2, 110.1, 111.0, 111.3]
+thpt p1b        sampled  16 users, tok/s incl. TTFT, warm passes [107.8, 107.8, 107.5, 107.8, 107.7, 107.5, 107.7]
+eq3 p1b alone: 24 outputs, 0 tokens not top-1
+eq3 p1b batched: 24 outputs, 0 tokens not top-1
+eq3 p1b batched2: 24 outputs, 0 tokens not top-1
+errors 0
+decode shapes: 'decode', 1, 1, 1;'decode', 1, 1, 32;'decode', 20, 1, 32;'decode', 20, 1, 64;'decode', 2, 1, 32;'decode', 8, 1, 32
+cards released
+#### greedy equality (24 prompts x 128 tokens)
+p8a:alone        vs p1a:alone        identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+p1a:alone        vs p1b:alone        identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+p8a:alone        vs p8a:batched      identical  9/24, largest flip 0.375, margin drift n=1976 median 0.000 p99 0.750 max 3.125
+p8a:batched      vs p8a:batched2     identical 20/24, largest flip 0.125, margin drift n=2819 median 0.000 p99 0.375 max 3.125
+p1a:alone        vs p1a:batched      identical  3/24, largest flip 0.500, margin drift n=1459 median 0.125 p99 0.812 max 3.125
+p1b:alone        vs p1b:batched      identical  3/24, largest flip 0.500, margin drift n=1459 median 0.125 p99 0.812 max 3.125
+p1a:batched      vs p8a:batched      identical 16/24, largest flip 0.250, margin drift n=2423 median 0.000 p99 0.562 max 1.875
+p1a:alone        vs m1a:alone        identical  2/24, largest flip 1.000, margin drift n=1057 median 0.125 p99 0.688 max 1.125
+p1a:alone        vs m1b:alone        identical  2/24, largest flip 1.000, margin drift n=1057 median 0.125 p99 0.688 max 1.125
+m1a:alone        vs m1b:alone        identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+m1a:alone        vs m1a:batched      identical  2/24, largest flip 0.312, margin drift n=999 median 0.125 p99 1.312 max 2.062
+p1a:batched      vs m1a:batched      identical  4/24, largest flip 0.750, margin drift n=1290 median 0.125 p99 1.125 max 2.188
+p1b:batched      vs m1b:batched      identical  5/24, largest flip 0.750, margin drift n=1379 median 0.125 p99 1.125 max 2.188
+p1a:alone        vs m1a:batched      identical  3/24, largest flip 0.500, margin drift n=1144 median 0.125 p99 0.938 max 1.875
+

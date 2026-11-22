@@ -623,7 +623,30 @@ To-do, in working order:
              token's margins are identical, later ones move by 0.125 median and up to 1.125, with a flip at a margin of
              1.0. That is past every noise sample at TP=8 (0.75). No noise floor for other batch shapes at PP=8 yet, so
              this may be shape noise or a bug.
-          Control to run: no MTP with a queue of 1, and no-MTP output alone vs batched.
+    - [x] **Control: the queue alone changes nothing, the 16-user gain is MTP's** (`mtp_pp8_queue_control.txt`, five
+          fresh launches; per-launch medians, 6 runs for 1 user and 7 passes for 16).
+
+          | Median tok/s | stock, queue of 8 | no MTP, queue of 1 (2 launches) | MTP, queue of 1 (2 launches) |
+          |---|---|---|---|
+          | 1 user, greedy | 31.95 | 31.9, 32.2 | 35.4, 35.95 |
+          | 1 user, sampled | 31.0 | 31.45, 31.65 | 29.7, 28.95 |
+          | 1 user, seeded | 30.95 | 31.5, 31.35 | 25.3, 25.15 |
+          | 16 users, greedy | 110.5 | 110.7, 111.0 | 183.3, 181.3 |
+          | 16 users, sampled | 107.0 | 107.6, 107.7 | 150.5, 145.2 |
+
+          So MTP at PP=8 is +64% greedy and +35-40% sampled for 16 users, +10-13% for one greedy user, and slower for
+          one sampled (-6 to -9%) or seeded (-19 to -20%) user. Every MTP launch repeats the other's greedy tokens 24/24.
+    - [ ] **Is the MTP output right at PP=8? Open.** Same control, 24 prompts x 128 tokens, greedy:
+
+          | Pair | Identical | Largest flip margin | Margin drift p99 | max |
+          |---|---|---|---|---|
+          | no MTP: alone vs batched (queue of 1) | 3/24 | 0.5 | 0.812 | 3.125 |
+          | no MTP: alone vs batched (stock) | 9/24 | 0.375 | 0.750 | 3.125 |
+          | MTP vs no MTP, alone | 2/24 | 1.0 | 0.688 | 1.125 |
+          | MTP vs no MTP, batched | 4-5/24 | 0.75 | 1.125 | 2.188 |
+
+          Batch shape alone moves the output about as much, but MTP exceeds that baseline on two of the figures.
+          Decisive test: identical copies of a prompt without MTP, which has MTP's decode shape and none of its code.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
