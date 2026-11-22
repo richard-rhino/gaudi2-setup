@@ -1,0 +1,285 @@
+From 67e8d59acf98466e46aa14704ce774230ca288e5 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 03:57:45 +0000
+Subject: [PATCH] MTP: per-token recurrent state slots in the runner and the
+ GDN layer
+
+With speculative method "mtp", the compact GDN allocation holds one row per
+token of a decode step, the runner resumes from the row of the last kept token,
+and the GDN layer saves every token's state. Without it the layout and code
+path are unchanged.
+
+The slot arithmetic is tested on CPU. The speculative path has not run on HPU.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../ops/test_recurrent_state_slots.py         | 49 +++++++++++++++++++
+ vllm_gaudi/models/qwen3_5.py                  | 15 ++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py      | 37 +++++++++++---
+ vllm_gaudi/v1/worker/recurrent_state_slots.py | 46 +++++++++++++++++
+ 4 files changed, 140 insertions(+), 7 deletions(-)
+ create mode 100644 tests/unit_tests/ops/test_recurrent_state_slots.py
+ create mode 100644 vllm_gaudi/v1/worker/recurrent_state_slots.py
+
+diff --git a/tests/unit_tests/ops/test_recurrent_state_slots.py b/tests/unit_tests/ops/test_recurrent_state_slots.py
+new file mode 100644
+index 00000000..ac508b6d
+--- /dev/null
++++ b/tests/unit_tests/ops/test_recurrent_state_slots.py
+@@ -0,0 +1,49 @@
++# SPDX-License-Identifier: Apache-2.0
++"""CPU tests for RecurrentStateSlots: after any prefill chunking and any rejections, load the right token's state."""
++
++from __future__ import annotations
++
++import random
++
++import pytest
++
++from vllm_gaudi.v1.worker.recurrent_state_slots import RecurrentStateSlots
++
++
++@pytest.mark.parametrize("width", [1, 2, 4])
++@pytest.mark.parametrize("seed", range(50))
++def test_resume_state_is_last_kept_token(width, seed):
++    rng = random.Random(seed)
++    reqs, groups = 5, 3
++    slots = RecurrentStateSlots(width)
++    held = [None] * slots.total_rows(reqs, groups)  # row -> (request, group, position) whose state it holds
++    for life in range(4):  # base slots are reused by later requests
++        for base in range(reqs):
++            req, pos = f"{life}-{base}", 0
++            for _ in range(rng.randint(1, 3)):  # prefill chunks
++                n = rng.randint(1, 50)
++                for g in range(groups):
++                    row = slots.row(base, groups, g)
++                    assert pos == 0 or held[row] == (req, g, pos - 1)
++                    held[row] = (req, g, pos + n - 1)
++                slots.prefill_scheduled(req, pos, n)
++                pos += n
++            for _ in range(30):
++                step = slots.decode_scheduled(req, pos)
++                length = rng.randint(1, width)
++                for g in range(groups):
++                    assert held[slots.row(base, groups, g, step)] == (req, g, pos - 1)
++                    for j in range(width):  # shorter requests still write their padded rows
++                        row = slots.row(base, groups, g, j)
++                        assert 0 < row < len(held) - 1
++                        held[row] = (req, g, pos + j) if j < length else ("padding", g, j)
++                pos += rng.randint(1, length)
++            slots.release(req)
++
++
++def test_width_one_is_the_plain_compact_layout():
++    slots = RecurrentStateSlots(1)
++    assert slots.total_rows(7, 4) == 7 * 4 + 2
++    for base in range(7):
++        for group in range(4):
++            assert slots.row(base, 4, group) == base * 4 + group + 1
+diff --git a/vllm_gaudi/models/qwen3_5.py b/vllm_gaudi/models/qwen3_5.py
+index ee267105..1476d4ce 100644
+--- a/vllm_gaudi/models/qwen3_5.py
++++ b/vllm_gaudi/models/qwen3_5.py
+@@ -11,6 +11,7 @@ from vllm_gaudi.ops.hpu_gdn_pytorch import (
+     hpu_fused_gdn_gating,
+     hpu_fused_recurrent_gated_delta_rule,
+ )
++from vllm_gaudi.ops.hpu_gdn_spec_decode import hpu_causal_conv1d_spec_update, hpu_gdn_spec_recurrent
+ 
+ 
+ def _save_ssm_state(core_attn_out, final_state, ssm_state, state_indices):
+@@ -273,6 +274,17 @@ class HPUGatedDeltaNetAttention(QwenGatedDeltaNetAttention):
+             g, beta = hpu_fused_gdn_gating(self.A_log, a, b, self.dt_bias)
+ 
+             conv_weights = self.conv1d.weight.view(self.conv1d.weight.size(0), self.conv1d.weight.size(2))
++            # MTP: the runner passes one store row per token, so every drafted token's state can be resumed from.
++            if (state_indices is not None and store_indices is not None
++                    and store_indices.numel() != state_indices.numel()):
++                assert store_indices.numel() == num_tokens, "expected one state row per decoded token"
++                spec_store = store_indices.view(state_indices.numel(), -1)
++                mixed_qkv_conv = hpu_causal_conv1d_spec_update(mixed_qkv, conv_state, conv_weights, state_indices,
++                                                               spec_store, self.conv1d.bias, self.activation)
++                query, key, value = self.rearrange_mixed_qkv(mixed_qkv_conv)
++                spec_out = hpu_gdn_spec_recurrent(query, key, value, g, beta, ssm_state, state_indices, spec_store)
++                return self._project_out(spec_out.squeeze(0), z, orig_shape)
++
+             mixed_qkv_conv = hpu_causal_conv1d_update(
+                 x=mixed_qkv,
+                 conv_state=conv_state,
+@@ -312,6 +324,9 @@ class HPUGatedDeltaNetAttention(QwenGatedDeltaNetAttention):
+                 core_attn_out[:n] = non_spec_out[:n]
+ 
+         # === Part 3: Output Projection ===============================
++        return self._project_out(core_attn_out, z, orig_shape)
++
++    def _project_out(self, core_attn_out: torch.Tensor, z: torch.Tensor, orig_shape: torch.Size) -> torch.Tensor:
+         z_shape_og = z.shape
+         core_attn_out = core_attn_out.reshape(-1, core_attn_out.shape[-1])
+         z = z.reshape(-1, z.shape[-1])
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 19bd6cb9..0b53aec0 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -102,6 +102,7 @@ from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
+ from vllm.v1.worker.utils import (AttentionGroup, prepare_kernel_block_sizes, sanity_check_mm_encoder_outputs)
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
+ from vllm_gaudi.v1._vendored.spec_decode.eagle import EagleProposer
++from vllm_gaudi.v1.worker.recurrent_state_slots import RecurrentStateSlots
+ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ from vllm_gaudi.v1._vendored.spec_decode.ngram_proposer import NgramProposer
+ from vllm_gaudi.v1._vendored.sample.sampler import Sampler
+@@ -1675,6 +1676,10 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         self._num_gdn_groups = 0  # set during initialize_kv_cache
+         self._gdn_slot_free_list: list[int] = []  # stack of free base-slot IDs
+         self._gdn_req_to_base_slot: dict[str, int] = {}
++        # MTP: one row per token of a step, so that rejected drafts can be rewound (width 1 = the layout above).
++        spec = vllm_config.speculative_config
++        self._recurrent_slots = RecurrentStateSlots(
++            1 + spec.num_speculative_tokens if spec is not None and spec.method == "mtp" else 1)
+ 
+         # Lazy initialization
+         # self.model: nn.Module  # set after load_model
+@@ -1836,7 +1841,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+     def _make_buffer(self, *size: Union[int, torch.SymInt], dtype: torch.dtype, numpy: bool = True) -> CpuGpuBuffer:
+         return CpuGpuBuffer(*size, dtype=dtype, device=self.device, pin_memory=self.pin_memory, with_numpy=numpy)
+ 
+-    def prepare_mamba_state_idxs(self, req_indices, block_table_offsets, target_bs):
++    def prepare_mamba_state_idxs(self, req_indices, block_table_offsets, target_bs, steps=None):
+         num_indices = len(req_indices)
+         all_state_indices_cpu = []
+         for group_idx in range(len(self.input_batch.block_table.block_tables)):
+@@ -1846,7 +1851,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 for i, req_idx in enumerate(req_indices):
+                     req_id = self.input_batch.req_ids[req_idx]
+                     base_slot = self._gdn_req_to_base_slot[req_id]
+-                    state_indices_cpu[i] = base_slot * self._num_gdn_groups + g_offset + 1
++                    state_indices_cpu[i] = self._recurrent_slots.row(base_slot, self._num_gdn_groups, g_offset,
++                                                                     steps[i] if steps is not None else 0)
+             else:
+                 block_table_cpu_tensor = self.input_batch.block_table[group_idx].get_cpu_tensor()
+                 state_indices_cpu = block_table_cpu_tensor[req_indices, block_table_offsets].clone()
+@@ -2100,6 +2106,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         if self._compact_gdn_group_ids:
+             for req_id in sorted(scheduler_output.finished_req_ids):
+                 base_slot = self._gdn_req_to_base_slot.pop(req_id, None)
++                self._recurrent_slots.release(req_id)
+                 if base_slot is not None:
+                     self._gdn_slot_free_list.append(base_slot)
+                 else:
+@@ -3309,6 +3316,9 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 zeros = [0] * len(req_indices)
+                 load_state_indices_cpu = store_state_indices_cpu = \
+                     self.prepare_mamba_state_idxs(req_indices, zeros, target_bs)
++                if self._recurrent_slots.width > 1:
++                    for i, req_id in enumerate(contents.req_ids):
++                        self._recurrent_slots.prefill_scheduled(req_id, int(context_lens[i]), int(query_lens[i]))
+ 
+             if self.use_prefix_caching:
+                 assert len(contents.req_ids) == 1
+@@ -3739,8 +3749,21 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                                                         padded_batch_size)
+             else:
+                 zeros = [0] * len(req_indices)
+-                load_state_indices_cpu = store_state_indices_cpu = \
+-                    self.prepare_mamba_state_idxs(req_indices, zeros, padded_batch_size)
++                if self._recurrent_slots.width == 1:
++                    load_state_indices_cpu = store_state_indices_cpu = \
++                        self.prepare_mamba_state_idxs(req_indices, zeros, padded_batch_size)
++                else:
++                    resume = [
++                        self._recurrent_slots.decode_scheduled(self.input_batch.req_ids[i], int(context_lens[i]))
++                        for i in req_indices
++                    ]
++                    load_state_indices_cpu = self.prepare_mamba_state_idxs(req_indices, zeros, padded_batch_size,
++                                                                           resume)
++                    # One store row per token, [groups, batch * num_tokens], in the flattened token order
++                    store_state_indices_cpu = torch.stack([
++                        self.prepare_mamba_state_idxs(req_indices, zeros, padded_batch_size, [j] * num_decodes)
++                        for j in range(num_tokens)
++                    ], dim=2).flatten(1)
+ 
+             seq_lens_cpu = torch.tensor(num_tokens_per_req, dtype=torch.int32, device='cpu', pin_memory=self.pin_memory)
+ 
+@@ -7307,7 +7330,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                         # (slot 0 unused, last slot for -1 padding).
+                         self._compact_gdn_group_ids.add(group_idx)
+                         gdn_max_reqs = self._gdn_max_reqs
+-                        compact_total = gdn_max_reqs * self._num_gdn_groups + 2
++                        compact_total = self._recurrent_slots.total_rows(gdn_max_reqs, self._num_gdn_groups)
+                         logger.debug("GDN compact tensor: %d slots (max_reqs=%d * groups=%d + 2) vs baseline %d",
+                                      compact_total, gdn_max_reqs, self._num_gdn_groups, num_blocks + 1)
+                         kv_caches[layer_name] = _mamba_state_tensors(kv_cache_spec, layer_pos, compact_total)
+@@ -7380,7 +7403,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                         # GDN/linear_attention: compact allocation.
+                         self._compact_gdn_group_ids.add(group_idx)
+                         gdn_max_reqs = self._gdn_max_reqs
+-                        compact_total = gdn_max_reqs * self._num_gdn_groups + 2
++                        compact_total = self._recurrent_slots.total_rows(gdn_max_reqs, self._num_gdn_groups)
+                         kv_caches[layer_name] = _mamba_state_tensors(kv_cache_spec, layer_pos, compact_total)
+                     elif isinstance(kv_cache_spec, MambaSpec) and \
+                             kv_cache_spec.mamba_type in _GDN_MAMBA_TYPES:
+@@ -7509,7 +7532,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+             gdn_max_reqs = self._gdn_max_reqs
+             self._gdn_slot_free_list = list(range(gdn_max_reqs - 1, -1, -1))
+             self._gdn_req_to_base_slot.clear()
+-            compact_total = gdn_max_reqs * self._num_gdn_groups + 2
++            compact_total = self._recurrent_slots.total_rows(gdn_max_reqs, self._num_gdn_groups)
+             logger.info("GDN compact: %d groups, %d base_slots, tensor_dim0=%d vs baseline=%d, free_list_len=%d",
+                         len(self._compact_gdn_group_ids), gdn_max_reqs, compact_total, num_blocks + 1,
+                         len(self._gdn_slot_free_list))
+diff --git a/vllm_gaudi/v1/worker/recurrent_state_slots.py b/vllm_gaudi/v1/worker/recurrent_state_slots.py
+new file mode 100644
+index 00000000..5a731f1d
+--- /dev/null
++++ b/vllm_gaudi/v1/worker/recurrent_state_slots.py
+@@ -0,0 +1,46 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Slot arithmetic for compact recurrent (GDN, PLE) state, with room to rewind rejected speculative tokens.
++
++Each (request base slot, GDN group) owns ``width = 1 + num_speculative_tokens`` consecutive rows. A decode step that
++processes ``width`` tokens from position ``p`` leaves the state after token ``p + j`` in row ``j``. The next step
++starts at ``p' <= p + width`` (rejected tokens are scheduled again), so it resumes from row ``p' - p - 1``.
++
++With ``width == 1`` the rows are the plain compact layout, ``base * num_groups + group + 1`` (row 0 is unused).
++"""
++
++from __future__ import annotations
++
++
++class RecurrentStateSlots:
++
++    def __init__(self, width: int = 1):
++        assert width >= 1
++        self.width = width
++        self._row0_position: dict[str, int] = {}  # request -> position of the token whose state is in row 0
++
++    def total_rows(self, max_requests: int, num_groups: int) -> int:
++        """Rows to allocate: every request's rows, the unused row 0 and the padding row at the end."""
++        return max_requests * num_groups * self.width + 2
++
++    def row(self, base_slot: int, num_groups: int, group: int, step: int = 0) -> int:
++        return (base_slot * num_groups + group) * self.width + step + 1
++
++    def prefill_scheduled(self, req_id: str, start: int, length: int) -> None:
++        """A prefill chunk leaves only its final state, in row 0."""
++        if self.width > 1:
++            self._row0_position[req_id] = start + length - 1
++
++    def decode_scheduled(self, req_id: str, start: int) -> int:
++        """Record a decode step from position ``start`` and return the row index (0..width-1) to resume from."""
++        if self.width == 1:
++            return 0
++        step = start - self._row0_position[req_id] - 1
++        if not 0 <= step < self.width:
++            raise RuntimeError(f"cannot rewind the recurrent state of {req_id} to position {start}: it holds "
++                               f"positions {self._row0_position[req_id]} to "
++                               f"{self._row0_position[req_id] + self.width - 1}")
++        self._row0_position[req_id] = start
++        return step
++
++    def release(self, req_id: str) -> None:
++        self._row0_position.pop(req_id, None)
+-- 
+2.43.0
+

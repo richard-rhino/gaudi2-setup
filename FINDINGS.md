@@ -448,7 +448,9 @@ To-do, in working order:
     Design: 1 + num_spec state slots per request, save after every token, resume from the last kept token's slot.
     - [x] GDN conv + SSM ops for this (`hpu_gdn_spec_decode.py`, patch 0007): 24/24 CPU cases, random rejections.
     - [x] The same for the PLE conv history and n-gram context tokens (patch 0008): 24/24 CPU cases.
-    - [ ] Runner: 1 + num_spec slots per request (load = last kept, store = one per token), and the compact GDN slots.
+    - [x] Runner and GDN layer: 1 + num_spec compact slots per request, load = last kept, store = one per token
+          (patch 0009; slot arithmetic CPU-tested, speculative path not run on HPU).
+    - [ ] Runner: mrope positions for drafted tokens (the decode path builds one position per request today).
     - [ ] Target model: return the pre-mixer streams. Proposer: feed each draft step the previous step's streams
           (today it takes only a single hidden stream and reuses the target's hidden states for the later steps).
     - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.
