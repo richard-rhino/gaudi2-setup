@@ -1,6 +1,6 @@
 # Gaudi2 internal NIC links: port 9 flapping and FEC errors
 
-Status: **likely root cause found, workaround under test** (2026-11-22, see the next section). The rest of the page
+Status: **root cause found, fix installed; long soak, TP=8 and reboot checks still open** (2026-11-22, see the next section). The rest of the page
 is the investigation up to 2026-11-21. Firmware, BIOS and BMC are all at their latest versions. This page collects all
 the evidence in one place: what we see, how it hurts performance, what we tried, and how to collect the data again.
 
@@ -25,7 +25,11 @@ Found and tested by a second Claude session on this machine; link counts and dri
 
   Raw: `link-downs-per-minute-1122.txt`, `allreduce-trace-port8down-1122.txt` in `results-ubuntu2404/nic-port9/`.
 
-The temporary workaround, lost at reboot:
+**Persistent fix, installed 2026-11-22 02:31 UTC:** [05-gaudi-external.network](05-gaudi-external.network) in
+`/etc/systemd/network/` keeps networkd off all 24 external netdevs (d8, d22, d23). Mechanism, driver messages and install
+steps: [ROOT-CAUSE-2026-11-22.md](../results-ubuntu2404/nic-port9/ROOT-CAUSE-2026-11-22.md).
+
+By hand, until the next reboot (also needed once after installing the rule, which does not take links down):
 ```bash
 for i in /sys/class/net/enp*d8; do sudo ip link set "$(basename "$i")" down; done
 ```
@@ -33,7 +37,7 @@ for i in /sys/class/net/enp*d8; do sudo ip link set "$(basename "$i")" down; don
 Still open:
 - A longer soak, and Qwen at TP=8.
 - The trace processes did not exit afterwards and had to be killed.
-- A persistent rule (mark the habanalabs_en netdevs unmanaged) is proposed but **not applied**.
+- The persistent rule has not been checked across a reboot.
 - The uncorrectable FEC counts on other internal ports are not explained by this.
 
 This supersedes the guess in symptom 5 below that port 9 has a physical signal fault.
@@ -154,7 +158,7 @@ Two things that do not work:
 | Check for newer firmware | None: card fw, BIOS and BMC are all latest (2026-11-21). |
 | BMC event log (`ipmitool sel elist`) | 132 entries: only PSU presence at boot and two "Unknown #0xff" on 11-19. Nothing about PCIe or links. |
 
-Not tried yet:
+Not tried yet (list from 2026-11-21, before the cause was found; not needed for the port 9 flapping):
 - A **cold power cycle** (AC off for ~1 min, or `ipmitool chassis power cycle`). It resets the baseboard retimers and
   the card CPLDs, which a warm reboot does not.
 - Intel's qualification tests for the links: `/opt/habanalabs/qual/gaudi2/bin/hl_qual` (NIC loopback / all-to-all,

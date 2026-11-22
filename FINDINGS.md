@@ -246,7 +246,8 @@ n-gram tables, again int64 hashing), Sinkhorn hyper-connections, sqrtsoftplus ro
   up/down events per minute while serving.
 - Masking port 9 (`nic_ports_mask=0xFFFDFF`) makes HCCL hang. Do not mask internal ports.
 - **Update 2026-11-22:** likely cause found: PHY resets of the unused external port 8 (brought up by netplan DHCP) make
-  the driver re-init port 9. With the d8 netdevs down the flapping stopped in a first short test.
+  the driver re-init port 9. With the d8 netdevs down the flapping stopped in a first short test. A persistent networkd rule is installed
+  (`setup-ubuntu2404/05-gaudi-external.network`), not yet checked across a reboot.
 - Full write-up with per-card counts, FEC counters and what was tried: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md).
   Summary: only port 9 goes down (~299k events in 28 h, 72% on card 0 / 43:00.0). It looks like port 9 is the
   card k <-> k+4 link. 33 internal ports have >1,000 uncorrectable FEC codewords. BIOS 2.3 / BMC 01.07.05 / card fw
@@ -393,6 +394,6 @@ Speed of that first eager run: 0.14 tok/s.
 ## 21. Next steps
 - Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill
   shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
-- Hardware: soak-test the port 8 workaround (section 17) and, if the user agrees, make it persistent. With healthy links, TP=8 + gather
+- Hardware: soak-test the port 8 fix (section 17) and check it across a reboot. With healthy links, TP=8 + gather
   MoE should be compared against PP=8.
 - DeepSeek-V4.1-Flash (section 20): speed up the decode step, and compare logprobs with rack-n03.
