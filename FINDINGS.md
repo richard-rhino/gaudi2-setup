@@ -298,8 +298,8 @@ at batch 1.
 
 **Other findings on the way:**
 - **Compiled PLE gives wrong outputs.** With the PLE layer compiled inside the decoder-layer graph, generated text turned
-  repetitive and prompt logprobs were off by 4-8. The same code under `@torch._dynamo.disable` is correct. It stays
-  disabled (it runs once per step, at layer 2 only).
+  repetitive and prompt logprobs were off by 4-8. The same code under `@torch._dynamo.disable` is correct. It was
+  disabled at this point. Section 19 found the compiler bug and a rewrite, so it is compiled again now.
 - **Profiler:** Habana's light profiler wrapper strips HPU events from `key_averages()` (SW-224979) and breaks
   `export_chrome_trace` (wrong argument count). `hpu_worker.py` now saves `prof.profiler.kineto_results` directly,
   which keeps the device events (~850 MB per rank for 12 steps). Python stacks are off unless
@@ -369,10 +369,28 @@ chat-16's p99 TTFT (79 s) is one more shape that still compiled in the second pa
 levels off at ~100-140 tok/s. Per decode step PP runs one micro-batch through 8 serial stages, so batching helps
 probably only until the gather MoE path (<= ~20 tokens) gives way to the fused op that reads all experts (not measured yet).
 
-## 20. Next steps
+## 20. DeepSeek-V4.1-Flash on the real checkpoint (2026-11-21/22)
+
+DeepSeek's reference `inference/model.py` runs on 4 cards (modules 0-3, model parallel 4) through
+`ports/deepseek_v41/`: streaming converter, torch kernels, engram tables in host RAM, real-valued RoPE.
+
+**What the output check does and does not show.** Three greedy prompts, 48 tokens, eager, against rack-n03
+(`results-ubuntu2404/dsv41-mp4-first-correct.txt`, `dsv41-reference-rack-n03.txt`):
+
+| Prompt | Gaudi vs rack-n03 |
+|---|---|
+| Capital of Japan | identical, including the stop |
+| Fibonacci function | differs from the first line (another title and intro); same section, signature and docstring after that |
+| Why the sky is blue | same start, then "(blue light)" vs "(blue)" and a different second sentence |
+
+So the port gives coherent output close to the reference, but **agreement with the reference is not established**.
+The commit message of 3328934 ("runs correctly") and the file name `*first-correct.txt` claim more than was measured.
+
+Speed of that first eager run: 0.14 tok/s.
+
+## 21. Next steps
 - Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill
   shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
-- Hardware: run `hl_qual` NIC tests and open a support case for the port 9 flapping. With healthy links, TP=8 + gather
+- Hardware: `hl_qual` NIC tests and a cold power cycle are untried (no support case planned). With healthy links, TP=8 + gather
   MoE should be compared against PP=8.
-- DeepSeek-V4.1-Flash Track A (section 15): CPU kernels validated; next `generate_hpu.py --selftest`, FP4->FP8
-  conversion, then an 8-card run. It will use PP for the same reason.
+- DeepSeek-V4.1-Flash (section 20): speed up the decode step, and compare logprobs with rack-n03.

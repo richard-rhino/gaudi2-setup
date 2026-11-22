@@ -1,12 +1,14 @@
 # Gaudi2 server setup (Debian 12) + second server (Ubuntu 24.04): new-model ports
 
 **Ubuntu 24.04 server (2026-11-20):** setup in [setup-ubuntu2404/](setup-ubuntu2404/README.md), the Qwen3.8-Flash-Next
-HPU port in [ports/qwen4_exp/](ports/qwen4_exp/), DeepSeek-V4.1 preparation in [ports/deepseek_v41/](ports/deepseek_v41/),
-results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md sections 13-20](FINDINGS.md), and
+HPU port in [ports/qwen4_exp/](ports/qwen4_exp/), the DeepSeek-V4.1 port in [ports/deepseek_v41/](ports/deepseek_v41/),
+results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md sections 13-21](FINDINGS.md), and
 [recovery steps after the driver crash](setup-ubuntu2404/AFTER-CRASH.md), [firmware re-flash guide](setup-ubuntu2404/FIRMWARE-UPDATE.md).
 
 Current state: Qwen3.8-Flash-Next runs on all 8 cards with pipeline parallelism (PP=8), output agrees with the Nvidia
-reference, single-user decode ~32 tok/s, 16 users 123 tok/s aggregate ([FINDINGS 18-19](FINDINGS.md)). TP=8 runs at only
+reference, single-user decode ~32 tok/s, 100-140 tok/s aggregate with 10-16 users ([FINDINGS 18-19](FINDINGS.md)).
+DeepSeek-V4.1-Flash runs on 4 cards with coherent output that is close to, but not the same as, the Nvidia reference;
+it is still very slow ([FINDINGS 20](FINDINGS.md)). TP=8 (Qwen) runs at only
 ~3 tok/s because the internal NIC links stall all-reduces (details: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md)). The rest of this README is the Debian server.
 
 

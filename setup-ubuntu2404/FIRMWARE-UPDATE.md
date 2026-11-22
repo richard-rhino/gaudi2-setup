@@ -95,5 +95,5 @@ Takeaways:
    (8, 22, 23). If you tried it, undo it by reloading the driver without the parameter (or by deleting
    `/etc/modprobe.d/habanalabs-ports.conf` if you made it persistent).
 4. Measured bandwidth is still well below what this hardware should reach. Next diagnostic step:
-   `/opt/habanalabs/qual/gaudi2/bin/hl_qual` NIC tests, then a support case with Intel/the system vendor citing the
-   port 9 flapping.
+   `/opt/habanalabs/qual/gaudi2/bin/hl_qual` NIC tests. The evidence so far is in
+   [NIC-LINK-FLAPPING.md](NIC-LINK-FLAPPING.md).
