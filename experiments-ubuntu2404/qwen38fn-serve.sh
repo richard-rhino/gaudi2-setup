@@ -17,10 +17,10 @@ TP=${TP:-8}; PP=${PP:-1}
 # PROFILE=<dir>: enable the torch profiler (CPU + HPU activity); drive it with POST /start_profile and /stop_profile
 PROF=(); [ -n "${PROFILE:-}" ] && { export VLLM_TORCH_PROFILER_DIR="$PROFILE"
   PROF=(--profiler-config "{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$PROFILE\"}"); }
-# MTP=k: k drafted tokens per step (patches 0007-0023). The HPU runner has no async scheduling with spec decode.
-# WARNING: EXPERIMENTS ONLY. Needs 0019 for temperature > 0 and logprobs. Sampled requests are no faster with MTP.
+# MTP=k: k drafted tokens per step (patches 0007-0024). The HPU runner has no async scheduling with spec decode.
+# WARNING: EXPERIMENTS ONLY. Needs 0019 for temperature > 0 and logprobs. PP=8: faster for several users, slower for one sampled user.
 # Needs 0022: before it, greedy requests batched with sampled ones silently get wrong tokens (FINDINGS 21).
-# Needs 0023 for structured output. TP only: not yet safe with PP (FINDINGS 21).
+# Needs 0023 for structured output, 0024 for PP (FINDINGS 21).
 SPEC=(); [ "${MTP:-0}" -gt 0 ] && SPEC=(--no-async-scheduling
   --speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":$MTP}")
 vllm serve Qwen/Qwen3.8-Flash-Next --served-model-name qwen38fn \

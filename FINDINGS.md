@@ -568,8 +568,8 @@ To-do, in working order:
             cause not known.
           - Forced tool calls are untested: the serve script has no `--tool-call-parser` (400 with and without MTP).
           - Slower than no MTP for concurrent schemas: 16 at once took 17.8-30.5 s vs 13.1-14.2 s (warm rounds).
-          - Limits: TP only. With deferred scheduling (PP, async) the scheduler pads drafts with -1, which the HPU
-            rejection sampler still treats as padding: to fix before MTP at PP=8. When all drafts are trimmed, the
+          - Limits: with deferred scheduling the scheduler pads drafts with -1, which the HPU rejection sampler
+            still treats as padding. Since 0024 that does not arise at PP=8 (one batch in flight, by reading the code). When all drafts are trimmed, the
             proposer returns dummy drafts for that step.
     - [x] **0019-0021 on the full server (TP=8): sampling is now correct in every check for all-sampled batches**
           (`results-ubuntu2404/qwen38fn/mtp_sampling_dist2_tp8.txt`; 6400 completions per launch, each token against
@@ -600,12 +600,12 @@ To-do, in working order:
     - [x] **0020-0021 at PP=8 without MTP: sampling is correct** (`results-ubuntu2404/qwen38fn/sampling_dist_pp8.txt`,
           6400 completions): p = 0.42-0.92 in the 4 checks, no draw outside its top-p set. Single user 31.2 tok/s greedy,
           30.3 sampled, 31.2 seeded.
-    - [ ] **MTP at PP=8 kills the engine on the first decode step (tried with 0023).** With a batch queue (PP without
+    - [x] **MTP at PP=8 killed the engine on the first decode step (0023 and before), fixed by 0024.** With a batch queue (PP without
           async scheduling) the engine stores the drafts before it processes the output of their step, so the next step
           is scheduled with the drafts but without the sampled token (`mtp_pp8_scheduler_order.txt`, reproduced with
           the real scheduler), and the drafter gets 3 slots for 4 rows. The same ordering makes the engine wait for
           each step's drafts and can label drafts with a later batch. With a queue of 1 the scheduler output is right.
-    - [ ] **MTP at PP=8 with a queue of 1: runs, not yet accepted** (`mtp_pp8_queue1_trial.txt`, one launch each, test-only
+    - [x] **MTP at PP=8 with a queue of 1: runs** (accepted below) (`mtp_pp8_queue1_trial.txt`, one launch each, test-only
           override). No engine errors; JSON, mixed batches and choices complete (forced tool calls untested, no parser).
           The sampled distribution passes 4 of 4 (p = 0.15-0.85; 4 draws outside their computed top-p set).
 
@@ -636,7 +636,7 @@ To-do, in working order:
 
           So MTP at PP=8 is +64% greedy and +35-40% sampled for 16 users, +10-13% for one greedy user, and slower for
           one sampled (-6 to -9%) or seeded (-19 to -20%) user. Every MTP launch repeats the other's greedy tokens 24/24.
-    - [ ] **Is the MTP output right at PP=8? Open.** Same control, 24 prompts x 128 tokens, greedy:
+    - [x] **Is the MTP output right at PP=8? Yes for one user, exactly; batch shape explains the rest.** Same control, 24 prompts x 128 tokens, greedy:
 
           | Pair | Identical | Largest flip margin | Margin drift p99 | max |
           |---|---|---|---|---|
@@ -645,8 +645,20 @@ To-do, in working order:
           | MTP vs no MTP, alone | 2/24 | 1.0 | 0.688 | 1.125 |
           | MTP vs no MTP, batched | 4-5/24 | 0.75 | 1.125 | 2.188 |
 
-          Batch shape alone moves the output about as much, but MTP exceeds that baseline on two of the figures.
-          Decisive test: identical copies of a prompt without MTP, which has MTP's decode shape and none of its code.
+          Batch shape alone moves the output about as much, but MTP exceeded that baseline on two figures. The test
+          that settles it (`mtp_pp8_shape_copies.txt`): no MTP, 4 identical copies of each prompt in one request, so
+          the last copy decodes in MTP's 4-row shape without any MTP code. Against MTP for one user it gives 24/24
+          identical tokens and exactly equal logprobs in 3061 of 3072 steps; the other 11 are all the last token, where
+          MTP has fewer drafts left and a different shape. Against single-row output it flips at margin 1.0 too.
+          So the drift is bf16 rounding that depends on the batch shape, not MTP. Limit: for 16 users the shapes can't
+          be reproduced exactly; there the drift is within the shape noise on medians, slightly above it at p99.
+    - [x] **0024: one batch in flight with MTP and PP** (`mtp_pp8_0024.txt`), a plugin patch on vLLM's
+          `max_concurrent_batches` (CPU unit test, fails with the patch removed). On the cards without the test hook:
+          the same tokens and logprobs as the hooked launch for all 24 prompts alone (22/24 batched, where launches
+          without MTP also differ), JSON / mixed / choice / regex rounds all complete, sampled distribution p = 0.16-0.89,
+          0 errors, speeds as in the control (16 users 182.5 greedy, 149.0 sampled).
+          **Use MTP at PP=8 for several users, not for a single sampled user.** Known issue: one 16-user pass in
+          about every 7 drops to ~45-50 tok/s (seen 3 times, with and without the hook), cause not known.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

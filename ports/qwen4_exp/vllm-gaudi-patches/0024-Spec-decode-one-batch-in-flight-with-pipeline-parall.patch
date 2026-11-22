@@ -1,0 +1,140 @@
+From c4bb69b722f530cf222d2801d447429d6c19c637 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 21:48:52 +0000
+Subject: [PATCH] Spec decode: one batch in flight with pipeline parallelism
+
+Without async scheduling, which HPU disables for both features, vLLM keeps
+pipeline_parallel_size batches in flight with pipeline parallelism. The
+engine's batch queue then stores a step's drafts before it processes that
+step's output, so the next step is scheduled with the drafts but without
+the sampled token they follow, and the drafter gets fewer slots than rows.
+Fetching the drafts also waits for each step, so the queue gives no
+overlap. With speculative decoding and pipeline parallelism keep one batch
+in flight, which makes the engine process each output before the drafts.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ docs/configuration/pipeline_parallelism.md    |  1 +
+ .../unit_tests/test_spec_decode_pp_batches.py | 50 +++++++++++++++++++
+ vllm_gaudi/patches.py                         | 30 +++++++++++
+ 3 files changed, 81 insertions(+)
+ create mode 100644 tests/unit_tests/test_spec_decode_pp_batches.py
+
+diff --git a/docs/configuration/pipeline_parallelism.md b/docs/configuration/pipeline_parallelism.md
+index 17cc37b0..a502989f 100644
+--- a/docs/configuration/pipeline_parallelism.md
++++ b/docs/configuration/pipeline_parallelism.md
+@@ -18,4 +18,5 @@ Currently, pipeline parallelism on the lazy mode requires the `PT_HPUGRAPH_DISAB
+ Limitations:
+ 
+ - Async scheduling is not supported with pipeline parallelism. vLLM enables it by default, so on HPU it is turned off when `pipeline_parallel_size` is greater than 1.
++- With speculative decoding, one batch is in flight at a time instead of `pipeline_parallel_size` batches, because the drafts of a step are only valid once that step's output has been processed.
+ - vLLM rejects pipeline parallelism with the `external_launcher` distributed executor backend on every platform. Use the default `mp` or `ray` backend instead.
+diff --git a/tests/unit_tests/test_spec_decode_pp_batches.py b/tests/unit_tests/test_spec_decode_pp_batches.py
+new file mode 100644
+index 00000000..75911d71
+--- /dev/null
++++ b/tests/unit_tests/test_spec_decode_pp_batches.py
+@@ -0,0 +1,50 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Batches in flight with speculative decoding and pipeline parallelism."""
++from types import SimpleNamespace
++
++import pytest
++
++from vllm.config import ParallelConfig, SchedulerConfig, VllmConfig
++
++from vllm_gaudi import patches
++
++
++@pytest.fixture
++def stock_property():
++    prop = VllmConfig.__dict__["max_concurrent_batches"]
++    yield prop
++    VllmConfig.max_concurrent_batches = prop
++
++
++def _config(pp: int, spec: bool, async_scheduling: bool) -> VllmConfig:
++    config = object.__new__(VllmConfig)
++    parallel = ParallelConfig()
++    parallel.pipeline_parallel_size = pp
++    scheduler = SchedulerConfig.default_factory()
++    scheduler.async_scheduling = async_scheduling
++    object.__setattr__(config, "parallel_config", parallel)
++    object.__setattr__(config, "scheduler_config", scheduler)
++    object.__setattr__(config, "speculative_config", SimpleNamespace(method="mtp") if spec else None)
++    return config
++
++
++@pytest.mark.parametrize("pp, spec, async_scheduling, expected", [
++    (8, True, False, 1),
++    (2, True, False, 1),
++    (1, True, False, 1),
++    (8, False, False, 8),
++    (1, False, False, 1),
++    (1, False, True, 2),
++    (1, True, True, 2),
++    (8, True, True, 9),
++])
++def test_batches_in_flight(stock_property, pp, spec, async_scheduling, expected):
++    patches._patch_max_concurrent_batches()
++    assert _config(pp, spec, async_scheduling).max_concurrent_batches == expected
++
++
++def test_patch_is_idempotent(stock_property):
++    patches._patch_max_concurrent_batches()
++    patched = VllmConfig.__dict__["max_concurrent_batches"]
++    patches._patch_max_concurrent_batches()
++    assert VllmConfig.__dict__["max_concurrent_batches"] is patched
+diff --git a/vllm_gaudi/patches.py b/vllm_gaudi/patches.py
+index 8c6d19ec..607462b0 100644
+--- a/vllm_gaudi/patches.py
++++ b/vllm_gaudi/patches.py
+@@ -663,6 +663,35 @@ def _patch_use_sequence_parallel_moe() -> None:
+     ParallelConfig.use_sequence_parallel_moe = property(_hpu_use_sequence_parallel_moe)
+ 
+ 
++def _patch_max_concurrent_batches() -> None:
++    """Keep one batch in flight with speculative decoding and pipeline parallelism, without async scheduling.
++
++    HPU turns async scheduling off for both features. With pipeline parallelism vLLM still uses a batch queue of
++    ``pipeline_parallel_size``, and ``step_with_batch_queue`` then stores a step's drafts before it processes that
++    step's output: the next step is scheduled with the drafts but without the sampled token they follow. Fetching
++    the drafts also waits for the step, so the queue gives no overlap here. With a queue of one the engine uses
++    ``step``, which processes the output first.
++    """
++    from vllm.config.vllm import VllmConfig
++
++    prop = VllmConfig.__dict__.get("max_concurrent_batches")
++    if not isinstance(prop, property) or prop.fget is None:
++        return  # Not a property anymore: do not risk an incompatible override.
++    if getattr(prop.fget, "_hpu_patched", False):
++        return  # load_general_plugins can run several times per process.
++
++    original_fget = prop.fget
++
++    def _hpu_max_concurrent_batches(self) -> int:
++        if (self.speculative_config is not None and not self.scheduler_config.async_scheduling
++                and self.parallel_config.pipeline_parallel_size > 1):
++            return 1
++        return original_fget(self)
++
++    _hpu_max_concurrent_batches._hpu_patched = True  # type: ignore[attr-defined]
++    VllmConfig.max_concurrent_batches = property(_hpu_max_concurrent_batches)
++
++
+ def _patch_cleanup_dist_env_and_memory() -> None:
+     """Install the HPU-safe ``cleanup_dist_env_and_memory`` replacement.
+ 
+@@ -1972,6 +2001,7 @@ def apply() -> None:
+         _patch_granite_hybrid_layer_types()
+         _patch_get_num_layers_by_block_type()
+         _patch_use_sequence_parallel_moe()
++        _patch_max_concurrent_batches()
+         _patch_check_shm_free_space()
+         _patch_mamba_bind_kv_cache()
+         _patch_mla_bind_kv_cache()
+-- 
+2.43.0
+

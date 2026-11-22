@@ -1,0 +1,33 @@
+# PP=8, no MTP, one batch in flight (test-only override): n identical copies of each prompt in one request, greedy.
+# Row n-1 joins every decode step at batch size n; with n=4 that is MTP k=3's decode shape for one user (no MTP code runs).
+copies 4: 24 prompts, all rows alike in 9
+copies 2: 24 prompts, all rows alike in 23
+copies 8: 24 prompts, all rows alike in 2
+errors 0
+decode shapes: 'decode', 1, 1, 1;'decode', 1, 1, 32;'decode', 2, 1, 32;'decode', 4, 1, 32;'decode', 8, 1, 32
+2 copies row 0 vs p1a alone: identical tokens 4/24, steps with exactly equal logprobs 32/1281, first decode step exact 1/24, largest flip 0.250
+2 copies row 0 vs m1a alone: identical tokens 5/24, steps with exactly equal logprobs 63/1536, first decode step exact 13/24, largest flip 0.500
+2 copies row 1 vs p1a alone: identical tokens 4/24, steps with exactly equal logprobs 31/1246, first decode step exact 0/24, largest flip 0.375
+2 copies row 1 vs m1a alone: identical tokens 5/24, steps with exactly equal logprobs 63/1533, first decode step exact 13/24, largest flip 0.500
+4 copies row 0 vs p1a alone: identical tokens 5/24, steps with exactly equal logprobs 34/1282, first decode step exact 2/24, largest flip 1.000
+4 copies row 0 vs m1a alone: identical tokens 18/24, steps with exactly equal logprobs 1834/2524, first decode step exact 14/24, largest flip 0.375
+4 copies row 3 vs p1a alone: identical tokens 2/24, steps with exactly equal logprobs 27/1060, first decode step exact 0/24, largest flip 1.000
+4 copies row 3 vs m1a alone: identical tokens 24/24, steps with exactly equal logprobs 3061/3072, first decode step exact 24/24, largest flip 0.000
+8 copies row 0 vs p1a alone: identical tokens 3/24, steps with exactly equal logprobs 35/1298, first decode step exact 0/24, largest flip 0.375
+8 copies row 0 vs m1a alone: identical tokens 5/24, steps with exactly equal logprobs 46/1343, first decode step exact 16/24, largest flip 0.375
+8 copies row 7 vs p1a alone: identical tokens 3/24, steps with exactly equal logprobs 33/1430, first decode step exact 0/24, largest flip 0.875
+8 copies row 7 vs m1a alone: identical tokens 4/24, steps with exactly equal logprobs 29/1312, first decode step exact 2/24, largest flip 0.688
+cards released
+
+#### steps where 4 copies (row 3) and MTP alone differ
+prompt 0 step 127 max |dlogprob| 0.2421 same key set True
+prompt 1 step 127 max |dlogprob| 0.125 same key set True
+prompt 4 step 127 max |dlogprob| 0.125 same key set True
+prompt 5 step 127 max |dlogprob| 0.125 same key set True
+prompt 7 step 127 max |dlogprob| 0.0626 same key set True
+prompt 9 step 127 max |dlogprob| 0.1075 same key set True
+prompt 10 step 127 max |dlogprob| 0.1246 same key set True
+prompt 12 step 127 max |dlogprob| 0.0001 same key set True
+prompt 15 step 127 max |dlogprob| 0.0768 same key set True
+prompt 19 step 127 max |dlogprob| 0.2499 same key set True
+prompt 23 step 127 max |dlogprob| 0.125 same key set True

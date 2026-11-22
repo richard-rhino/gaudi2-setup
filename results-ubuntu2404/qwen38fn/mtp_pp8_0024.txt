@@ -1,0 +1,50 @@
+# PP=8, MTP k=3, plugin e3b40ad1 + 0024 (one batch in flight, no test hook). Compared with launch m1a of mtp_pp8_queue_control.txt.
+#### patched, no hook 20:57:14 plugin e3b40ad1 +  2 files changed, 31 insertions(+)
+speed patched    greedy   single user, warm decode tok/s [33.4, 34.0, 35.7, 36.0, 36.3, 36.5]
+speed patched    sampled  single user, warm decode tok/s [26.7, 28.0, 28.9, 29.4, 32.9, 34.1]
+speed patched    seeded   single user, warm decode tok/s [23.9, 24.4, 25.0, 25.1, 29.7, 30.9]
+thpt patched    greedy   16 users, tok/s incl. TTFT, warm passes [178.4, 181.5, 182.5, 183.8, 185.5, 182.1, 183.2]
+thpt patched    sampled  16 users, tok/s incl. TTFT, warm passes [45.3, 149.0, 144.9, 153.1, 149.7, 148.4, 149.2]
+eq3 patched alone: 24 outputs, 0 tokens not top-1
+eq3 patched batched: 24 outputs, 0 tokens not top-1
+eq3 patched batched2: 24 outputs, 0 tokens not top-1
+pp8p  schema, greedy, alone                      1/1 ok   16.7 s  {'river_0': 'Danube', 'id': 1000, 'countries
+pp8p  schema, sampled, alone                     1/1 ok    1.9 s  {'river_1': 'Danube', 'id': 1001, 'countries
+pp8p  schema after thinking                      1/1 ok    1.8 s  {'river_2': 'Danube', 'id': 1002, 'countries
+pp8p  schema with logprobs                       1/1 ok    1.8 s  {'river_3': 'Danube', 'id': 1003, 'countries
+pp8p  16 schemas at once, round 1                16/16 ok  105.1 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  16 schemas, all greedy, round 1            16/16 ok    8.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 greedy + 8 sampled free, round 1         16/16 ok    8.4 s  " a vast body of salt water that covers mo
+pp8p  4 schema + 4 greedy + 8 sampled, round 1   16/16 ok    9.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 schemas + 8 free, round 1                16/16 ok    8.6 s  " the largest habitat on earth and has a h
+pp8p  16 schemas at once, round 2                16/16 ok    8.7 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  16 schemas, all greedy, round 2            16/16 ok    8.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 greedy + 8 sampled free, round 2         16/16 ok    8.4 s  ' an inexhaustible source of valuable prod
+pp8p  4 schema + 4 greedy + 8 sampled, round 2   16/16 ok    8.8 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 schemas + 8 free, round 2                16/16 ok    9.2 s  " a huge, salty, important part of the wat
+pp8p  16 schemas at once, round 3                16/16 ok    8.9 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  16 schemas, all greedy, round 3            16/16 ok    8.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 greedy + 8 sampled free, round 3         16/16 ok    8.4 s  " the most important part of Earth's water
+pp8p  4 schema + 4 greedy + 8 sampled, round 3   16/16 ok    8.9 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 schemas + 8 free, round 3                16/16 ok    8.5 s  " a vast, dynamic body of salt water that 
+pp8p  16 schemas at once, round 4                16/16 ok   19.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  16 schemas, all greedy, round 4            16/16 ok    8.0 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 greedy + 8 sampled free, round 4         16/16 ok    8.9 s  ' a major source of food for humans.\n\nA.
+pp8p  4 schema + 4 greedy + 8 sampled, round 4   16/16 ok    8.9 s  {'river_0': 'Danube', 'id': 1000, 'countri
+pp8p  8 schemas + 8 free, round 4                16/16 ok    8.9 s  ' the most common place to find __________
+pp8p  16 choices                                 16/16 ok  187.0 s  'answer-0-blue'
+pp8p  16 regexes                                 16/16 ok   75.1 s  '2000-10-09'
+pp8p  forced tool call                           0/1 ok    0.0 s  ['RuntimeError(\'400 b\\\'{"error":{"message
+pp8p  free request afterwards                    1/1 ok    2.3 s  ' the largest ecosystem of the Earth.\nThe C
+patched: 6400 samples
+patched    token 0 prefix [] n= 6400 TVD 0.0065 null 0.0096 p=0.889 outside own top-p 0
+patched    token 1 prefix [279] n= 4281 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+patched    token 1 prefix [524] n=  591 TVD 0.0550 null 0.0412 p=0.160 outside own top-p 0
+patched    token 2 prefix [279, 799] n= 4281 TVD 0.0056 null 0.0049 p=0.453 outside own top-p 0
+patched    token 2 prefix [799, 421] n=  360 TVD 0.0903 null 0.0761 p=0.185 outside own top-p 2
+errors 0
+m1a:alone        vs patched:alone    identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+m1a:batched      vs patched:batched  identical 22/24, largest flip 0.250, margin drift n=2883 median 0.000 p99 0.125 max 0.812
+alone, identical including every logprob: 24 of 24
+cards released
+
