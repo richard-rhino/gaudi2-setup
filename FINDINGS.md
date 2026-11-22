@@ -604,8 +604,26 @@ To-do, in working order:
           async scheduling) the engine stores the drafts before it processes the output of their step, so the next step
           is scheduled with the drafts but without the sampled token (`mtp_pp8_scheduler_order.txt`, reproduced with
           the real scheduler), and the drafter gets 3 slots for 4 rows. The same ordering makes the engine wait for
-          each step's drafts and can label drafts with a later batch. With a queue of 1 the scheduler output is right;
-          being tried on the cards.
+          each step's drafts and can label drafts with a later batch. With a queue of 1 the scheduler output is right.
+    - [ ] **MTP at PP=8 with a queue of 1: runs, not yet accepted** (`mtp_pp8_queue1_trial.txt`, one launch each, test-only
+          override). No engine errors; JSON, mixed batches and choices complete (forced tool calls untested, no parser).
+          The sampled distribution passes 4 of 4 (p = 0.15-0.85; 4 draws outside their computed top-p set).
+
+          | Median tok/s | no MTP, queue of 8 | MTP k=3, queue of 1 | change |
+          |---|---|---|---|
+          | 1 user, greedy | 31.05 | 36.8 | +19% |
+          | 1 user, sampled | 30.45 | 29.55 | -3% |
+          | 1 user, seeded | 30.8 | 25.15 | -18% |
+          | 16 users, greedy | 110.4 | 177.5 (one pass 49.6) | see below |
+          | 16 users, sampled | 106.7 | 148.0 | see below |
+
+          Two open questions before any verdict:
+          1. The 16-user arms differ in MTP **and** in batches in flight, so that gain can't be credited to MTP.
+          2. Greedy output: 1 of 8 prompts identical to no MTP, which repeats 8 of 8 exactly across launches. The first
+             token's margins are identical, later ones move by 0.125 median and up to 1.125, with a flip at a margin of
+             1.0. That is past every noise sample at TP=8 (0.75). No noise floor for other batch shapes at PP=8 yet, so
+             this may be shape noise or a bug.
+          Control to run: no MTP with a queue of 1, and no-MTP output alone vs batched.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

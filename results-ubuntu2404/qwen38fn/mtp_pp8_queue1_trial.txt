@@ -1,0 +1,98 @@
+# PP=8 at plugin e3b40ad1: MTP k=3 with one batch in flight (test-only override, not in the plugin), then no MTP (8 in flight).
+# NOT a clean MTP comparison at 16 users: the two arms also differ in batches in flight.
+#### q1pp8mtp3 ready=1 17:21:56 plugin e3b40ad1
+equal q1pp8mtp3: 128 tokens, 0 not top-1: ' Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madr'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking me to explain how a transistor works. This is a fundamental electronics'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: '\n    if len(a) <= 1:\n        return a\n    else:\n        pivot = a[0]\n        less = [x for x in a[1:'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: ', in a magical land far away, there lived a little adventurer named Lily. Lily was a very curious an'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: ' the one that best fits the problem at hand.\n\n## 1. Introduction\n\nIn the last article, we introduced'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking for a simple list of the planets in our solar system. This is straightf'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: ' une source d’inspiration inépuisable pour les artistes. Les peintres, les photographes, les sculpte'
+equal q1pp8mtp3: 128 tokens, 0 not top-1: ' 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75'
+speed q1pp8mtp3  greedy   single user, warm decode tok/s [34.7, 34.8, 36.8, 36.8, 36.9, 36.9]
+speed q1pp8mtp3  sampled  single user, warm decode tok/s [26.7, 27.6, 28.6, 30.5, 31.7, 33.3]
+speed q1pp8mtp3  seeded   single user, warm decode tok/s [24.0, 24.5, 25.1, 25.2, 30.3, 30.8]
+thpt q1pp8mtp3  greedy   16 users, tok/s incl. TTFT, warm passes [177.5, 49.6, 181.9]
+thpt q1pp8mtp3  sampled  16 users, tok/s incl. TTFT, warm passes [153.4, 148.0, 142.4]
+pp8m3 schema, greedy, alone                      1/1 ok   17.0 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 schema, sampled, alone                     1/1 ok    2.0 s  {'river_1': 'Danube', 'id': 1001, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+pp8m3 schema after thinking                      1/1 ok    1.9 s  {'river_2': 'Danube', 'id': 1002, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+pp8m3 schema with logprobs                       1/1 ok    2.0 s  {'river_3': 'Danube', 'id': 1003, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+pp8m3 16 schemas at once, round 1                16/16 ok  195.0 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 16 schemas, all greedy, round 1            16/16 ok    8.1 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 greedy + 8 sampled free, round 1         16/16 ok    8.5 s  ' rough, with waves crashing violently against the rocks. A storm is brewing, and the sky is dark and ominous.'
+pp8m3 4 schema + 4 greedy + 8 sampled, round 1   16/16 ok    9.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 schemas + 8 free, round 1                16/16 ok    8.6 s  " an endless source of inspiration for us at The Surf Lounge. The ocean and its creatures are truly fascinating, and this is reflect
+pp8m3 16 schemas at once, round 2                16/16 ok  150.7 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 16 schemas, all greedy, round 2            16/16 ok    8.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 greedy + 8 sampled free, round 2         16/16 ok    8.6 s  ' a huge reservoir of organic matter. The organic matter of the sea is produced by photosynthetic marine organisms, primarily phytop
+pp8m3 4 schema + 4 greedy + 8 sampled, round 2   16/16 ok    8.9 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 schemas + 8 free, round 2                16/16 ok    9.0 s  " a huge body of saltwater that covers about 71% of Earth's surface. The planet's major divisions of the sea are five distinct ocean
+pp8m3 16 schemas at once, round 3                16/16 ok    8.6 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 16 schemas, all greedy, round 3            16/16 ok    8.1 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 greedy + 8 sampled free, round 3         16/16 ok    8.3 s  ' rising. In the United States, 3.5 million acres of coastal land will be lost to the ocean by 2100. This is a fact, not a predictio
+pp8m3 4 schema + 4 greedy + 8 sampled, round 3   16/16 ok    9.0 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 schemas + 8 free, round 3                16/16 ok    8.8 s  " a great teacher.\nWhat's your favorite thing about this game?\nA study of the United Nations University found that the most signif
+pp8m3 16 schemas at once, round 4                16/16 ok    9.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 16 schemas, all greedy, round 4            16/16 ok    8.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 greedy + 8 sampled free, round 4         16/16 ok    8.6 s  ' a constant presence in the life of the island. The sea was the vehicle by which the island was colonised by the Phoenicians, the G
+pp8m3 4 schema + 4 greedy + 8 sampled, round 4   16/16 ok    9.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+pp8m3 8 schemas + 8 free, round 4                16/16 ok    8.8 s  ' a dangerous place, but the sea is also a source of food, energy, and jobs. In order to protect the lives of the people who work on
+pp8m3 16 choices                                 16/16 ok   87.0 s  'answer-0-blue'
+pp8m3 16 regexes                                 16/16 ok   16.9 s  '2000-01-25'
+pp8m3 forced tool call                           0/1 ok    0.0 s  ['RuntimeError(\'400 b\\\'{"error":{"message":"tool_choice=function \\\\\\\\"weather\\\\\\\\" requires --tool-call-parser to be set","
+pp8m3 free request afterwards                    1/1 ok    2.2 s  ' described as having a color that is “not blue but transparent,” yet it appears blue to an observer. Explain the physical reason 
+q1pp8mtp3: 6400 samples
+q1pp8mtp3  token 0 prefix [] n= 6400 TVD 0.0069 null 0.0096 p=0.853 outside own top-p 0
+q1pp8mtp3  token 1 prefix [279] n= 4279 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+q1pp8mtp3  token 1 prefix [524] n=  587 TVD 0.0326 null 0.0419 p=0.803 outside own top-p 0
+q1pp8mtp3  token 2 prefix [279, 799] n= 4279 TVD 0.0059 null 0.0051 p=0.451 outside own top-p 0
+q1pp8mtp3  token 2 prefix [799, 421] n=  361 TVD 0.0929 null 0.0754 p=0.151 outside own top-p 4
+Mean acceptance length: 2.61 Mean acceptance length: 1.11 Mean acceptance length: 1.67 Mean acceptance length: 2.81 Mean acceptance length: 2.83 Mean acceptance length: 3.04 Mean acceptance length: 2.58 Mean acceptance length: 2.63 Mean acceptance length: 2.55 Mean acceptance length: 2.62 Mean acceptance length: 2.56 Mean acceptance length: 2.65 Mean acceptance length: 2.52 Mean acceptance length: 2.18 Mean acceptance length: 2.17 Mean acceptance length: 2.17 Mean acceptance length: 2.09 Mean ac
+errors 0
+cards released
+#### q1pp8mtp0 ready=1 18:09:30 plugin e3b40ad1
+equal q1pp8mtp0: 128 tokens, 0 not top-1: ' Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madr'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking me to explain how a transistor works. This is a fundamental electronics'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: '\n    if len(a) <= 1:\n        return a\n    else:\n        pivot = a[0]\n        less = [x for x in a[1:'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: ', in a magical land called Schoolville, there was a group of little kids who were learning all about'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: ' the one that you know best.\n\n## 1. Introduction\n\nIn this tutorial, we’ll explore the differences be'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking for a simple list of the planets in our solar system. This is straightf'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: ' une source d’inspiration inépuisable pour les artistes. Les peintres, les photographes, les sculpte'
+equal q1pp8mtp0: 128 tokens, 0 not top-1: ' 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75'
+speed q1pp8mtp0  greedy   single user, warm decode tok/s [30.9, 30.9, 31.0, 31.1, 31.2, 31.3]
+speed q1pp8mtp0  sampled  single user, warm decode tok/s [30.2, 30.3, 30.4, 30.5, 30.7, 30.7]
+speed q1pp8mtp0  seeded   single user, warm decode tok/s [30.5, 30.7, 30.8, 30.8, 31.2, 31.2]
+thpt q1pp8mtp0  greedy   16 users, tok/s incl. TTFT, warm passes [110.4, 106.5, 110.6]
+thpt q1pp8mtp0  sampled  16 users, tok/s incl. TTFT, warm passes [102.6, 106.7, 106.8]
+errors 0
+cards released
+#### MTP vs no MTP, one user
+prompt 0: first difference at token 34, reference margin 0.5000
+prompt 1: first difference at token 53, reference margin 0.3750
+prompt 2: first difference at token 100, reference margin 1.0000
+prompt 3: first difference at token 5, reference margin 0.0000
+prompt 4: first difference at token 3, reference margin 0.0000
+prompt 5: first difference at token 25, reference margin 0.1250
+prompt 6: first difference at token 99, reference margin 0.1250
+prompt 7: identical (128 tokens)
+#### no MTP vs no MTP of the launch before (the noise floor)
+prompt 0: identical (128 tokens)
+prompt 1: identical (128 tokens)
+prompt 2: identical (128 tokens)
+prompt 3: identical (128 tokens)
+prompt 4: identical (128 tokens)
+prompt 5: identical (128 tokens)
+prompt 6: identical (128 tokens)
+prompt 7: identical (128 tokens)
+
+#### top-1 minus top-2 margin, no MTP vs MTP, over each prompt's common prefix
+prompt 0: same  34, token 0 delta 0.000, median 0.188, largest (delta@token/ref margin) 0.625@34/0.50 0.625@20/6.06 0.500@28/0.00 0.438@25/7.75
+prompt 1: same  53, token 0 delta 0.000, median 0.125, largest (delta@token/ref margin) 0.375@53/0.38 0.250@47/1.75 0.250@39/1.00 0.250@33/14.75
+prompt 2: same 100, token 0 delta 0.000, median 0.125, largest (delta@token/ref margin) 1.125@72/5.88 1.062@53/8.56 0.750@32/6.75 0.625@49/4.88
+prompt 3: same   5, token 0 delta 0.000, median 0.000, largest (delta@token/ref margin) 0.125@5/0.00 0.125@4/1.38 0.000@3/1.25 0.000@2/1.62
+prompt 4: same   3, token 0 delta 0.000, median 0.062, largest (delta@token/ref margin) 0.125@3/0.00 0.125@2/0.38 0.000@1/3.50 0.000@0/1.62
+prompt 5: same  25, token 0 delta 0.000, median 0.125, largest (delta@token/ref margin) 1.125@6/12.25 0.500@22/7.12 0.500@15/4.88 0.312@18/14.06
+prompt 6: same  99, token 0 delta 0.000, median 0.125, largest (delta@token/ref margin) 0.375@85/0.25 0.375@76/6.12 0.375@2/0.50 0.312@45/12.38
+prompt 7: same 128, token 0 delta 0.000, median 0.188, largest (delta@token/ref margin) 0.812@112/5.00 0.750@126/9.00 0.688@120/2.31 0.688@93/8.12
+all n=451 median 0.125 p90 0.375 p99 0.750 max 1.125
