@@ -1,0 +1,138 @@
+From 086289b8555f6f61d4163ac83b0e7d2f9e23cdda Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 16:17:18 +0000
+Subject: [PATCH] Spec decode: greedy requests next to sampled ones
+
+The input batch stores the temperature -1 for greedy requests, not 0. In a
+batch with greedy and sampled requests, the rejection sampler divided the
+logits of the greedy ones by -1 and sampled from them, so they emitted the
+least likely tokens.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../worker/test_spec_decode_sampling.py       | 52 +++++++++++++++++--
+ vllm_gaudi/v1/sample/hpu_rejection_sampler.py |  9 ++--
+ 2 files changed, 54 insertions(+), 7 deletions(-)
+
+diff --git a/tests/unit_tests/worker/test_spec_decode_sampling.py b/tests/unit_tests/worker/test_spec_decode_sampling.py
+index 0cd707f5..71505c8f 100644
+--- a/tests/unit_tests/worker/test_spec_decode_sampling.py
++++ b/tests/unit_tests/worker/test_spec_decode_sampling.py
+@@ -6,11 +6,14 @@ from types import SimpleNamespace
+ import numpy as np
+ import torch
+ 
++from vllm.sampling_params import SamplingParams
+ from vllm.v1.outputs import LogprobsTensors
++from vllm_gaudi.utils import hpu_device_string
+ from vllm_gaudi.v1._vendored.sample.metadata import SamplingMetadata
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
+ from vllm_gaudi.v1._vendored.sample.sampler import Sampler
+ from vllm_gaudi.v1.sample.hpu_rejection_sampler import grid_metadata
++from vllm_gaudi.v1.worker.hpu_input_batch import CachedRequestState, InputBatch
+ from vllm_gaudi.v1.worker.hpu_model_runner import HPUModelRunner
+ 
+ VOCAB = 12
+@@ -41,20 +44,22 @@ def _params(batch_size, temperature=None, top_k=None, top_p=None, **kwargs):
+ 
+ def _sample(logits, drafts, width, params):
+     """What the runner does, from its [batch * width, 1] token ids to the parsed output."""
+-    batch_size = len(drafts)
+-    runner = SimpleNamespace(device=torch.device("cpu"),
++    batch_size, device = len(drafts), params.temperature.device
++    runner = SimpleNamespace(device=device,
+                              arange_np=np.arange(batch_size * width),
+                              input_batch=SimpleNamespace(req_id_to_index={str(i): i for i in range(batch_size)}))
+     runner._get_cumsum_and_arange = lambda *a, **k: HPUModelRunner._get_cumsum_and_arange(runner, *a, **k)
+     scheduled = SimpleNamespace(scheduled_spec_decode_tokens={str(i): d for i, d in enumerate(drafts) if d})
+-    token_ids = torch.tensor([[t] for d in drafts for t in ([0] + d + [0] * width)[:width]], dtype=torch.int32)
++    token_ids = torch.tensor([[t] for d in drafts for t in ([0] + d + [0] * width)[:width]],
++                             dtype=torch.int32,
++                             device=device)
+     logits_indices, metadata = HPUModelRunner._prepare_spec_decode_inputs(runner, scheduled, torch.arange(batch_size),
+                                                                           token_ids, width)
+     if metadata is None:
+         # No drafts at all: not a speculative step
+         return None
+     # The padded rows hold the last row, as after hidden_states[logits_indices]
+-    logits = logits[logits_indices]
++    logits = logits[logits_indices].to(device)
+     width = logits.shape[0] // batch_size
+     out = RejectionSampler(Sampler())(grid_metadata(metadata, width), None, logits.clone(), params)
+     return RejectionSampler.parse_output(out.sampled_token_ids, VOCAB)[0], out.logprobs_tensors
+@@ -172,3 +177,42 @@ def test_logprobs_output_has_a_row_per_token():
+     assert out.slice_request(0, 1).logprob_token_ids.tolist() == [[4]]
+     assert out.slice_request(1, 3).logprob_token_ids.tolist() == [[0], [1], [2]]
+     assert out.slice_request(3, 1).logprob_token_ids.tolist() == [[90]]
++
++
++def _input_batch_params(sampling_params):
++    """The metadata the runner really passes: greedy requests do not have temperature 0 in it."""
++    batch = InputBatch(max_num_reqs=len(sampling_params),
++                       max_model_len=64,
++                       max_num_batched_tokens=64,
++                       device=torch.device(hpu_device_string()),
++                       pin_memory=False,
++                       vocab_size=VOCAB,
++                       block_sizes=[1],
++                       kernel_block_sizes=[1])
++    for i, params in enumerate(sampling_params):
++        batch.add_request(
++            CachedRequestState(req_id=str(i),
++                               prompt_token_ids=[0],
++                               sampling_params=params,
++                               pooling_params=None,
++                               mm_features=[],
++                               block_ids=([], ),
++                               generator=None,
++                               num_computed_tokens=0,
++                               output_token_ids=[]))
++    return batch.make_selective_sampling_metadata([(str(i), []) for i in range(len(sampling_params))])
++
++
++def test_greedy_next_to_sampled_with_the_input_batch_metadata():
++    width, best = 4, 7
++    for mask in (False, True):
++        for top in ({}, {"top_k": 5, "top_p": 0.9}):
++            logits = torch.zeros(4 * width, VOCAB)
++            logits[:, best], logits[:, 3] = 5.0, -9.0
++            if mask:
++                logits[:, [0, 1, 2, 3, 4]] = -float("inf")
++            params = [SamplingParams(temperature=0.8 * (i % 2), **(top if i % 2 else {})) for i in range(4)]
++            tokens, _ = _sample(logits, [[best] * 3, [best] * 3, [best], []], width, _input_batch_params(params))
++            assert tokens[0] == [best] * 4 and tokens[2] == [best] * 2, (mask, top, tokens)
++            if mask:
++                assert not {0, 1, 2, 3, 4} & set(tokens[1] + tokens[3]), (top, tokens)
+diff --git a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+index fbb01f6a..40845231 100644
+--- a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
++++ b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+@@ -40,10 +40,13 @@ def expand_batch_to_tokens(
+     replace_from: int = 0,
+     replace_to: int = 0,
+ ) -> torch.Tensor:
+-    """Replaces the Triton kernel. In the grid layout every request has the same number of rows."""
++    """Replaces the Triton kernel. In the grid layout every request has the same number of rows.
++
++    ``replace_from`` is used for the greedy temperature only, which is <= 0: the HPU input batch stores -1, not 0.
++    """
+     assert num_tokens % x.shape[0] == 0, "expected the grid layout, see grid_metadata"
+     if replace_from != replace_to:
+-        x = x.masked_fill(x == replace_from, replace_to)
++        x = x.masked_fill(x <= replace_from, replace_to)
+     return x.repeat_interleave(num_tokens // x.shape[0])
+ 
+ 
+@@ -75,7 +78,7 @@ def sample_target_tokens(target_logits: torch.Tensor, sampling_metadata: Samplin
+     if sampling_metadata.all_random:
+         return sampled
+     # Chosen on the CPU: torch.where on integer tensors is not reliable on HPU
+-    greedy = (sampling_metadata.temperature.cpu() == GREEDY_TEMPERATURE).repeat_interleave(depth)
++    greedy = (sampling_metadata.temperature.cpu() <= GREEDY_TEMPERATURE).repeat_interleave(depth)
+     return torch.where(greedy, target_logits.argmax(dim=-1).cpu(), sampled)
+ 
+ 
+-- 
+2.43.0
+

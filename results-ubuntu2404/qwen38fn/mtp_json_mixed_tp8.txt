@@ -1,0 +1,122 @@
+# TP=8, structured output and mixed greedy/sampled batches.
+# Run 1: plugin 05f78821 + the uncommitted 0023, WITHOUT 0022 (the greedy sentinel bug).
+#### mtp3 ready=1 15:47:03 plugin 05f78821 changed=2
+mtp3  schema, greedy, alone                      1/1 ok  153.3 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  schema, sampled, alone                     1/1 ok   80.3 s  {'river_1': 'Danube', 'id': 1001, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  schema after thinking                      1/1 ok    2.1 s  {'river_2': 'Danube', 'id': 1002, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  schema with logprobs                       1/1 ok    2.6 s  {'river_3': 'Danube', 'id': 1003, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  16 schemas at once, round 1                8/16 ok  276.1 s  <HTTPError 500: 'Internal Server Error'>
+mtp3  8 schemas + 8 free, round 1                16/16 ok  105.5 s   rough today, and the waves are high.
+The 1870s witnessed the development of the first true modern bicycles.
+It is not a game, it is a serious business.
+The Government of the Democratic Republic of
+mtp3  16 schemas at once, round 2                8/16 ok   13.0 s  <HTTPError 500: 'Internal Server Error'>
+mtp3  8 schemas + 8 free, round 2                15/16 ok   22.7 s  JSONDecodeError("Expecting ',' delimiter: line 1268 column 1 (char 1444)")
+mtp3  16 schemas at once, round 3                8/16 ok   16.1 s  <HTTPError 500: 'Internal Server Error'>
+mtp3  8 schemas + 8 free, round 3                16/16 ok   18.3 s   rough and the wind is strong, but the man is calm.
+mtp3  16 choices                                 16/16 ok  206.3 s  answer-0-blue
+mtp3  16 regexes                                 16/16 ok    6.9 s  2000-04-21
+mtp3  forced tool call                           0/1 ok    0.0 s  <HTTPError 400: 'Bad Request'>
+mtp3  free request afterwards                    1/1 ok    3.1 s   very calm.
+This is what the Lord, the LORD of hosts, says: In this place, in this nation, in all the cities of Egypt, I will bring the sword, famine, and pestilence upon those who go
+errors 0
+Mean acceptance length: 4.00 Mean acceptance length: 1.80 Mean acceptance length: 2.88 Mean acceptance length: 2.53 Mean acceptance length: 2.47 Mean acceptance length: 2.60 Mean acceptance length: 1.00 Mean acceptance length: 2.34 Mean acceptance length: 1.92 Mean acceptance length: 2.85 Mean acceptance length: 4.00 Mean acceptance length: 2.18 Mean acceptance length: 2.52 Mean acceptance length: 2.12 Mean acceptance length: 2.56 Mean acceptance length: 2.22 Mean acceptance length: 3.39 Mean acceptance length: 2.15 Mean acceptance length: 2.84 Mean acceptance length: 2.07 Mean acceptance leng
+cards released
+#### mtp0 ready=1 16:05:50 plugin 05f78821 changed=2
+mtp0  schema, greedy, alone                      1/1 ok  114.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  schema, sampled, alone                     1/1 ok   67.4 s  {'river_1': 'The Danube is the second-longest river…', 'id': 1001, 'countries': ['Germany', 'Austria', 'Hungary']}
+mtp0  schema after thinking                      1/1 ok    2.7 s  {'river_2': 'Danube', 'id': 1002, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  schema with logprobs                       1/1 ok    3.3 s  {'river_3': 'Danube', 'id': 1003, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  16 schemas at once, round 1                16/16 ok   38.5 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 1                16/16 ok   13.7 s   blue, the sky is blue, and you are very beautiful.
+
+<think>
+
+</think>
+
+That is a lovely sentiment! 🌊☁️
+
+While I don’t have a physical form, I’m flattered by the compliment.
+mtp0  16 schemas at once, round 2                16/16 ok   13.0 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 2                16/16 ok   13.1 s   described as a “global commons.” According to scholarly descriptions, what are the three primary ways in which the sea functions as a global commons?
+
+1. **Identify the source statement** – The passage on the sea as a global comm
+mtp0  16 schemas at once, round 3                16/16 ok   14.3 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  8 schemas + 8 free, round 3                16/16 ok   12.6 s   the largest ecosystem on Earth, and marine organisms are rich in resources, and many marine organisms have medicinal value. Marine organisms live in a high salt, high pressure, dark, cold, and relatively closed environment, and t
+mtp0  16 choices                                 16/16 ok    6.3 s  answer-0-blue
+mtp0  16 regexes                                 16/16 ok    5.3 s  2000-01-01
+mtp0  forced tool call                           0/1 ok    0.0 s  <HTTPError 400: 'Bad Request'>
+mtp0  free request afterwards                    1/1 ok    3.6 s   a very important natural resource. We get food, medicines, and other valuable products from the sea. It also plays a crucial role in regulating the Earth's climate and provides recreational opportunities. The sea supports a wide 
+errors 0
+
+cards released
+
+
+# Run 2: 0022 + 0023 (0023 uncommitted at the time, same content). Also checks that every greedy token is the top-1 of its step.
+# The two 15/16 are the test's own rule that a free completion has > 20 characters (' blue.' then EOS).
+# The tool call needs --tool-call-parser, which the serve script does not pass.
+#### mtp3 ready=1 16:20:13 plugin 086289b8 changed=2
+mtp3  schema, greedy, alone                      1/1 ok  150.9 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  schema, sampled, alone                     1/1 ok   74.2 s  {'river_1': 'Danube', 'id': 1001, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  schema after thinking                      1/1 ok    2.1 s  {'river_2': 'Danube', 'id': 1002, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  schema with logprobs                       1/1 ok    2.0 s  {'river_3': 'Danube', 'id': 1003, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp3  16 schemas at once, round 1                16/16 ok  483.4 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  16 schemas, all greedy, round 1            16/16 ok   13.3 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 greedy + 8 sampled free, round 1         16/16 ok   17.0 s  ' the most commonly used environment for aquaculture. The ocean or sea may be used as the entire environment, as a feed source, or as a replacement for freshwater. Sea water is 3.5% salt, and contains about '
+mtp3  4 schema + 4 greedy + 8 sampled, round 1   16/16 ok   16.5 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 schemas + 8 free, round 1                16/16 ok   17.6 s  ' rising, and coastal cities are sinking. Miami, Venice, and Bangkok all face this crisis. But how much can we really do?\n\n<think>\nThe user is asking about sea level rise and coastal city subsidence, mentioning Miami, Venice'
+mtp3  16 schemas at once, round 2                16/16 ok   19.4 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  16 schemas, all greedy, round 2            16/16 ok   17.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 greedy + 8 sampled free, round 2         16/16 ok   15.8 s  ' the largest reservoir of natural radioactivity, and the presence of uranium, potassium-40, and carbon-14, among other radioisotopes, in seawater is well documented. In addition to natural radioactivity, the sea'
+mtp3  4 schema + 4 greedy + 8 sampled, round 2   16/16 ok   16.7 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 schemas + 8 free, round 2                15/16 ok   17.7 s  ["AssertionError(' very blue.')"]
+mtp3  16 schemas at once, round 3                16/16 ok   17.8 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  16 schemas, all greedy, round 3            16/16 ok   17.6 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 greedy + 8 sampled free, round 3         16/16 ok   19.5 s  ' rough.\nThe Committee recommends that the State party amend the relevant legislation to ensure that children in alternative care receive adequate support and assistance and that they are involved in the planning of their care and that the State party ensure that children in residential care'
+mtp3  4 schema + 4 greedy + 8 sampled, round 3   16/16 ok   18.3 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 schemas + 8 free, round 3                16/16 ok   18.3 s  " rising at 3.4 mm per year. That's roughly 10 cm since 1993, and it's accelerating. The IPCC projects 0.3 to 1.0 meters of rise by 21"
+mtp3  16 schemas at once, round 4                16/16 ok   30.5 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  16 schemas, all greedy, round 4            16/16 ok   12.3 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp3  8 greedy + 8 sampled free, round 4         16/16 ok   12.2 s  " the largest ecosystem on our planet. It covers more than 70 percent of the earth's surface and contains 97 percent of the earth's water. The sea is home to more than 230,000 species"
+mtp3  4 schema + 4 greedy + 8 sampled, round 4   15/16 ok   12.8 s  ["AssertionError(' blue.')"]
+mtp3  8 schemas + 8 free, round 4                16/16 ok   14.1 s  ' a vast, wild and mysterious place, and it has been the subject of many stories and legends over the years. One of the most famous stories is that of the Flying Dutchman, a ghost ship that is said to haunt the waters around'
+mtp3  16 choices                                 16/16 ok    8.9 s  'answer-0-blue'
+mtp3  16 regexes                                 16/16 ok   45.6 s  '2000-09-10'
+mtp3  forced tool call                           0/1 ok    0.0 s  ['RuntimeError(\'400 b\\\'{"error":{"message":"tool_choice=function \\\\\\\\"weather\\\\\\\\" requires --tool-call-parser to be set","type":"BadRequestError","param":null,"code":400}}\\\'\')']
+mtp3  free request afterwards                    1/1 ok    3.1 s  " a constant in the life of the poet, who lives by the sea, and for whom the sea is the source of all his poetry.\nI don't want to be a slave.\nThe hotel offers a variety of rooms and suites"
+errors 0
+Mean acceptance length: 2.17 Mean acceptance length: 2.88 Mean acceptance length: 2.71 Mean acceptance length: 2.50 Mean acceptance length: 3.81 Mean acceptance length: 1.94 Mean acceptance length: 2.67 Mean acceptance length: 2.90 Mean acceptance length: 2.75 Mean acceptance length: 2.00 Mean acceptance length: 2.71 Mean acceptance length: 2.39 Mean acceptance length: 2.07 Mean acceptance length: 2.43 Mean acceptance length: 2.27 Mean acceptance length: 2.40 Mean acceptance length: 2.22 Mean acceptance length: 2.72 Mean acceptance length: 2.37 Mean acceptance length: 2.25 Mean acceptance leng
+cards released
+#### mtp0 ready=1 16:42:14 plugin 086289b8 changed=2
+mtp0  schema, greedy, alone                      1/1 ok  114.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  schema, sampled, alone                     1/1 ok   67.8 s  {'river_1': 'The Danube is the second-longest river…', 'id': 1001, 'countries': ['Germany', 'Austria', 'Hungary']}
+mtp0  schema after thinking                      1/1 ok    3.1 s  {'river_2': 'Danube', 'id': 1002, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  schema with logprobs                       1/1 ok    3.2 s  {'river_3': 'Danube', 'id': 1003, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  16 schemas at once, round 1                16/16 ok   40.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  16 schemas, all greedy, round 1            16/16 ok   12.1 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 greedy + 8 sampled free, round 1         16/16 ok   15.9 s  ' a dynamic and dangerous environment. To keep people safe and protect the environment, a comprehensive set of rules and regulations has been established for the marine industry. This includes everything from navigation rules to pollution control.\nThe International Maritime Organization (IMO)'
+mtp0  4 schema + 4 greedy + 8 sampled, round 1   16/16 ok   12.5 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 1                16/16 ok   12.7 s  ' blue, the sky is blue, but the sky is not the sea.'
+mtp0  16 schemas at once, round 2                16/16 ok   13.9 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  16 schemas, all greedy, round 2            16/16 ok   13.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  8 greedy + 8 sampled free, round 2         16/16 ok   14.3 s  ' described as a “common heritage of mankind.” \nWhat are the two principal legal consequences of this characterization, and how does each consequence affect the legal status of the sea and of the resources found within it?\n\n1. **Identify the'
+mtp0  4 schema + 4 greedy + 8 sampled, round 2   16/16 ok   14.6 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 2                16/16 ok   12.8 s  ' the only place where you can find the true essence of the sea.'
+mtp0  16 schemas at once, round 3                16/16 ok   14.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  16 schemas, all greedy, round 3            16/16 ok   10.8 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Hungary', 'Romania']}
+mtp0  8 greedy + 8 sampled free, round 3         16/16 ok   13.0 s  ' a beautiful and dangerous place.\nThe first part of the program is dedicated to the analysis of the current situation on the market and the formation of a strategy for entering the market, the second is the formation of a trading strategy, and the'
+mtp0  4 schema + 4 greedy + 8 sampled, round 3   16/16 ok   14.1 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 3                16/16 ok   12.9 s  " the largest ecosystem in the world. It covers 70% of the earth's surface, but only 5% of it is explored."
+mtp0  16 schemas at once, round 4                16/16 ok   13.1 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  16 schemas, all greedy, round 4            16/16 ok   11.2 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 greedy + 8 sampled free, round 4         16/16 ok   13.1 s  ' a great teacher, and its lessons are often harsh but invaluable. The sea is not a place for the weak, the timid, or the unprepared. It demands respect, humility, and a deep understanding of its power. It is a'
+mtp0  4 schema + 4 greedy + 8 sampled, round 4   16/16 ok   14.5 s  {'river_0': 'Danube', 'id': 1000, 'countries': ['Germany', 'Austria', 'Slovakia', 'Hungary']}
+mtp0  8 schemas + 8 free, round 4                16/16 ok   13.3 s  ' rough and the boat is rocking.\nThe 12 Best Hotels in Wexford\nIt is therefore possible that the Commission will have to reconsider the question.\nIt was also the first time that the euro had been used as a'
+mtp0  16 choices                                 16/16 ok    7.0 s  'answer-0-blue'
+mtp0  16 regexes                                 16/16 ok    6.0 s  '2000-12-13'
+mtp0  forced tool call                           0/1 ok    0.0 s  ['RuntimeError(\'400 b\\\'{"error":{"message":"tool_choice=function \\\\\\\\"weather\\\\\\\\" requires --tool-call-parser to be set","type":"BadRequestError","param":null,"code":400}}\\\'\')']
+mtp0  free request afterwards                    1/1 ok    4.2 s  ' a harsh environment for metals, with saltwater, humidity, and temperature fluctuations all contributing to rapid corrosion. To protect metal surfaces in marine environments, a robust anti-corrosion paint is essential. This article will explore the best anti-corros'
+errors 0
+
+cards released
+

@@ -523,7 +523,7 @@ To-do, in working order:
             without it. No extra repetition (the one new looping prompt also loops on fused MoE without MTP). The high
             acceptance is the prompts: launch 8 already accepted 70.8% on them with 1 and 4 users. Limit: after a
             prompt's first difference nothing is compared.
-    - [ ] **MTP is not servable yet (JSON schema crashes it). The plugin's HPU rejection sampler (`v1/sample/hpu_rejection_sampler.py`).** Found by
+    - [ ] **The plugin's HPU rejection sampler (`v1/sample/hpu_rejection_sampler.py`).** Found by
           reading it, reproduced on CPU with the real code, fixed by 0019:
           1. `assert sampling_metadata.all_greedy`: any request with temperature > 0 raises in the workers. This model's
              default is temperature 1.0, so that includes a plain chat request. **Every MTP result above is temperature 0.**
@@ -533,7 +533,7 @@ To-do, in working order:
              mismatch): right tokens, fewer per step. The 16-user speeds above include that loss.
           **Fix 0019 (exported)**, on
           the cards at TP=8, one launch each (`mtp_sampling_tp8.txt`):
-          - works (except mixed batches, see KNOWN BUG below): chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
+          - works (mixed batches only since 0022, see below): chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
             requests at once. Logprobs agree with the non-MTP run as closely as that run agrees with itself (top-2 margin
             difference 0.20 vs 0.21 mean), prompt logprobs vs deb-ai as without MTP. Greedy: 9/16 and 3/16 identical
             (1 and 16 users), largest flips 0.4375 and 0.75, the latter what switching the MoE path does without MTP.
@@ -541,9 +541,9 @@ To-do, in working order:
             greedy only. Greedy was 29.4 tok/s in this launch (31.8-32.6 in the A/B before 0019), cause not known yet.
           - the sampled distribution, open at first (960 completions, p = 0.03-0.04 for tokens 2-4), was the stock
             sampler's bias, see the next item. Correct since 0020.
-          - **still crashes: structured output (JSON schema)**, `UnboundLocalError: sampling_metadata`. The plugin's
-            structured-output path does not handle speculative decoding.
-    - [ ] **All sampled output on this stack is biased, with or without MTP: `Tensor.exponential_` on HPU.** Found while
+          - structured output (JSON schema) still crashed with 0019 (`UnboundLocalError: sampling_metadata`). Fixed by
+            0023, see below.
+    - [x] **All sampled output on this stack was biased until 0020, with or without MTP: `Tensor.exponential_` on HPU.** Found while
           testing 0019 against exact probabilities (`results-ubuntu2404/hpu-exponential-sampling-bias.txt`, one card).
           The values have the right marginal distribution but are not independent within a row, and vLLM samples with
           `argmax(probs / exponential noise)`. In a test distribution the compiled stock sampler was off by TVD
@@ -552,12 +552,25 @@ To-do, in working order:
           (p = 0.34, 0.94; all rejection-step positions p >= 0.57; seeded 0.69 over 72000 draws), and two cards still
           draw identical tokens from one seed, which TP needs. Greedy results are not affected. Not checked: lazy mode,
           other Gaudi software versions. Not reported upstream.
-    - [ ] **KNOWN BUG in 0019-0021, do not use MTP with mixed traffic: wrong output without any error.** When greedy and
-          sampled requests share a batch with MTP, the greedy ones get negated logits and emit the least likely tokens
-          (token 0 under a grammar). The runner marks greedy requests with temperature -1; 0019 and its unit test
-          assumed 0. Reproduced on CPU with the real rejection sampler. My "16 mixed requests" check only looked at
-          HTTP success and logprob signs, so "works" below was wrong for that case. All-greedy and all-sampled batches
-          (every equality, distribution and speed result) and serving without MTP are not affected. Fix in progress.
+    - [x] **0022: a bug I introduced in 0019, wrong output without any error.** Anyone on 0019-0021 with MTP needs 0022.
+          When greedy and sampled requests shared a batch with MTP, the greedy ones got negated logits and emitted the
+          least likely tokens (token 0 under a grammar). The runner marks greedy requests with temperature -1; 0019 and
+          its unit test assumed 0, and my "16 mixed requests" check only looked at HTTP success and logprob signs.
+          All-greedy and all-sampled batches (every equality, distribution and speed result) and serving without MTP
+          were not affected. The test now uses the real input batch and failed before the fix on one card.
+    - [x] **0023: structured output with MTP** (`results-ubuntu2404/qwen38fn/mtp_json_mixed_tp8.txt`, TP=8, a different
+          schema per request). It fixes the crash and the mask layout: the scheduler sends k+1 masks per request, the
+          plugin read them as compact rows, which puts masks on wrong requests when several use a grammar.
+          - with 0022+0023: 128/128 schemas in the all-schema rounds, choices and regexes 16/16, logprobs, thinking,
+            mixed batches; no grammar rejects; every checked greedy token is the top-1 of its step.
+          - Without 0022: 8 of 16 concurrent schemas failed each round.
+          - Once, in that run, a sampled request in an all-sampled batch returned unfinished JSON. Not seen in the rerun,
+            cause not known.
+          - Forced tool calls are untested: the serve script has no `--tool-call-parser` (400 with and without MTP).
+          - Slower than no MTP for concurrent schemas: 16 at once took 17.8-30.5 s vs 13.1-14.2 s (warm rounds).
+          - Limits: TP only. With deferred scheduling (PP, async) the scheduler pads drafts with -1, which the HPU
+            rejection sampler still treats as padding: to fix before MTP at PP=8. When all drafts are trimmed, the
+            proposer returns dummy drafts for that step.
     - [x] **0019-0021 on the full server (TP=8): sampling is now correct in every check for all-sampled batches**
           (`results-ubuntu2404/qwen38fn/mtp_sampling_dist2_tp8.txt`; 6400 completions per launch, each token against
           the probabilities of its own step; 4 non-trivial checks per launch).
