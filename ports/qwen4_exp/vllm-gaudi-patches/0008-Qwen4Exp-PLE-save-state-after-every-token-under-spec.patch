@@ -1,0 +1,195 @@
+From 569aa20546490154d187c70fcb1fc0bc9d1d8c83 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 03:31:41 +0000
+Subject: [PATCH] Qwen4Exp PLE: save state after every token under speculative
+ decode
+
+When the runner passes one store slot per token, the PLE layer writes its conv
+history and n-gram context after each token, so that rejected drafts can be
+rewound. One slot per sequence behaves as before. Tested on CPU.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../ops/test_qwen4_exp_ple_rewind.py          | 88 +++++++++++++++++++
+ vllm_gaudi/models/qwen4_exp.py                | 32 +++++--
+ 2 files changed, 113 insertions(+), 7 deletions(-)
+ create mode 100644 tests/unit_tests/ops/test_qwen4_exp_ple_rewind.py
+
+diff --git a/tests/unit_tests/ops/test_qwen4_exp_ple_rewind.py b/tests/unit_tests/ops/test_qwen4_exp_ple_rewind.py
+new file mode 100644
+index 00000000..3663977f
+--- /dev/null
++++ b/tests/unit_tests/ops/test_qwen4_exp_ple_rewind.py
+@@ -0,0 +1,88 @@
++# SPDX-License-Identifier: Apache-2.0
++"""CPU test: the Qwen4Exp PLE state survives rejected speculative tokens (real _ple_prepare and layer forward)."""
++
++from __future__ import annotations
++
++import math
++import types
++
++import pytest
++import torch
++from torch import nn
++
++from vllm_gaudi.models import qwen4_exp as Q
++
++H, HC, EMB, NGRAM, KERNEL, VOCAB = 8, 2, 12, 4, 3, 50
++
++
++def _build(slots, gen):
++    cfg = types.SimpleNamespace(ngram_size=NGRAM,
++                                heads_per_ngram=2,
++                                eos_token_id=1,
++                                ngram_vocab_size_base=101,
++                                make_ngram_vocab_size_divisible_by=8,
++                                vocab_size=VOCAB,
++                                seed=0)
++    hasher = Q.NGramHasher(cfg, 0)
++    weight = torch.randn(hasher.padded_vocab, EMB // hasher.num_heads, generator=gen)
++    table = types.SimpleNamespace(tp=1, host=False)
++
++    class Table:
++        tp, host = table.tp, table.host
++
++        def __call__(self, ids):
++            return weight[ids.long()].to(torch.bfloat16)
++
++    ple = Q.HpuPLELayer.__new__(Q.HpuPLELayer)
++    nn.Module.__init__(ple)
++    ple.H, ple.hc, ple.kernel, ple.dil, ple.ple_slot = H, HC, KERNEL, NGRAM, 0
++    ple.state_len = (KERNEL - 1) * NGRAM
++    ple.ctx = hasher.ctx
++    ple.hist_f32 = (ple.state_len * H * HC + 1) // 2
++    ple.state_numel = ple.hist_f32 + ple.ctx
++    ple.cache_group_idx = None
++    ple.ple_embedding = types.SimpleNamespace(ngram_embedding=Table())
++    ple.key_proj, ple.value_proj = nn.Linear(EMB, H * HC, bias=False), nn.Linear(EMB, H, bias=False)
++    for name in ("norm_key", "norm_query", "norm_conv"):
++        setattr(ple, name, Q.GroupedGemmaRMSNorm(H * HC, H, 1e-6))
++    ple.conv1d = nn.Conv1d(H * HC, H * HC, KERNEL, groups=H * HC, dilation=NGRAM, bias=False)
++    for p in ple.parameters():
++        p.data = (torch.randn(p.shape, generator=gen) / math.sqrt(H)).to(torch.bfloat16)
++    ple.kv_cache = (None, torch.zeros(slots, ple.state_numel))
++    model = types.SimpleNamespace(ple_hasher=Q.MultiNGramHasher([hasher]), ple_layers=[ple])
++    return model, ple
++
++
++def _step(monkeypatch, model, ple, ids, hidden, load, store):
++    md = types.SimpleNamespace(is_prompt=False, load_indices_tensor=load, store_indices_tensor=store)
++    monkeypatch.setattr(Q, "get_forward_context", lambda: types.SimpleNamespace(attn_metadata=md))
++    ple_in = Q.HpuQwen4ExpModel._ple_prepare(model, ids)
++    return Q.HpuPLELayer.forward(ple, hidden, ple_in)
++
++
++@pytest.mark.parametrize("n", [1, 3])
++@pytest.mark.parametrize("length", [1, 2, 4])
++@pytest.mark.parametrize("seed", [0, 1, 2, 3])
++def test_rejected_drafts_leave_no_trace(monkeypatch, n, length, seed):
++    monkeypatch.setattr(Q, "_PLE_COMPILE", False)
++    gen = torch.Generator().manual_seed(seed)
++    model, ple = _build(1 + 2 * n + n * length, gen)  # slot 0 is the null block
++    ref_slot = torch.arange(1, n + 1)
++    store = torch.arange(2 * n + 1, 2 * n + 1 + n * length).view(n, length)
++    load = torch.arange(n + 1, 2 * n + 1)  # zero-filled, like ref_slot
++    for _ in range(25):
++        ids = torch.randint(0, VOCAB, (n * length, ), generator=gen)
++        hidden = torch.randn(n * length, H * HC, generator=gen).to(torch.bfloat16)
++        out = _step(monkeypatch, model, ple, ids, hidden, load, store.flatten())
++        accepted = torch.randint(1, length + 1, (n, ), generator=gen)
++        for i in range(n):
++            for j in range(int(accepted[i])):
++                t = i * length + j
++                slot = ref_slot[i:i + 1]
++                ref = _step(monkeypatch, model, ple, ids[t:t + 1], hidden[t:t + 1], slot, slot)
++                torch.testing.assert_close(out[t], ref[0], rtol=2e-2, atol=2e-2)
++        load = store.gather(1, (accepted - 1).view(-1, 1)).squeeze(1)
++        kept, want = ple.kv_cache[1][load], ple.kv_cache[1][ref_slot]
++        assert torch.equal(kept[:, ple.hist_f32:], want[:, ple.hist_f32:]), "n-gram context tokens differ"
++        hist = [r[:, :ple.hist_f32].contiguous().view(torch.bfloat16).float() for r in (kept, want)]
++        torch.testing.assert_close(hist[0], hist[1], rtol=2e-2, atol=2e-2)
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index a0da8c1c..1be1ec45 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -403,11 +403,16 @@ class HpuPLELayer(MambaBase, nn.Module):
+ 
+         # ---- write back state (last state_len valid positions + last ctx token ids)
+         if store is not None:
+-            gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=hidden.device).view(1, -1)  # into xp
+-            new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
+-            hist_bf16 = new_hist.reshape(n, -1).to(torch.bfloat16)
++            if _saves_every_token(store, n, L):  # the window that ends at each token
++                new_hist = torch.stack([xp[:, j + 1:j + 1 + self.state_len] for j in range(L)], dim=1)
++                rows = n * L
++            else:
++                gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=hidden.device).view(1, -1)
++                new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
++                rows = n
++            hist_bf16 = new_hist.reshape(rows, -1).to(torch.bfloat16)
+             if hist_bf16.shape[1] % 2:
+-                hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(n, 1)], dim=1)
++                hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(rows, 1)], dim=1)
+             new_rows = torch.cat([hist_bf16.contiguous().view(torch.float32), ple_in.new_tok], dim=1)
+             st = self.kv_cache[1].view(self.kv_cache[1].shape[0], -1)
+             st[:, :self.state_numel].index_copy_(0, store.long(), new_rows.to(st.dtype))
+@@ -448,10 +453,16 @@ class MultiNGramHasher:
+         return torch.cat(blocks, dim=-1)[:, -tokens.shape[0]:]
+ 
+ 
++def _saves_every_token(store: Optional[torch.Tensor], n: int, length: int) -> bool:
++    """Speculative decode: the runner passes one store slot per token, flat [n * L], so that rejected drafts can be
++    rewound by loading the last kept token's slot. Otherwise there is one slot per sequence."""
++    return store is not None and length > 1 and store.numel() == n * length
++
++
+ class PLEStepInputs(NamedTuple):
+     ids: torch.Tensor  # [P, T, num_heads] int32 n-gram ids for every PLE layer
+     lens: torch.Tensor  # [n] valid tokens per sequence (long)
+-    new_tok: torch.Tensor  # [n, ctx] fp32 last ctx token ids, written into every PLE state slot
++    new_tok: torch.Tensor  # [n or n * L, ctx] fp32 last ctx token ids (after every token under spec decode)
+     valid: Optional[torch.Tensor]  # [n, L] bool prompt padding mask, or None
+     emb: Optional[torch.Tensor] = None  # [P, T, num_heads, head_dim] rows gathered on the host (host-mode table)
+ 
+@@ -534,6 +545,7 @@ class HpuQwen4ExpModel(nn.Module):
+         T = ids_flat.shape[0]
+         md = get_forward_context().attn_metadata
+         valid = None
++        every_token = False
+         if md is None or p0.kv_cache is None:  # profiling / dummy run
+             n = 1
+             ctx_cpu = torch.full((1, hs.ctx), hs.eos, dtype=torch.long)
+@@ -558,6 +570,8 @@ class HpuQwen4ExpModel(nn.Module):
+                 ctx_cpu, lens = packed[:, :-1].round().long(), packed[:, -1].long().tolist()
+             else:
+                 ctx_cpu, lens = tok.cpu().round().long(), [L] * n
++            if not is_prompt:
++                every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
+         if _PLE_TIMING:
+             t = _ple_tick("state_to_cpu", t)
+         L = T // n
+@@ -565,13 +579,17 @@ class HpuQwen4ExpModel(nn.Module):
+         if _PLE_TIMING:
+             t = _ple_tick("ids_to_cpu", t)
+         all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
+-        new_tok = torch.empty(n, hs.ctx, dtype=torch.float32)
++        new_tok = torch.empty(n * L if every_token else n, hs.ctx, dtype=torch.float32)
+         for i in range(n):
+             nv = int(lens[i])
+             toks = ids_cpu[i * L:i * L + nv]
+             if nv > 0:  # warmup pads with all-padding sequences
+                 all_ids[:, i * L:i * L + nv] = hs.ids(toks, ctx_cpu[i]).to(torch.int32)
+-            new_tok[i] = torch.cat([ctx_cpu[i], toks])[-hs.ctx:].to(torch.float32)
++            seen = torch.cat([ctx_cpu[i], toks])
++            if every_token:
++                new_tok[i * L:(i + 1) * L] = seen.unfold(0, hs.ctx, 1)[1:].to(torch.float32)
++            else:
++                new_tok[i] = seen[-hs.ctx:].to(torch.float32)
+         if _PLE_TIMING:
+             t = _ple_tick("hash", t)
+         emb = None
+-- 
+2.43.0
+

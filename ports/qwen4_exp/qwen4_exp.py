@@ -403,11 +403,16 @@ class HpuPLELayer(MambaBase, nn.Module):
 
         # ---- write back state (last state_len valid positions + last ctx token ids)
         if store is not None:
-            gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=hidden.device).view(1, -1)  # into xp
-            new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
-            hist_bf16 = new_hist.reshape(n, -1).to(torch.bfloat16)
+            if _saves_every_token(store, n, L):  # the window that ends at each token
+                new_hist = torch.stack([xp[:, j + 1:j + 1 + self.state_len] for j in range(L)], dim=1)
+                rows = n * L
+            else:
+                gather = ple_in.lens.view(-1, 1) + torch.arange(self.state_len, device=hidden.device).view(1, -1)
+                new_hist = torch.gather(xp, 1, gather.unsqueeze(-1).expand(-1, -1, hc_hidden))
+                rows = n
+            hist_bf16 = new_hist.reshape(rows, -1).to(torch.bfloat16)
             if hist_bf16.shape[1] % 2:
-                hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(n, 1)], dim=1)
+                hist_bf16 = torch.cat([hist_bf16, hist_bf16.new_zeros(rows, 1)], dim=1)
             new_rows = torch.cat([hist_bf16.contiguous().view(torch.float32), ple_in.new_tok], dim=1)
             st = self.kv_cache[1].view(self.kv_cache[1].shape[0], -1)
             st[:, :self.state_numel].index_copy_(0, store.long(), new_rows.to(st.dtype))
@@ -448,10 +453,16 @@ class MultiNGramHasher:
         return torch.cat(blocks, dim=-1)[:, -tokens.shape[0]:]
 
 
+def _saves_every_token(store: Optional[torch.Tensor], n: int, length: int) -> bool:
+    """Speculative decode: the runner passes one store slot per token, flat [n * L], so that rejected drafts can be
+    rewound by loading the last kept token's slot. Otherwise there is one slot per sequence."""
+    return store is not None and length > 1 and store.numel() == n * length
+
+
 class PLEStepInputs(NamedTuple):
     ids: torch.Tensor  # [P, T, num_heads] int32 n-gram ids for every PLE layer
     lens: torch.Tensor  # [n] valid tokens per sequence (long)
-    new_tok: torch.Tensor  # [n, ctx] fp32 last ctx token ids, written into every PLE state slot
+    new_tok: torch.Tensor  # [n or n * L, ctx] fp32 last ctx token ids (after every token under spec decode)
     valid: Optional[torch.Tensor]  # [n, L] bool prompt padding mask, or None
     emb: Optional[torch.Tensor] = None  # [P, T, num_heads, head_dim] rows gathered on the host (host-mode table)
 
@@ -534,6 +545,7 @@ class HpuQwen4ExpModel(nn.Module):
         T = ids_flat.shape[0]
         md = get_forward_context().attn_metadata
         valid = None
+        every_token = False
         if md is None or p0.kv_cache is None:  # profiling / dummy run
             n = 1
             ctx_cpu = torch.full((1, hs.ctx), hs.eos, dtype=torch.long)
@@ -558,6 +570,8 @@ class HpuQwen4ExpModel(nn.Module):
                 ctx_cpu, lens = packed[:, :-1].round().long(), packed[:, -1].long().tolist()
             else:
                 ctx_cpu, lens = tok.cpu().round().long(), [L] * n
+            if not is_prompt:
+                every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
         if _PLE_TIMING:
             t = _ple_tick("state_to_cpu", t)
         L = T // n
@@ -565,13 +579,17 @@ class HpuQwen4ExpModel(nn.Module):
         if _PLE_TIMING:
             t = _ple_tick("ids_to_cpu", t)
         all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
-        new_tok = torch.empty(n, hs.ctx, dtype=torch.float32)
+        new_tok = torch.empty(n * L if every_token else n, hs.ctx, dtype=torch.float32)
         for i in range(n):
             nv = int(lens[i])
             toks = ids_cpu[i * L:i * L + nv]
             if nv > 0:  # warmup pads with all-padding sequences
                 all_ids[:, i * L:i * L + nv] = hs.ids(toks, ctx_cpu[i]).to(torch.int32)
-            new_tok[i] = torch.cat([ctx_cpu[i], toks])[-hs.ctx:].to(torch.float32)
+            seen = torch.cat([ctx_cpu[i], toks])
+            if every_token:
+                new_tok[i * L:(i + 1) * L] = seen.unfold(0, hs.ctx, 1)[1:].to(torch.float32)
+            else:
+                new_tok[i] = seen[-hs.ctx:].to(torch.float32)
         if _PLE_TIMING:
             t = _ple_tick("hash", t)
         emb = None

@@ -442,7 +442,7 @@ To-do, in working order:
     NotImplementedError for speculative decoding. A KV cache rewinds by position; GDN and PLE state do not.
     Design: 1 + num_spec state slots per request, save after every token, resume from the last kept token's slot.
     - [x] GDN conv + SSM ops for this (`hpu_gdn_spec_decode.py`, patch 0007): 24/24 CPU cases, random rejections.
-    - [ ] The same for the PLE conv history and n-gram context tokens.
+    - [x] The same for the PLE conv history and n-gram context tokens (patch 0008): 24/24 CPU cases.
     - [ ] Runner: 1 + num_spec slots per request (load = last kept, store = one per token), and the compact GDN slots.
     - [ ] Target model: return the pre-mixer streams. Proposer: feed each draft step the previous step's streams
           (today it takes only a single hidden stream and reuses the target's hidden states for the later steps).
