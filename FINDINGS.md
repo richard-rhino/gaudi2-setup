@@ -391,6 +391,12 @@ The commit message of 3328934 ("runs correctly") and the file name `*first-corre
 
 Speed of that first eager run: 0.14 tok/s.
 
+### TP=8 re-test after the port 8 fix (section 17), 2026-11-22
+Qwen3.8-Flash-Next, TP=8 PP=1, gather MoE, single user, 256 tokens: **27.7-29.7 tok/s on 9 of 9 warm runs** (median
+28.4), TTFT 0.22-0.31 s, 0 port 9 link-downs. Raw: `results-ubuntu2404/qwen38fn/single_user_tp8_port8fix_gather.txt`.
+The old 2.6-3.4 tok/s at TP=8 was measured with the fused MoE and the uncompiled PLE layer as well as the flapping
+links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single user.
+
 ## 21. Next steps
 - Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill
   shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
