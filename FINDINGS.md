@@ -402,9 +402,7 @@ links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single u
 To-do, in working order:
 - [ ] **TP=8 soak** (16 users, 20 min) after the port 8 fix, then the same single-user test with the gather MoE off, to
       separate the link fix from the MoE speed-up.
-- [ ] **DeepSeek-V4.1-Flash** (section 20): run `compare_modes.py` with the static-shape attention (speed, and whether
-      each speed-up changes the output), then compare logprobs with rack-n03.
-- [ ] **Qwen3.8-Flash-Next MTP** (requested 2026-11-22). All Gaudi numbers so far are without it; deb-ai gets 2.4-2.6
+- [ ] **Qwen3.8-Flash-Next MTP** (requested 2026-11-22, ahead of DeepSeek). All Gaudi numbers so far are without it; deb-ai gets 2.4-2.6
       tokens per step with it. Scope, from reading the code (nothing run yet):
   - The checkpoint has the head (31 `mtp.*` tensors); `qwen4_exp.py` drops them today (`"mtp.": None`).
   - Port upstream `vllm/models/qwen4_exp/nvidia/mtp.py` (508 lines) to the HPU layers and register `Qwen4ExpMTP`.
@@ -415,6 +413,8 @@ To-do, in working order:
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
     single and 16 users.
+- [ ] **DeepSeek-V4.1-Flash** (section 20): run `compare_modes.py` with the static-shape attention (speed, and whether
+      each speed-up changes the output), then compare logprobs with rack-n03.
 - [ ] Qwen: warm up the common prefill shapes (a new prompt length compiles for 1-4 minutes); keep the PLE context
       tokens on the host.
 - [ ] Check the port 8 fix across a reboot.
