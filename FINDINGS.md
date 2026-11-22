@@ -523,6 +523,14 @@ To-do, in working order:
             without it. No extra repetition (the one new looping prompt also loops on fused MoE without MTP). The high
             acceptance is the prompts: launch 8 already accepted 70.8% on them with 1 and 4 users. Limit: after a
             prompt's first difference nothing is compared.
+    - [ ] **MTP is not servable yet: the plugin's HPU rejection sampler (`v1/sample/hpu_rejection_sampler.py`).** Found by
+          reading it, reproduced on CPU with the real code, not yet sent to the cards:
+          1. `assert sampling_metadata.all_greedy`: any request with temperature > 0 raises in the workers. This model's
+             default is temperature 1.0, so that includes a plain chat request. **Every MTP result above is temperature 0.**
+          2. Logprobs: token ids are left on the CPU (the crash of launch 4), the runner drops the spec-decode logprobs,
+             and in a padded batch they would be read from other requests' rows (the vendored code expects compact rows).
+          3. In a padded batch a request whose drafts were all accepted loses its bonus token (the padding counts as a
+             mismatch): right tokens, fewer per step. The 16-user speeds above include that loss.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
