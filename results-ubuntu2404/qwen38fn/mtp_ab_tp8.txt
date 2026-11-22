@@ -1,0 +1,178 @@
+# TP=8 MTP A/B, plugin 9ad4aeb4, start 06:52:47
+## launch 1 mtp=0 ready=1 06:55:47
+single cold: run 0: TTFT 104.65 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.3 tok/s
+single cold: run 1: TTFT 65.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+single cold: run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.6 tok/s
+single warm1: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.2 tok/s
+single warm1: run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+single warm1: run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+single warm2: run 0: TTFT 0.36 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.4 tok/s
+single warm2: run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.5 tok/s
+single warm2: run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+single warm3: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+single warm3: run 1: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+single warm3: run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+spec counters after-single: 
+real16 cold: 38.4 tok/s (48/48 ok, 9204 tokens, 239.6 s)
+real16 cold2: 173.9 tok/s (48/48 ok, 9215 tokens, 53.0 s)
+real16 warm1: 181.6 tok/s (48/48 ok, 9094 tokens, 50.1 s)
+real16 warm2: 182.2 tok/s (48/48 ok, 8928 tokens, 49.0 s)
+spec counters after-real16: 
+random16 cold: Successful requests:                     32        
+random16 cold: Failed requests:                         0         
+random16 cold: Output token throughput (tok/s):         38.90     
+random16 cold: P50 TTFT (ms):                           55471.15  
+random16 cold: P99 TTFT (ms):                           174430.62 
+random16 cold: P50 TPOT (ms):                           75.44     
+random16 cold: P99 TPOT (ms):                           320.10    
+random16 cold: P50 ITL (ms):                            58.74     
+random16 cold: P99 ITL (ms):                            703.40    
+random16 warm1: Successful requests:                     96        
+random16 warm1: Failed requests:                         0         
+random16 warm1: Output token throughput (tok/s):         203.85    
+random16 warm1: P50 TTFT (ms):                           1990.50   
+random16 warm1: P99 TTFT (ms):                           5435.12   
+random16 warm1: P50 TPOT (ms):                           70.75     
+random16 warm1: P99 TPOT (ms):                           78.88     
+random16 warm1: P50 ITL (ms):                            59.14     
+random16 warm1: P99 ITL (ms):                            658.62    
+random16 warm2: Successful requests:                     96        
+random16 warm2: Failed requests:                         0         
+random16 warm2: Output token throughput (tok/s):         205.06    
+random16 warm2: P50 TTFT (ms):                           2005.18   
+random16 warm2: P99 TTFT (ms):                           5394.66   
+random16 warm2: P50 TPOT (ms):                           70.35     
+random16 warm2: P99 TPOT (ms):                           76.93     
+random16 warm2: P50 ITL (ms):                            58.54     
+random16 warm2: P99 ITL (ms):                            655.97    
+spec counters after-random16: 
+errors 0
+## launch 2 mtp=3 ready=1 07:19:18
+single cold: run 0: TTFT 110.34 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 8.6 tok/s
+single cold: run 1: TTFT 75.93 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 33.8 tok/s
+single cold: run 2: TTFT 0.25 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 34.2 tok/s
+single warm1: run 0: TTFT 0.28 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.9 tok/s
+single warm1: run 1: TTFT 0.28 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 32.6 tok/s
+single warm1: run 2: TTFT 0.23 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 33.6 tok/s
+single warm2: run 0: TTFT 0.34 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 38.1 tok/s
+single warm2: run 1: TTFT 0.23 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 32.4 tok/s
+single warm2: run 2: TTFT 0.24 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.3 tok/s
+single warm3: run 0: TTFT 0.30 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 37.7 tok/s
+single warm3: run 1: TTFT 0.33 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.7 tok/s
+single warm3: run 2: TTFT 0.30 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.5 tok/s
+spec counters after-single: 3564.0 1884.0 
+real16 cold: 14.2 tok/s (48/48 ok, 9853 tokens, 693.0 s)
+real16 cold2: 151.8 tok/s (48/48 ok, 9279 tokens, 61.1 s)
+real16 warm1: 157.6 tok/s (48/48 ok, 9078 tokens, 57.6 s)
+real16 warm2: 166.9 tok/s (48/48 ok, 10494 tokens, 62.9 s)
+spec counters after-real16: 39636.0 28597.0 
+random16 cold: Successful requests:                     32        
+random16 cold: Failed requests:                         0         
+random16 cold: Output token throughput (tok/s):         13.42     
+random16 cold: P50 TTFT (ms):                           56758.57  
+random16 cold: P99 TTFT (ms):                           472065.20 
+random16 cold: P50 TPOT (ms):                           279.75    
+random16 cold: P99 TPOT (ms):                           1678.74   
+random16 cold: P50 ITL (ms):                            220.41    
+random16 cold: P99 ITL (ms):                            45077.91  
+random16 warm1: Successful requests:                     96        
+random16 warm1: Failed requests:                         0         
+random16 warm1: Output token throughput (tok/s):         112.89    
+random16 warm1: P50 TTFT (ms):                           720.19    
+random16 warm1: P99 TTFT (ms):                           6961.76   
+random16 warm1: P50 TPOT (ms):                           97.60     
+random16 warm1: P99 TPOT (ms):                           268.15    
+random16 warm1: P50 ITL (ms):                            215.38    
+random16 warm1: P99 ITL (ms):                            688.65    
+random16 warm2: Successful requests:                     96        
+random16 warm2: Failed requests:                         0         
+random16 warm2: Output token throughput (tok/s):         134.46    
+random16 warm2: P50 TTFT (ms):                           719.21    
+random16 warm2: P99 TTFT (ms):                           7505.49   
+random16 warm2: P50 TPOT (ms):                           101.99    
+random16 warm2: P99 TPOT (ms):                           198.50    
+random16 warm2: P50 ITL (ms):                            223.62    
+random16 warm2: P99 ITL (ms):                            699.13    
+spec counters after-random16: 111192.0 62098.0 
+errors 0
+## launch 3 mtp=3 ready=1 08:00:08
+single cold: run 0: TTFT 113.73 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 8.4 tok/s
+single cold: run 1: TTFT 71.83 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 30.7 tok/s
+single cold: run 2: TTFT 0.26 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 31.8 tok/s
+single warm1: run 0: TTFT 0.31 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.8 tok/s
+single warm1: run 1: TTFT 0.26 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 32.1 tok/s
+single warm1: run 2: TTFT 0.25 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 31.5 tok/s
+single warm2: run 0: TTFT 0.33 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.8 tok/s
+single warm2: run 1: TTFT 0.27 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.3 tok/s
+single warm2: run 2: TTFT 0.26 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.0 tok/s
+single warm3: run 0: TTFT 0.32 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.5 tok/s
+single warm3: run 1: TTFT 0.25 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 32.2 tok/s
+single warm3: run 2: TTFT 0.24 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 33.1 tok/s
+spec counters after-single: 3564.0 1884.0 
+real16 cold: 13.7 tok/s (48/48 ok, 9941 tokens, 724.3 s)
+real16 cold2: 130.8 tok/s (48/48 ok, 9477 tokens, 72.4 s)
+real16 warm1: 128.2 tok/s (48/48 ok, 9924 tokens, 77.4 s)
+real16 warm2: 130.3 tok/s (48/48 ok, 10224 tokens, 78.5 s)
+spec counters after-real16: 40233.0 29253.0 
+errors 0
+## launch 4 mtp=0 ready=1 08:24:42
+single cold: run 0: TTFT 110.55 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 11.7 tok/s
+single cold: run 1: TTFT 66.95 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.5 tok/s
+single cold: run 2: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.5 tok/s
+single warm1: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.0 tok/s
+single warm1: run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.3 tok/s
+single warm1: run 2: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+single warm2: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.2 tok/s
+single warm2: run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.2 tok/s
+single warm2: run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.9 tok/s
+single warm3: run 0: TTFT 0.33 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.3 tok/s
+single warm3: run 1: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.1 tok/s
+single warm3: run 2: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+spec counters after-single: 
+real16 cold: 35.5 tok/s (48/48 ok, 8945 tokens, 252.1 s)
+real16 cold2: 164.1 tok/s (48/48 ok, 9504 tokens, 57.9 s)
+real16 warm1: 175.9 tok/s (48/48 ok, 9177 tokens, 52.2 s)
+real16 warm2: 176.0 tok/s (48/48 ok, 9042 tokens, 51.4 s)
+spec counters after-real16: 
+errors 0
+## launch 5 mtp=0 ready=1 08:40:29
+single cold: run 0: TTFT 106.68 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.0 tok/s
+single cold: run 1: TTFT 62.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.6 tok/s
+single cold: run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+single warm1: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+single warm1: run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.9 tok/s
+single warm1: run 2: TTFT 0.32 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.2 tok/s
+single warm2: run 0: TTFT 0.31 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.9 tok/s
+single warm2: run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.2 tok/s
+single warm2: run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.6 tok/s
+single warm3: run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+single warm3: run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.1 tok/s
+single warm3: run 2: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+spec counters after-single: 
+real16 cold: 37.7 tok/s (48/48 ok, 9317 tokens, 246.9 s)
+real16 cold2: 182.0 tok/s (48/48 ok, 9707 tokens, 53.3 s)
+real16 warm1: 198.6 tok/s (48/48 ok, 9461 tokens, 47.6 s)
+real16 warm2: 183.8 tok/s (48/48 ok, 8882 tokens, 48.3 s)
+spec counters after-real16: 
+errors 0
+## launch 6 mtp=3 ready=1 08:55:52
+single cold: run 0: TTFT 117.24 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 8.7 tok/s
+single cold: run 1: TTFT 75.02 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 30.1 tok/s
+single cold: run 2: TTFT 0.29 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 30.0 tok/s
+single warm1: run 0: TTFT 0.32 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 35.5 tok/s
+single warm1: run 1: TTFT 0.28 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.8 tok/s
+single warm1: run 2: TTFT 0.35 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 30.0 tok/s
+single warm2: run 0: TTFT 0.32 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.9 tok/s
+single warm2: run 1: TTFT 0.28 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.4 tok/s
+single warm2: run 2: TTFT 0.30 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 31.7 tok/s
+single warm3: run 0: TTFT 0.33 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.7 tok/s
+single warm3: run 1: TTFT 0.25 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.4 tok/s
+single warm3: run 2: TTFT 0.25 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.3 tok/s
+spec counters after-single: 3564.0 1884.0 
+real16 cold: 15.1 tok/s (48/48 ok, 9923 tokens, 655.3 s)
+real16 cold2: 63.6 tok/s (48/48 ok, 9636 tokens, 151.4 s)
+real16 warm1: 161.9 tok/s (48/48 ok, 9582 tokens, 59.2 s)
+real16 warm2: 149.4 tok/s (48/48 ok, 9203 tokens, 61.6 s)
+spec counters after-real16: 39294.0 28340.0 
+errors 0
+# end 09:17:17

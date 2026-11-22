@@ -500,6 +500,14 @@ To-do, in working order:
           draft acceptance 61.4% (62.2% before). **34.4 tok/s** single user (31.7-38.3), TTFT 0.25 s. That is one launch
           against non-MTP launches of 24.5-29.2, so the size of the gain needs repeated launches. With 4 users the test
           finished at about the same rate as without MTP (38 vs 39 tok/s, compiles included), so a multi-user gain is open.
+          A/B with 0018 (`mtp_ab_tp8.txt`; TP=8, six launches, order 0 3 3 0 0 3, warm passes only):
+          - single user: launch medians 25.8/26.1/26.4 -> 31.8/32.2/32.6 tok/s, **+23%** (+20.5 to +26.4% over the pairings),
+            TTFT 0.26 -> 0.28 s. That is the level of PP=8 without MTP (31.6, one launch).
+          - 16 users, real text: 176/182/191 -> 129/156/162 tok/s, **-14%** (-8 to -32%).
+          - 16 users, random tokens 1024/256 (one launch each): 204.5 -> 123.7 tok/s; TTFT p50 2.0 -> 0.72 s, p99 5.4 -> 7.0-7.5 s.
+          - **Output at 16 users is NOT verified, and something is off:** from the same 48 requests MTP wrote 9718 tokens
+            per pass against 9206 (12 passes each, all three MTP launches above all three others), at 74% draft acceptance
+            (53% on the single-user prompts). The equality test only went to 4 users and 128 tokens. Being tested.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
