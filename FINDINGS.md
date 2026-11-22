@@ -486,6 +486,14 @@ To-do, in working order:
           with flips at margins up to 0.375.
           **Speed with that code: MTP is slower**, 15.7 vs 24.5 tok/s single user (medians, 1 launch each) at 2.56-2.61
           tokens per step, so a step costs ~4x a non-MTP step. TTFT ~0.8 vs ~0.27 s. Not yet profiled.
+          Launch 7, with 0017 (same saved non-MTP tokens as reference): 8/16 identical one at a time, 5/16 with 4
+          users at a time. Both large-margin flips are gone: the first differences are at margins up to 0.4375 (one
+          at a time) and 0.25 (4 users), against up to 0.375 between the two non-MTP runs, so one is a step past that
+          noise sample. **Limits of this test:** tokens are comparable only up to a prompt's first difference, which
+          is 1330 of 1812 and 953 of 1868 tokens, with 7 and 4 block crossings among them. Not tested: images,
+          logprobs (crash), more than 4 users, contexts over ~1k tokens, PP=8, warm-up.
+          Speed is unchanged: **15.3 tok/s** (14.9-15.9) vs 24.5 (24.2-25.6) without MTP, 1 launch each, single user;
+          ~171 ms per step against ~41, where break-even at 2.61 tokens per step is ~107 ms. Next: profile the step.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
