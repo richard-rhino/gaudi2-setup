@@ -403,7 +403,7 @@ links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single u
 |---|---|---|---|
 | Before: flapping links, fused MoE, eager PLE | 2.6-3.4 | 294-385 | |
 | Port 8 fix, fused MoE (`single_user_tp8_port8fix_fused.txt`) | **5.7** (5.5-6.0, 9 runs) | 175 | **1.7-2.2x**: the link fix, plus a little from the compiled PLE (~7 ms per token) |
-| Port 8 fix, gather MoE | **28.1** (27.7-29.7, 9 runs; other launches: medians 26.4-29.2) | 36 | **4.6-5.1x**: the gather MoE alone |
+| Port 8 fix, gather MoE | **28.1** (27.7-29.7, 9 runs; other launches: medians 24.5-29.2) | 36 | **4.3-5.1x**: the gather MoE alone |
 
 So the larger factor is the gather MoE, and the link fix is what makes TP=8 stable (no stalls, no hangs).
 
@@ -413,14 +413,14 @@ So the larger factor is the gather MoE, and the link fix is what makes TP=8 stab
 | | TP=8, port 8 fix | PP=8, port 8 fix (re-run afterwards, `*pp8_port8fix*`) |
 |---|---|---|
 | Aggregate output | **214.8 tok/s** (213.5-218.8 over 10 passes) | **197.7 tok/s** (187.7-204.7 over 3 passes) |
-| Single user, median | 26.4-29.2 tok/s by launch (28.1 in the soak's launch) | **31.6 tok/s** (31.0-31.9, 9 runs, 1 launch) |
+| Single user, median | 24.5-29.2 tok/s by launch (28.1 in the soak's launch) | **31.6 tok/s** (31.0-31.9, 9 runs, 1 launch) |
 | TPOT p50 | 66-68 ms | 72-83 ms |
 | TTFT p50 / p99 | ~2.0 s / 5.3-5.7 s | **1.3-1.6 s / 2.5-2.6 s** |
 | ITL p50 / p99 | 54-55 ms / 627-671 ms | 68-78 ms / **84-91 ms** |
 
 The 123 tok/s in section 18 is obsolete for PP=8. At 16 users the two can't be ranked: TP measured 9% higher, but that
-is one launch each, and TP=8 alone varies by up to ~11% from launch to launch (the A/B in the to-do list). PP is ahead
-for one user (8-20%, against the slowest to fastest TP launch) and has far better tail latency. **PP=8 stays the default for interactive serving**; TP=8 is the simpler
+is one launch each, and TP=8 alone varies by up to ~19% from launch to launch (medians 24.5-29.2). PP is ahead
+for one user (8-29%, against the fastest to slowest TP launch) and has far better tail latency. **PP=8 stays the default for interactive serving**; TP=8 is the simpler
 base for MTP. The PP soak was short (3 passes, the last one the slowest), so it is not a stability test.
 
 - 0 of 960 requests failed, 0 port 9 link-downs, no server errors.
@@ -478,6 +478,14 @@ To-do, in working order:
           without MTP also differs from it). Launch 5: same token for every max_tokens, and the 4 compare prompts
           match non-MTP Gaudi for the 120 saved chars each. A token-level test against non-MTP Gaudi decides it.
           Requests with logprobs crash in the rejection sampler (token ids on the CPU).
+          Launch 6, token-level test (`mtp_equivalence_*.json`, 16 prompts x 128 tokens, TP=8): the suspected prompt was
+          fine (non-MTP Gaudi gives the same text, margin 0.25). But MTP had a **real bug**: 5/16 identical, and 2
+          flips at margins 7.6 and 7.8, at tokens computed from positions 896 and 129. A drafted token that opened a new
+          128-token KV block got the first token's block list (a plugin bug, patch 0017, CPU repro on the runner's
+          lines: 2270 wrong rows before, 0 after). Noise floor: non-MTP sequential vs 4 at a time is 6/16 identical,
+          with flips at margins up to 0.375.
+          **Speed with that code: MTP is slower**, 15.7 vs 24.5 tok/s single user (medians, 1 launch each) at 2.56-2.61
+          tokens per step, so a step costs ~4x a non-MTP step. TTFT ~0.8 vs ~0.27 s. Not yet profiled.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

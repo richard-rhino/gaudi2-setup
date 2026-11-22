@@ -1,0 +1,100 @@
+From b53c7ac6e22a1dccc5748adb902276d103a1cef2 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 05:57:40 +0000
+Subject: [PATCH] Spec decode: give each drafted token the KV blocks up to its
+ own position
+
+A multi-token decode step gave every token the block list of the request's
+first token. A drafted token that opened a new KV block was then computed
+without that block and with the previous block mostly masked, so it lost its
+context. Single-token steps are unchanged.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../unit_tests/worker/test_decode_token_padding.py  | 10 ++++++++--
+ vllm_gaudi/v1/worker/decode_token_padding.py        |  8 ++++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py            | 13 +++++++------
+ 3 files changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/tests/unit_tests/worker/test_decode_token_padding.py b/tests/unit_tests/worker/test_decode_token_padding.py
+index 5360e72c..77617d2b 100644
+--- a/tests/unit_tests/worker/test_decode_token_padding.py
++++ b/tests/unit_tests/worker/test_decode_token_padding.py
+@@ -9,8 +9,8 @@ import random
+ import pytest
+ import torch
+ 
+-from vllm_gaudi.v1.worker.decode_token_padding import (flat_decode_seq_lens, mrope_decode_positions,
+-                                                       redirect_padded_tokens)
++from vllm_gaudi.v1.worker.decode_token_padding import (decode_row_num_blocks, flat_decode_seq_lens,
++                                                       mrope_decode_positions, redirect_padded_tokens)
+ 
+ 
+ @pytest.mark.parametrize("width", [1, 2, 4])
+@@ -25,6 +25,12 @@ def test_only_scheduled_tokens_reach_live_slots(width, seed):
+     assert pos.shape == (3, (n + pad_rows) * width)
+     lens = flat_decode_seq_lens(counts + [0] * pad_rows, width)
+     assert lens.shape == ((n + pad_rows) * width, ) and lens.view(-1, width).sum(1).tolist() == counts + [0] * pad_rows
++    for start, count in zip(starts, counts):
++        for block_size in (2, 128):
++            rows = decode_row_num_blocks(start, count, width, block_size)
++            assert len(rows) == width
++            assert rows[:count] == [(start + j) // block_size + 1 for j in range(count)]
++            assert set(rows[count:]) <= {start // block_size + 1}
+     live = torch.arange(1, n * width + 1).view(n, width)
+     slots = live.clone()
+     redirect_padded_tokens(slots, counts, itertools.cycle(range(90000, 90128)))
+diff --git a/vllm_gaudi/v1/worker/decode_token_padding.py b/vllm_gaudi/v1/worker/decode_token_padding.py
+index 5e752a2a..2eb8bb93 100644
+--- a/vllm_gaudi/v1/worker/decode_token_padding.py
++++ b/vllm_gaudi/v1/worker/decode_token_padding.py
+@@ -21,6 +21,14 @@ def mrope_decode_positions(context_lens: Sequence[int], token_counts: Sequence[i
+     return positions.flatten().repeat(3, 1)
+ 
+ 
++def decode_row_num_blocks(context_len: int, count: int, width: int, block_size: int) -> list[int]:
++    """``[width]`` KV blocks that each token of one request sees: up to the block of its own position.
++
++    A token can open a new block in the middle of the step. Padded tokens get the first token's blocks.
++    """
++    return [(int(context_len) + (j if j < count else 0)) // block_size + 1 for j in range(width)]
++
++
+ def flat_decode_seq_lens(token_counts: Sequence[int], width: int) -> torch.Tensor:
+     """``[batch * width]`` lengths of the flattened one-token rows: 1 for a scheduled token, 0 for padding.
+ 
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 65ad1891..cef0e5e7 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -102,8 +102,8 @@ from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
+ from vllm.v1.worker.utils import (AttentionGroup, prepare_kernel_block_sizes, sanity_check_mm_encoder_outputs)
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
+ from vllm_gaudi.v1._vendored.spec_decode.eagle import EagleProposer
+-from vllm_gaudi.v1.worker.decode_token_padding import (flat_decode_seq_lens, mrope_decode_positions,
+-                                                       redirect_padded_tokens)
++from vllm_gaudi.v1.worker.decode_token_padding import (decode_row_num_blocks, flat_decode_seq_lens,
++                                                       mrope_decode_positions, redirect_padded_tokens)
+ from vllm_gaudi.v1.worker.recurrent_state_slots import RecurrentStateSlots
+ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ from vllm_gaudi.v1._vendored.spec_decode.ngram_proposer import NgramProposer
+@@ -3560,10 +3560,11 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         num_tokens_per_req = num_tokens_per_req + [0] * (padded_batch_size - num_decodes)
+ 
+         block_tables_list = []
+-        for i, n in enumerate(num_blocks):
+-            seq_block_table = block_table_cpu_tensor[i, :n].tolist()
+-            assert len(seq_block_table) == n
+-            block_tables_list.extend([seq_block_table] * num_tokens)
++        for i in range(len(num_blocks)):
++            for n in decode_row_num_blocks(context_lens[i], num_tokens_per_req[i], num_tokens, decode_block_size):
++                seq_block_table = block_table_cpu_tensor[i, :n].tolist()
++                assert len(seq_block_table) == n
++                block_tables_list.append(seq_block_table)
+ 
+         ###################################
+         # initialize positions with padding
+-- 
+2.43.0
+
