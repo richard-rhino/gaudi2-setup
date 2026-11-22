@@ -1,0 +1,86 @@
+From ca1f9d1d3367f5a366d653b8a2c125a4fe9d9937 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 04:51:08 +0000
+Subject: [PATCH] Hybrid models with spec decode: block table width, proposer's
+ table
+
+Mamba groups get one state block per drafted token, which did not fit in their
+block table of max_model_len / block_size entries. The proposer also read the
+table of group 0, which in a hybrid model need not be the attention group.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ vllm_gaudi/v1/worker/hpu_input_batch.py  |  3 +++
+ vllm_gaudi/v1/worker/hpu_model_runner.py | 13 +++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/vllm_gaudi/v1/worker/hpu_input_batch.py b/vllm_gaudi/v1/worker/hpu_input_batch.py
+index e7dda2be..d7979d5a 100644
+--- a/vllm_gaudi/v1/worker/hpu_input_batch.py
++++ b/vllm_gaudi/v1/worker/hpu_input_batch.py
+@@ -153,6 +153,7 @@ class InputBatch:
+         logitsprocs: Optional[LogitsProcessors] = None,
+         is_spec_decode: bool = False,
+         is_pooling_model: bool = False,
++        min_num_blocks: Optional[list[int]] = None,  # least table width per group, e.g. Mamba speculative blocks
+     ):
+         self.is_pooling_model = is_pooling_model
+         self.is_spec_decode = is_spec_decode
+@@ -195,6 +196,8 @@ class InputBatch:
+         # use DCP (cp_world_size == 1), so max_num_blocks reduces to
+         # cdiv(max_model_len, block_size) per KV cache group.
+         max_num_blocks = [cdiv(max_model_len, block_size) for block_size in block_sizes]
++        if min_num_blocks is not None:
++            max_num_blocks = [max(n, least) for n, least in zip(max_num_blocks, min_num_blocks, strict=True)]
+         self.block_table = HPUMultiGroupBlockTable(max_num_reqs=max_num_reqs,
+                                                    max_num_batched_tokens=max_num_batched_tokens,
+                                                    pin_memory=pin_memory,
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 6fd40579..01037153 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -7580,6 +7580,12 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 "Cannot re-initialize the input batch when CPU weight "
+                 "offloading is enabled. See https://github.com/vllm-project/vllm/pull/18298 "  # noqa: E501
+                 "for more details.")
++            # Mamba groups hold one more state block per drafted token, beyond max_model_len / block_size
++            min_num_blocks = [
++                group.kv_cache_spec.max_num_blocks_per_req(self.vllm_config, self.max_model_len)
++                if isinstance(group.kv_cache_spec, MambaSpec) else 0 for group in kv_cache_config.kv_cache_groups
++                if not isinstance(group.kv_cache_spec, EncoderOnlyAttentionSpec)
++            ]
+             self.input_batch = InputBatch(
+                 max_num_reqs=self.max_num_reqs,
+                 max_model_len=max(self.max_model_len, self.max_encoder_len),
+@@ -7592,6 +7598,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 is_spec_decode=bool(self.vllm_config.speculative_config),
+                 logitsprocs=self.input_batch.logitsprocs,
+                 is_pooling_model=self.is_pooling_model,
++                min_num_blocks=min_num_blocks,
+             )
+ 
+     def get_kv_caches_4D(self, kv_caches) -> dict[str, torch.Tensor]:
+@@ -7793,7 +7800,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         # Decodes are the first num_decodes requests.
+         # Prefill are the next num_reqs - num_decodes requests.
+         # Note: sampled_token_ids includes both decode and prefill sampled tokens
+-        block_table_cpu_tensor = self.input_batch.block_table[0].get_cpu_tensor()
++        block_table_cpu_tensor = self.input_batch.block_table[
++            self._get_attention_group_id_for_hybrid()].get_cpu_tensor()
+         decode_block_table = block_table_cpu_tensor[:num_decodes]
+ 
+         common_attn_metadata = decode_data.attn_metadata
+@@ -7841,7 +7849,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         # The input batch block table include both decodes and prefills
+         # Decodes are the first num_decodes requests.
+         # Prefill are the next num_reqs - num_decodes requests and divide into batches
+-        block_table_cpu_tensor = self.input_batch.block_table[0].get_cpu_tensor()
++        block_table_cpu_tensor = self.input_batch.block_table[
++            self._get_attention_group_id_for_hybrid()].get_cpu_tensor()
+         batch_size = logits_indices.shape[0]
+         prefill_batch_block_table = block_table_cpu_tensor[batch_start_idx:batch_start_idx + batch_size]
+ 
+-- 
+2.43.0
+

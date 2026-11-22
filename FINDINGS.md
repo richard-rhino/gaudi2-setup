@@ -466,6 +466,8 @@ To-do, in working order:
     - [x] Draft model written: one attention layer (dense on HPU, like the target), no GDN, no PLE (patch 0013;
           weight routing and input fusion CPU-tested, never loaded).
     - [ ] First run on HPU: load, then compare greedy output and logprobs with the non-MTP run.
+          Launch 1 (TP=8, k=3): the draft model loads (0.96 GB per card), then the first request failed on a
+          too-narrow state block table. Fixed in patch 0014, with the proposer's choice of block table.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
