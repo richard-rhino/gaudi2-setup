@@ -407,9 +407,17 @@ To-do, in working order:
   - The checkpoint has the head (31 `mtp.*` tensors); `qwen4_exp.py` drops them today (`"mtp.": None`).
   - Port upstream `vllm/models/qwen4_exp/nvidia/mtp.py` (508 lines) to the HPU layers and register `Qwen4ExpMTP`.
     It takes the hyper-connection streams (hc_count x hidden) before the final mixer and returns two hidden streams.
-  - The plugin has a generic path to build on: `hpu_model_runner` sends method `mtp` to `HpuEagleProposer`. To check:
-    the multi-stream hidden state through it, multi-token decode in the PLE and QSA state, and rewind of rejected
-    tokens. Speculative decoding is not supported with async scheduling, and not fully with torch.compile.
+  - The plugin has a generic path to build on: `hpu_model_runner` sends method `mtp` to `HpuEagleProposer`. Speculative
+    decoding is not supported with async scheduling, and not fully with torch.compile.
+  - **Main blocker: recurrent state cannot be rewound on HPU.** The plugin's GDN kernels (36 of the 48 layers) raise
+    NotImplementedError for speculative decoding. A KV cache rewinds by position; GDN and PLE state do not.
+    Design: 1 + num_spec state slots per request, save after every token, resume from the last kept token's slot.
+    - [x] GDN conv + SSM ops for this (`hpu_gdn_spec_decode.py`, patch 0007): 24/24 CPU cases, random rejections.
+    - [ ] The same for the PLE conv history and n-gram context tokens.
+    - [ ] Runner: 1 + num_spec slots per request (load = last kept, store = one per token), and the compact GDN slots.
+    - [ ] Target model: return the pre-mixer streams. Proposer: feed each draft step the previous step's streams
+          (today it takes only a single hidden stream and reuses the target's hidden states for the later steps).
+    - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
     single and 16 users.

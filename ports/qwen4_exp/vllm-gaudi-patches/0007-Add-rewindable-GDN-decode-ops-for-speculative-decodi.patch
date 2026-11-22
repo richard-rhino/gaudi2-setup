@@ -1,0 +1,202 @@
+From 279cec35b1445de061bf2d76625deeff1fe748b6 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 03:01:46 +0000
+Subject: [PATCH] Add rewindable GDN decode ops for speculative decoding
+
+Save the conv window and SSM state after each drafted token, so that rejected
+drafts can be dropped by resuming from the last kept token's slot. Tested on
+CPU. Not yet wired into the model or runner, and not yet run on HPU.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../ops/test_hpu_gdn_spec_decode.py           | 81 +++++++++++++++++
+ vllm_gaudi/ops/hpu_gdn_spec_decode.py         | 88 +++++++++++++++++++
+ 2 files changed, 169 insertions(+)
+ create mode 100644 tests/unit_tests/ops/test_hpu_gdn_spec_decode.py
+ create mode 100644 vllm_gaudi/ops/hpu_gdn_spec_decode.py
+
+diff --git a/tests/unit_tests/ops/test_hpu_gdn_spec_decode.py b/tests/unit_tests/ops/test_hpu_gdn_spec_decode.py
+new file mode 100644
+index 00000000..3e3088fb
+--- /dev/null
++++ b/tests/unit_tests/ops/test_hpu_gdn_spec_decode.py
+@@ -0,0 +1,81 @@
++# SPDX-License-Identifier: Apache-2.0
++"""CPU tests for hpu_gdn_spec_decode: drafting and then rejecting must leave no trace in the recurrent state."""
++
++from __future__ import annotations
++
++import pytest
++import torch
++
++from vllm_gaudi.ops.causal_conv1d_pytorch import hpu_causal_conv1d_update
++from vllm_gaudi.ops.hpu_gdn_pytorch import hpu_fused_recurrent_gated_delta_rule
++from vllm_gaudi.ops.hpu_gdn_spec_decode import hpu_causal_conv1d_spec_update, hpu_gdn_spec_recurrent, spec_load_slots
++
++H, HV, K, V, D, WIDTH = 2, 6, 8, 8, 12, 4
++
++
++def _inputs(gen, n, length):
++    t = n * length
++    return dict(
++        q=torch.randn(1, t, H, K, generator=gen),
++        k=torch.randn(1, t, H, K, generator=gen),
++        v=torch.randn(1, t, HV, V, generator=gen),
++        g=-torch.rand(1, t, HV, generator=gen),
++        beta=torch.rand(1, t, HV, generator=gen),
++        x=torch.randn(t, D, generator=gen),
++    )
++
++
++def _one_token(inp, i, ssm, conv, weight, slot):
++    slots = torch.tensor([slot], dtype=torch.int32)
++    qsl = torch.arange(2, dtype=torch.int32)
++    out, _ = hpu_fused_recurrent_gated_delta_rule(
++        **{name: inp[name][:, i:i + 1] for name in ("q", "k", "v", "g", "beta")},
++        initial_state=ssm,
++        inplace_final_state=True,
++        cu_seqlens=qsl,
++        ssm_state_indices=slots,
++        use_qk_l2norm_in_kernel=True,
++        ssm_store_indices=slots,
++    )
++    conv_out = hpu_causal_conv1d_update(
++        x=inp["x"][i:i + 1],
++        conv_state=conv,
++        weight=weight,
++        activation="silu",
++        conv_state_indices=slots,
++        query_start_loc=qsl,
++        store_cache_indices=slots,
++    )
++    return out[0, 0], conv_out[0]
++
++
++@pytest.mark.parametrize("n", [1, 3])
++@pytest.mark.parametrize("length", [1, 2, 4])
++@pytest.mark.parametrize("seed", [0, 1, 2, 3])
++def test_rejected_drafts_leave_no_trace(n, length, seed):
++    gen = torch.Generator().manual_seed(seed)
++    weight = torch.randn(D, WIDTH, generator=gen)
++    slots = 1 + n * length
++    ssm, conv = torch.randn(slots, HV, V, K, generator=gen), torch.randn(slots, WIDTH - 1, D, generator=gen)
++    store = torch.arange(1, slots, dtype=torch.int32).view(n, length)
++    load = store[:, 0].clone()
++    # Reference: one slot per request and only the accepted tokens, decoded one at a time.
++    ref_ssm, ref_conv = ssm[load.long()].clone(), conv[load.long()].clone()
++
++    for _ in range(12):
++        inp = _inputs(gen, n, length)
++        out = hpu_gdn_spec_recurrent(**{k: inp[k] for k in ("q", "k", "v", "g", "beta")},
++                                     state=ssm,
++                                     load=load,
++                                     store=store)
++        conv_out = hpu_causal_conv1d_spec_update(inp["x"], conv, weight, load, store, activation="silu")
++        accepted = torch.randint(1, length + 1, (n, ), generator=gen)
++        for i in range(n):
++            for j in range(int(accepted[i])):
++                t = i * length + j
++                ref_out, ref_conv_out = _one_token(inp, t, ref_ssm, ref_conv, weight, i)
++                torch.testing.assert_close(out[0, t], ref_out, rtol=1e-5, atol=1e-5)
++                torch.testing.assert_close(conv_out[t], ref_conv_out, rtol=1e-5, atol=1e-5)
++        load = spec_load_slots(store, accepted)
++        torch.testing.assert_close(ssm[load.long()], ref_ssm, rtol=1e-5, atol=1e-5)
++        torch.testing.assert_close(conv[load.long()], ref_conv, rtol=1e-5, atol=1e-5)
+diff --git a/vllm_gaudi/ops/hpu_gdn_spec_decode.py b/vllm_gaudi/ops/hpu_gdn_spec_decode.py
+new file mode 100644
+index 00000000..efc145a5
+--- /dev/null
++++ b/vllm_gaudi/ops/hpu_gdn_spec_decode.py
+@@ -0,0 +1,88 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Rewindable GDN decode for speculative decoding (MTP).
++
++A request decodes ``L = 1 + num_speculative_tokens`` tokens in one step and the sampler may reject a suffix. The
++recurrent state (conv window and SSM state) cannot be rewound by position like a KV cache, so it is saved after every
++token: token ``j`` of request ``i`` writes slot ``store[i, j]``. The next step loads the slot of the last token that
++was kept, ``store[i, accepted - 1]``.
++
++Both functions chain the single-token kernels, so the numerics are the same as decoding one token at a time.
++Tokens are flat in request-major order, ``[N * L, ...]``, as the HPU runner lays out a decode batch with drafts.
++"""
++
++from __future__ import annotations
++
++import torch
++
++from vllm_gaudi.ops.causal_conv1d_pytorch import hpu_causal_conv1d_update
++from vllm_gaudi.ops.hpu_gdn_pytorch import hpu_fused_recurrent_gated_delta_rule
++
++
++def spec_load_slots(store: torch.Tensor, accepted: torch.Tensor) -> torch.Tensor:
++    """[N] slots to resume from, given the previous step's [N, L] store slots and its number of kept tokens."""
++    return store.gather(1, (accepted.long() - 1).view(-1, 1)).squeeze(1)
++
++
++def hpu_causal_conv1d_spec_update(
++    x: torch.Tensor,
++    conv_state: torch.Tensor,
++    weight: torch.Tensor,
++    load: torch.Tensor,
++    store: torch.Tensor,
++    bias: torch.Tensor | None = None,
++    activation: bool | str | None = None,
++) -> torch.Tensor:
++    """x [N * L, D] -> [N * L, D], saving the conv window after each of the L tokens."""
++    n, length = store.shape
++    x = x.reshape(n, length, x.shape[-1])
++    query_start_loc = torch.arange(n + 1, dtype=torch.int32, device=x.device)
++    out, src = [], load
++    for j in range(length):
++        out.append(
++            hpu_causal_conv1d_update(
++                x=x[:, j],
++                conv_state=conv_state,
++                weight=weight,
++                bias=bias,
++                activation=activation,
++                conv_state_indices=src,
++                query_start_loc=query_start_loc,
++                store_cache_indices=store[:, j],
++            ))
++        src = store[:, j]
++    return torch.stack(out, dim=1).flatten(0, 1)
++
++
++def hpu_gdn_spec_recurrent(
++    q: torch.Tensor,
++    k: torch.Tensor,
++    v: torch.Tensor,
++    g: torch.Tensor,
++    beta: torch.Tensor,
++    state: torch.Tensor,
++    load: torch.Tensor,
++    store: torch.Tensor,
++    use_qk_l2norm_in_kernel: bool = True,
++) -> torch.Tensor:
++    """q/k/v/g/beta [1, N * L, ...] -> [1, N * L, HV, Vdim], saving the SSM state after each of the L tokens."""
++    n, length = store.shape
++    q, k, v, g, beta = (t.reshape(n, length, *t.shape[2:]) for t in (q, k, v, g, beta))
++    cu_seqlens = torch.arange(n + 1, dtype=torch.int32, device=q.device)
++    out, src = [], load
++    for j in range(length):
++        step, _ = hpu_fused_recurrent_gated_delta_rule(
++            q=q[None, :, j],
++            k=k[None, :, j],
++            v=v[None, :, j],
++            g=g[None, :, j],
++            beta=beta[None, :, j],
++            initial_state=state,
++            inplace_final_state=True,
++            cu_seqlens=cu_seqlens,
++            ssm_state_indices=src,
++            use_qk_l2norm_in_kernel=use_qk_l2norm_in_kernel,
++            ssm_store_indices=store[:, j],
++        )
++        out.append(step.squeeze(0))
++        src = store[:, j]
++    return torch.stack(out, dim=1).flatten(0, 1).unsqueeze(0)
+-- 
+2.43.0
+
