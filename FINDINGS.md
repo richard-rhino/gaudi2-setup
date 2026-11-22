@@ -456,8 +456,10 @@ To-do, in working order:
           Two bugs in the existing plugin path, both only hit when a step decodes >1 token per request:
           padded tokens of shorter requests overwrote that request's position-0 KV slot, and mrope positions
           were replaced by plain ones. Single-token steps are identical to before (2000 random steps).
-    - [ ] Target model: return the pre-mixer streams. Proposer: feed each draft step the previous step's streams
-          (today it takes only a single hidden stream and reuses the target's hidden states for the later steps).
+    - [x] Target model: return the pre-mixer streams, handed over through the aux hidden state path (patch 0011;
+          model forward CPU-tested with stub layers, not run on HPU).
+    - [ ] Proposer: feed each draft step the previous step's multi streams, not the target's, and take 3-axis
+          mrope positions (it flattens them today).
     - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
