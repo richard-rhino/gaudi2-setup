@@ -533,7 +533,7 @@ To-do, in working order:
              mismatch): right tokens, fewer per step. The 16-user speeds above include that loss.
           **Fix 0019 (exported)**, on
           the cards at TP=8, one launch each (`mtp_sampling_tp8.txt`):
-          - works: chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
+          - works (except mixed batches, see KNOWN BUG below): chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
             requests at once. Logprobs agree with the non-MTP run as closely as that run agrees with itself (top-2 margin
             difference 0.20 vs 0.21 mean), prompt logprobs vs deb-ai as without MTP. Greedy: 9/16 and 3/16 identical
             (1 and 16 users), largest flips 0.4375 and 0.75, the latter what switching the MoE path does without MTP.
@@ -552,7 +552,13 @@ To-do, in working order:
           (p = 0.34, 0.94; all rejection-step positions p >= 0.57; seeded 0.69 over 72000 draws), and two cards still
           draw identical tokens from one seed, which TP needs. Greedy results are not affected. Not checked: lazy mode,
           other Gaudi software versions. Not reported upstream.
-    - [x] **0019-0021 on the full server (TP=8): sampling is now correct in every check, with and without MTP**
+    - [ ] **KNOWN BUG in 0019-0021, do not use MTP with mixed traffic: wrong output without any error.** When greedy and
+          sampled requests share a batch with MTP, the greedy ones get negated logits and emit the least likely tokens
+          (token 0 under a grammar). The runner marks greedy requests with temperature -1; 0019 and its unit test
+          assumed 0. Reproduced on CPU with the real rejection sampler. My "16 mixed requests" check only looked at
+          HTTP success and logprob signs, so "works" below was wrong for that case. All-greedy and all-sampled batches
+          (every equality, distribution and speed result) and serving without MTP are not affected. Fix in progress.
+    - [x] **0019-0021 on the full server (TP=8): sampling is now correct in every check for all-sampled batches**
           (`results-ubuntu2404/qwen38fn/mtp_sampling_dist2_tp8.txt`; 6400 completions per launch, each token against
           the probabilities of its own step; 4 non-trivial checks per launch).
           - before 0020: fails 2 of 4 (p = 0.000 and 0.002; first token TVD 0.029, unbiased would be 0.010).

@@ -19,6 +19,7 @@ PROF=(); [ -n "${PROFILE:-}" ] && { export VLLM_TORCH_PROFILER_DIR="$PROFILE"
   PROF=(--profiler-config "{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$PROFILE\"}"); }
 # MTP=k: k drafted tokens per step (patches 0007-0021). The HPU runner has no async scheduling with spec decode.
 # WARNING: EXPERIMENTS ONLY. Needs 0019 for temperature > 0 and logprobs. Sampled requests are no faster with MTP.
+# KNOWN BUG up to 0021: greedy requests batched with sampled ones silently get wrong tokens (FINDINGS 21).
 # Structured output (JSON schema) crashes MTP with every patch so far, 0019 included (FINDINGS 21).
 SPEC=(); [ "${MTP:-0}" -gt 0 ] && SPEC=(--no-async-scheduling
   --speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":$MTP}")
