@@ -1,0 +1,42 @@
+# One Gaudi2 card, Gaudi 1.24.2, torch 2.13, eager + torch.compile. Draws compared with exact probabilities:
+# TVD = total variation distance, null = its median for an unbiased sampler with as many draws.
+## where the bias is
+A stock Sampler alone                                n= 19200 TVD 0.0653 null 0.0081 p=0.000
+B exponential_ noise, argmax                         n= 19200 TVD 0.0508 null 0.0082 p=0.000
+C rand gumbel noise, argmax (0019)                   n= 19200 TVD 0.0097 null 0.0082 p=0.236
+D bonus inside rejection step, every step            n= 20000 TVD 0.0619 null 0.0080 p=0.000
+D bonus, steps whose draft was accepted              n=  5075 TVD 0.0676 null 0.0159 p=0.000
+D bonus, steps whose draft was rejected              n= 14925 TVD 0.0599 null 0.0093 p=0.000
+E seed 21: corr(exponential, NEXT rand) +0.0065  corr(exponential, rand from the same state) -0.0074  exponential mean 0.9986 var 0.9928
+E seed 22: corr(exponential, NEXT rand) +0.0013  corr(exponential, rand from the same state) +0.0051  exponential mean 0.9999 var 0.9974
+## exponential_ on its own
+F CPU exponential_, width 20 (control)                     n=19200 TVD 0.0092 null 0.0081 p=0.329
+F HPU exponential_, width 20                               n=19200 TVD 0.0259 null 0.0082 p=0.000
+F HPU -log1p(-rand), width 20                              n=19200 TVD 0.0085 null 0.0082 p=0.438
+G HPU exponential_, full vocabulary                        n=19200 TVD 0.0594 null 0.0081 p=0.000
+G HPU -log1p(-rand), full vocabulary                       n=19200 TVD 0.0076 null 0.0081 p=0.589
+L HPU exponential_ with per-request generators             n=19200 TVD 0.0642 null 0.0082 p=0.000
+L HPU rand with per-request generators                     n=19200 TVD 0.0127 null 0.0081 p=0.032
+H stock Sampler, torch.compile like the runner             n=19200 TVD 0.0542 null 0.0081 p=0.000
+J exponential_: n=2621440 KS 0.00015 (5% level 0.00084) min 1.69e-06 distinct 0.940 P(<0.001)=0.00097/0.00100 P(<0.01)=0.00993/0.00995 P(<0.05)=0.04883/0.04877 P(<0.2)=0.18127/0.18127
+J -log1p(-rand): n=2621440 KS 0.00059 (5% level 0.00084) min 1.26e-07 distinct 0.921 P(<0.001)=0.00099/0.00100 P(<0.01)=0.00993/0.00995 P(<0.05)=0.04864/0.04877 P(<0.2)=0.18094/0.18127
+## with the fix (noise from torch.rand)
+H compiled Sampler, seed 41                      n= 24000 TVD 0.0081 null 0.0073 p=0.340 outside 0.00000
+H compiled Sampler, seed 42                      n= 24000 TVD 0.0046 null 0.0073 p=0.941 outside 0.00000
+L compiled Sampler, per-request seeds 100+       n= 19200 TVD 0.0063 null 0.0082 p=0.825 outside 0.00000
+L compiled Sampler, per-request seeds 200+       n= 19200 TVD 0.0121 null 0.0081 p=0.047 outside 0.00000
+L compiled Sampler, per-request seeds 300+       n= 19200 TVD 0.0131 null 0.0081 p=0.018 outside 0.00000
+D rejection step, 1 draft(s), position 0         n= 20000 TVD 0.0043 null 0.0079 p=0.980 outside 0.00000
+D rejection step, 1 draft(s), position 1         n=  5040 TVD 0.0128 null 0.0159 p=0.790 outside 0.00000
+D rejection step, 3 draft(s), position 0         n= 20000 TVD 0.0066 null 0.0079 p=0.742 outside 0.00000
+D rejection step, 3 draft(s), position 1         n=  5049 TVD 0.0141 null 0.0160 p=0.670 outside 0.00000
+D rejection step, 3 draft(s), position 2         n=  1013 TVD 0.0317 null 0.0346 p=0.630 outside 0.00000
+D rejection step, 3 draft(s), position 3         n=   257 TVD 0.0645 null 0.0677 p=0.571 outside 0.00000
+## seeded requests with the fix
+E shared draws of seeds 100 and 101 (step of 100, step of 101): []
+L seeded, spread seeds, set 0            n=24000 TVD 0.0094 null 0.0073 p=0.163
+L all sets so far                        n=24000 TVD 0.0094 null 0.0073 p=0.153
+L seeded, spread seeds, set 1            n=24000 TVD 0.0055 null 0.0073 p=0.839
+L all sets so far                        n=48000 TVD 0.0041 null 0.0052 p=0.801
+L seeded, spread seeds, set 2            n=24000 TVD 0.0116 null 0.0073 p=0.027
+L all sets so far                        n=72000 TVD 0.0037 null 0.0042 p=0.687

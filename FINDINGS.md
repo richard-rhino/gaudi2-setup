@@ -543,6 +543,15 @@ To-do, in working order:
             tokens 0-4 (dependent tests). The two runs also differ numerically, so this may or may not be the sampler.
           - **still crashes: structured output (JSON schema)**, `UnboundLocalError: sampling_metadata`. The plugin's
             structured-output path does not handle speculative decoding.
+    - [ ] **All sampled output on this stack is biased, with or without MTP: `Tensor.exponential_` on HPU.** Found while
+          testing 0019 against exact probabilities (`results-ubuntu2404/hpu-exponential-sampling-bias.txt`, one card).
+          The values have the right marginal distribution but are not independent within a row, and vLLM samples with
+          `argmax(probs / exponential noise)`. In a test distribution the compiled stock sampler was off by TVD
+          0.054-0.065 (about 5-6% of the probability on the wrong tokens; unbiased would be 0.008). CPU is exact, and so
+          is HPU `torch.rand`. **Fix 0020** (local until checked on the full server): noise from `torch.rand`; then exact
+          (p = 0.34, 0.94; all rejection-step positions p >= 0.57; seeded 0.69 over 72000 draws), and two cards still
+          draw identical tokens from one seed, which TP needs. Greedy results are not affected. Not checked: lazy mode,
+          other Gaudi software versions. Not reported upstream.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
