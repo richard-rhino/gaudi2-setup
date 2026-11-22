@@ -470,7 +470,10 @@ To-do, in working order:
           too-narrow state block table. Fixed in patch 0014, with the proposer's choice of block table.
           Launch 2: the graph compiler rejected the GDN rewind ops inside the decoder layer ("missing a control
           edge": several in-place updates of one state tensor per graph). A standalone compiled test did not
-          reproduce it. Patch 0015 writes each state once; whether the full model accepts it is being tested.
+          reproduce it. Patch 0015 writes each state once.
+          Launch 3: failed in the first attention layer of the drafted decode step, which the plugin took for a
+          prompt of 4 tokens (it reads the batch size from a per-request length tensor). Fixed in patch 0016.
+          That failure comes after the early GDN layers, whether 0015 is enough for all of them is not known yet.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

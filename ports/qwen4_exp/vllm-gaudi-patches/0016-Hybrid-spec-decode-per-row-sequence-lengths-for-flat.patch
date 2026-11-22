@@ -1,0 +1,89 @@
+From a04cf666d06d5baac96bcec5081212b34612cdac Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 05:06:56 +0000
+Subject: [PATCH] Hybrid spec decode: per-row sequence lengths for flattened
+ decode steps
+
+A multi-token decode step is flattened to [batch * num_tokens, 1], but hybrid
+models passed per-request lengths. Attention takes the batch size from that
+tensor and so ran the step as a prompt of num_tokens. Only multi-token steps
+change.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ tests/unit_tests/worker/test_decode_token_padding.py |  5 ++++-
+ vllm_gaudi/v1/worker/decode_token_padding.py         | 10 ++++++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py             |  5 ++++-
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/tests/unit_tests/worker/test_decode_token_padding.py b/tests/unit_tests/worker/test_decode_token_padding.py
+index 06b40efb..5360e72c 100644
+--- a/tests/unit_tests/worker/test_decode_token_padding.py
++++ b/tests/unit_tests/worker/test_decode_token_padding.py
+@@ -9,7 +9,8 @@ import random
+ import pytest
+ import torch
+ 
+-from vllm_gaudi.v1.worker.decode_token_padding import mrope_decode_positions, redirect_padded_tokens
++from vllm_gaudi.v1.worker.decode_token_padding import (flat_decode_seq_lens, mrope_decode_positions,
++                                                       redirect_padded_tokens)
+ 
+ 
+ @pytest.mark.parametrize("width", [1, 2, 4])
+@@ -22,6 +23,8 @@ def test_only_scheduled_tokens_reach_live_slots(width, seed):
+     deltas = [rng.randint(-9, 9) for _ in range(n)]
+     pos = mrope_decode_positions(starts, counts, deltas, n + pad_rows, width)
+     assert pos.shape == (3, (n + pad_rows) * width)
++    lens = flat_decode_seq_lens(counts + [0] * pad_rows, width)
++    assert lens.shape == ((n + pad_rows) * width, ) and lens.view(-1, width).sum(1).tolist() == counts + [0] * pad_rows
+     live = torch.arange(1, n * width + 1).view(n, width)
+     slots = live.clone()
+     redirect_padded_tokens(slots, counts, itertools.cycle(range(90000, 90128)))
+diff --git a/vllm_gaudi/v1/worker/decode_token_padding.py b/vllm_gaudi/v1/worker/decode_token_padding.py
+index 9fbb67de..5e752a2a 100644
+--- a/vllm_gaudi/v1/worker/decode_token_padding.py
++++ b/vllm_gaudi/v1/worker/decode_token_padding.py
+@@ -21,6 +21,16 @@ def mrope_decode_positions(context_lens: Sequence[int], token_counts: Sequence[i
+     return positions.flatten().repeat(3, 1)
+ 
+ 
++def flat_decode_seq_lens(token_counts: Sequence[int], width: int) -> torch.Tensor:
++    """``[batch * width]`` lengths of the flattened one-token rows: 1 for a scheduled token, 0 for padding.
++
++    Attention takes the batch size from the length tensor, so per-request lengths would make the flattened
++    ``[batch * width, 1]`` decode look like a ``[batch, width]`` prompt.
++    """
++    counts = torch.tensor(token_counts, dtype=torch.int32, device='cpu').view(-1, 1)
++    return (torch.arange(width, dtype=torch.int32, device='cpu') < counts).flatten().to(torch.int32)
++
++
+ def redirect_padded_tokens(slot_mapping: torch.Tensor, token_counts: Sequence[int],
+                            pad_slots: Iterator[int]) -> None:
+     """Point each request's padded tokens at the pad row. Their position is 0, whose slot is a live cache entry."""
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 01037153..65ad1891 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -102,7 +102,8 @@ from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
+ from vllm.v1.worker.utils import (AttentionGroup, prepare_kernel_block_sizes, sanity_check_mm_encoder_outputs)
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
+ from vllm_gaudi.v1._vendored.spec_decode.eagle import EagleProposer
+-from vllm_gaudi.v1.worker.decode_token_padding import mrope_decode_positions, redirect_padded_tokens
++from vllm_gaudi.v1.worker.decode_token_padding import (flat_decode_seq_lens, mrope_decode_positions,
++                                                       redirect_padded_tokens)
+ from vllm_gaudi.v1.worker.recurrent_state_slots import RecurrentStateSlots
+ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ from vllm_gaudi.v1._vendored.spec_decode.ngram_proposer import NgramProposer
+@@ -3759,6 +3760,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                                 pin_memory=self.pin_memory)
+             query_start_loc_p_cpu[1:] = torch.cumsum(seq_lens_cpu.clone().to(dtype=torch.int32), dim=0)
+ 
++            if num_tokens > 1:  # query_start_loc stays per request
++                seq_lens_cpu = flat_decode_seq_lens(num_tokens_per_req, num_tokens)
+             seq_lens_tensor = async_h2d_copy(seq_lens_cpu, device=self.device)
+             load_indices_tensor = async_h2d_copy(load_state_indices_cpu, device=self.device)
+             store_indices_tensor = async_h2d_copy(store_state_indices_cpu, device=self.device)
+-- 
+2.43.0
+
