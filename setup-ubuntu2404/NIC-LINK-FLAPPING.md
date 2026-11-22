@@ -1,11 +1,42 @@
 # Gaudi2 internal NIC links: port 9 flapping and FEC errors
 
-Status: **unresolved** (2026-11-21). Firmware, BIOS and BMC are all at their latest versions. This page collects all
+Status: **likely root cause found, workaround under test** (2026-11-22, see the next section). The rest of the page
+is the investigation up to 2026-11-21. Firmware, BIOS and BMC are all at their latest versions. This page collects all
 the evidence in one place: what we see, how it hurts performance, what we tried, and how to collect the data again.
 
 Raw data: [`results-ubuntu2404/nic-port9/`](../results-ubuntu2404/nic-port9/), collected by
 [`experiments-ubuntu2404/nic_link_report.sh`](../experiments-ubuntu2404/nic_link_report.sh). The script is read-only
 and safe to run while vLLM is serving.
+
+## Update 2026-11-22: resets of the unused external port 8 knock out port 9
+
+Found and tested by a second Claude session on this machine; link counts and driver source re-checked afterwards.
+
+- Port 8 is external and has no cable. Netplan's `en*` DHCP rule (`/etc/netplan/01-dhcp.yaml`) brings its netdev
+  (`enp*d8`) up. The second session saw the driver then reset that port's PHY about every 30 s.
+- Ports 8 and 9 depend on a shared macro clock. `gaudi2_cn_phy.c` (~line 2366) says a PHY reset of port 8 toggles port 9,
+  which "might lost stabilization", and calls `port_9_reinit()` after every port 8 reset.
+- With all eight d8 netdevs set down at 02:20:44 UTC:
+
+  | | Port 8 up | Port 8 down |
+  |---|---|---|
+  | Port 9 link-downs | 27,057 (01:20:00-02:20:44) | **0** in the first ~9 min, ~3 of them under load |
+  | 5 KiB 8-card all-reduce | p50 ~220 us, 4-16 s stalls, hung after ~90 s | p50 ~235 us, **worst 20 ms over 179 s** |
+
+  Raw: `link-downs-per-minute-1122.txt`, `allreduce-trace-port8down-1122.txt` in `results-ubuntu2404/nic-port9/`.
+
+The temporary workaround, lost at reboot:
+```bash
+for i in /sys/class/net/enp*d8; do sudo ip link set "$(basename "$i")" down; done
+```
+
+Still open:
+- A longer soak, and Qwen at TP=8.
+- The trace processes did not exit afterwards and had to be killed.
+- A persistent rule (mark the habanalabs_en netdevs unmanaged) is proposed but **not applied**.
+- The uncorrectable FEC counts on other internal ports are not explained by this.
+
+This supersedes the guess in symptom 5 below that port 9 has a physical signal fault.
 
 ## System
 

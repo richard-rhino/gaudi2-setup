@@ -9,7 +9,7 @@ Current state: Qwen3.8-Flash-Next runs on all 8 cards with pipeline parallelism 
 reference, single-user decode ~32 tok/s, 100-140 tok/s aggregate with 10-16 users ([FINDINGS 18-19](FINDINGS.md)).
 DeepSeek-V4.1-Flash runs on 4 cards with coherent output that is close to, but not the same as, the Nvidia reference;
 it is still very slow ([FINDINGS 20](FINDINGS.md)). TP=8 (Qwen) runs at only
-~3 tok/s because the internal NIC links stall all-reduces (details: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md)). The rest of this README is the Debian server.
+~3 tok/s because the internal NIC links stalled all-reduces (likely cause found 2026-11-22, TP=8 not re-tested; details: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md)). The rest of this README is the Debian server.
 
 
 Order:
