@@ -1,0 +1,12 @@
+prompt    55 chars: prompt-token |dlogprob| mean=0.1880 max=1.033 (n=11); greedy identical for 23/294 chars
+   gaudi: ' Tokyo. The capital of Italy is Rome. The capital of Spain is Madrid. The capital of Germany is Berlin. The capital of P'
+   nvidia: ' Tokyo. The capital of Australia is Canberra. The capital of Canada is Ottawa. The capital of Brazil is Brasília.'
+prompt    62 chars: prompt-token |dlogprob| mean=0.0543 max=0.251 (n=14); greedy identical for 201/201 chars
+   gaudi: '    if n < 0:\n        raise ValueError("Input must be a non-negative integer")\n    if n == 0:\n        return 0\n    elif '
+   nvidia: '    if n < 0:\n        raise ValueError("Input must be a non-negative integer")\n    if n == 0:\n        return 0\n    elif '
+prompt    45 chars: prompt-token |dlogprob| mean=0.0729 max=0.287 (n=10); greedy identical for 294/318 chars
+   gaudi: '\n\n<think>\nThe user wants a concise two-sentence explanation of why the sky is blue. I need to cover Rayleigh scattering '
+   nvidia: '\n\n<think>\nThe user wants a concise two-sentence explanation of why the sky is blue. I need to cover Rayleigh scattering '
+prompt  3414 chars: prompt-token |dlogprob| mean=0.0190 max=1.242 (n=868); greedy identical for 154/281 chars
+   gaudi: '\n\n<think>\nThe user has provided a text that repeats the same paragraph about Apollo 11 many times, and then asks me to s'
+   nvidia: '\n\n<think>\nThe user has provided a text that repeats the same paragraph about Apollo 11 many times, and then asks me to s'

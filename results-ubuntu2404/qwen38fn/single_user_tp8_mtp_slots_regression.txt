@@ -1,0 +1,14 @@
+# TP=8, no MTP, with the MTP state-slot code (patches 0007-0009) in place
+## cold 04:00:35
+run 0: TTFT 106.85 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.2 tok/s
+run 1: TTFT 63.47 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.1 tok/s
+run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.2 tok/s
+## warm1 04:04:05
+run 0: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.0 tok/s
+run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+## warm2 04:04:35
+run 0: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.9 tok/s
+run 1: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.5 tok/s
+# Regression result: text identical, median 26.4 tok/s vs 28.1 before. Cause under investigation (A/B).
