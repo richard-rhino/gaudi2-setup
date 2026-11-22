@@ -1,0 +1,36 @@
+# TP=8, 1 user, stage timers with device syncs (they add ~10-40 ms per step: a split, not a speed number)
+# median of the last 30 steps of the third request, slowest rank
+### drafter not compiled (plugin b53c7ac6), then without MTP
+## mtp3-1795328165: 8 ranks, step wall 208.9 ms (min rank 208.5)
+  execute_model                      in 30 steps, calls 1, done     0.2 ms, returned     0.1 ms
+  target(4, 1)                       in 29 steps, calls 1, done    66.1 ms, returned    59.3 ms
+  parse_output                       in 29 steps, calls 1, done     0.1 ms, returned     0.1 ms
+  draft.prepare_inputs               in 29 steps, calls 1, done     0.4 ms, returned     0.3 ms
+  draft.forward(4, 1)                in 29 steps, calls 1, done    37.5 ms, returned    17.3 ms
+  draft.logits                       in 30 steps, calls 3, done     7.6 ms, returned     2.0 ms
+  draft.attn_meta                    in 30 steps, calls 2, done     2.1 ms, returned     1.9 ms
+  draft.forward(1, 1)                in 30 steps, calls 2, done    69.7 ms, returned    39.1 ms
+  drafter.propose                    in 30 steps, calls 1, done   126.0 ms, returned   125.3 ms
+  propose                            in 30 steps, calls 1, done   128.8 ms, returned   128.7 ms
+  sample_tokens                      in 30 steps, calls 1, done   206.5 ms, returned   206.3 ms
+  target(1, 128)                     in  1 steps, calls 1, done   274.6 ms, returned   262.4 ms
+  draft.forward(1, 128)              in  1 steps, calls 1, done   483.7 ms, returned    80.3 ms
+## mtp0-1795328582: 8 ranks, step wall 50.2 ms (min rank 49.6)
+  execute_model                      in 30 steps, calls 1, done     0.1 ms, returned     0.0 ms
+  target(1, 1)                       in 30 steps, calls 1, done    44.4 ms, returned    33.5 ms
+  sample_tokens                      in 30 steps, calls 1, done    49.6 ms, returned    49.6 ms
+### drafter compiled (plugin 9ad4aeb4, patch 0018)
+## mtp3-1795329866: 8 ranks, step wall 108.1 ms (min rank 107.9)
+  execute_model                      in 30 steps, calls 1, done     0.1 ms, returned     0.1 ms
+  target(4, 1)                       in 29 steps, calls 1, done    54.7 ms, returned    48.6 ms
+  parse_output                       in 29 steps, calls 1, done     0.1 ms, returned     0.1 ms
+  draft.prepare_inputs               in 29 steps, calls 1, done     0.3 ms, returned     0.3 ms
+  draft.forward(4, 1)                in 29 steps, calls 1, done     8.3 ms, returned     4.7 ms
+  draft.logits                       in 30 steps, calls 3, done     4.5 ms, returned     1.5 ms
+  draft.attn_meta                    in 30 steps, calls 2, done     1.6 ms, returned     1.4 ms
+  draft.forward(1, 1)                in 30 steps, calls 2, done    16.4 ms, returned     9.0 ms
+  drafter.propose                    in 30 steps, calls 1, done    39.1 ms, returned    38.4 ms
+  propose                            in 30 steps, calls 1, done    41.6 ms, returned    41.6 ms
+  sample_tokens                      in 30 steps, calls 1, done   105.8 ms, returned   105.8 ms
+  target(1, 128)                     in  1 steps, calls 1, done   236.2 ms, returned   164.7 ms
+  draft.forward(1, 128)              in  1 steps, calls 1, done    16.2 ms, returned    10.6 ms

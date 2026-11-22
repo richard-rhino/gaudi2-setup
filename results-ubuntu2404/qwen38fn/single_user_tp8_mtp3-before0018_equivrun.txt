@@ -1,0 +1,17 @@
+# TP=8 mtp3, plugin b53c7ac6
+## cold
+run 0: TTFT 0.95 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.8 tok/s
+run 1: TTFT 0.81 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.1 tok/s
+run 2: TTFT 0.78 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.9 tok/s
+## warm1
+run 0: TTFT 0.81 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.8 tok/s
+run 1: TTFT 0.78 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 14.9 tok/s
+run 2: TTFT 0.83 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.2 tok/s
+## warm2
+run 0: TTFT 0.95 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.7 tok/s
+run 1: TTFT 0.78 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.1 tok/s
+run 2: TTFT 0.81 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.7 tok/s
+## warm3
+run 0: TTFT 0.86 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.9 tok/s
+run 1: TTFT 0.75 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.3 tok/s
+run 2: TTFT 0.73 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.3 tok/s

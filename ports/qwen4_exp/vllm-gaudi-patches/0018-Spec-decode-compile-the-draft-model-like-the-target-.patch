@@ -1,0 +1,132 @@
+From 9ad4aeb4a9b6fc992aad6dcd9e8d6fd3c99866bf Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 06:31:12 +0000
+Subject: [PATCH] Spec decode: compile the draft model like the target model
+
+With torch.compile only the target model was compiled, so every draft pass
+ran op by op in eager mode.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../unit_tests/worker/test_drafter_compile.py | 59 +++++++++++++++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py      | 19 ++++--
+ 2 files changed, 73 insertions(+), 5 deletions(-)
+ create mode 100644 tests/unit_tests/worker/test_drafter_compile.py
+
+diff --git a/tests/unit_tests/worker/test_drafter_compile.py b/tests/unit_tests/worker/test_drafter_compile.py
+new file mode 100644
+index 00000000..fc30e9e8
+--- /dev/null
++++ b/tests/unit_tests/worker/test_drafter_compile.py
+@@ -0,0 +1,59 @@
++# SPDX-License-Identifier: Apache-2.0
++"""The draft model gets the same regional compilation as the target."""
++
++from types import SimpleNamespace
++from unittest import mock
++
++import torch
++from torch import nn
++
++from vllm_gaudi.v1.worker import hpu_model_runner
++
++
++class _Model(nn.Module):
++
++    def __init__(self):
++        super().__init__()
++        self.layers = nn.ModuleList([nn.Linear(2, 2)])
++
++    def compute_logits(self, hidden_states):
++        return hidden_states
++
++
++def _compiled(drafter, regional=True):
++    runner = object.__new__(hpu_model_runner.HPUModelRunner)
++    runner.model, runner.sampler = _Model(), nn.Identity()
++    runner.vllm_config = SimpleNamespace(model_config=SimpleNamespace(enforce_eager=False))
++    if drafter is not None:
++        runner.drafter = drafter
++    targets = [runner.model, runner.model.layers[0]]
++    if getattr(drafter, "model", None) is not None:
++        targets += [drafter.model, drafter.model.layers[0]]
++    seen = []
++
++    def compile_stub(module, **kwargs):
++        seen.append(getattr(module, "__self__", module))
++        return module
++
++    runner._compile = compile_stub
++    config = SimpleNamespace(regional_compilation=regional)
++    with mock.patch.object(hpu_model_runner, "HPUCompileConfig", return_value=config), \
++            mock.patch.object(hpu_model_runner, "is_fake_hpu", return_value=False), \
++            mock.patch.object(hpu_model_runner.htorch.utils.internal, "is_lazy", return_value=False), \
++            mock.patch.object(hpu_model_runner.Sampler, "apply_logits_processors", lambda *a, **k: None), \
++            mock.patch.object(torch._dynamo.config, "force_parameter_static_shapes", True):
++        runner._maybe_compile(runner.model)
++    return [any(t is s for s in seen) for t in targets]
++
++
++def test_drafter_regions_are_compiled():
++    assert _compiled(SimpleNamespace(model=_Model())) == [True] * 4
++
++
++def test_drafter_is_compiled_without_regional_compilation():
++    assert _compiled(SimpleNamespace(model=_Model()), regional=False) == [True, False, True, False]
++
++
++def test_runner_without_draft_model():
++    assert _compiled(None) == [True] * 2
++    assert _compiled(SimpleNamespace()) == [True] * 2
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index cef0e5e7..7f668ab5 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -5520,10 +5520,12 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+             torch._dynamo.config.force_parameter_static_shapes = False
+             self.compile_config = HPUCompileConfig()
+ 
++            drafter_model = getattr(getattr(self, "drafter", None), "model", None)
+             if self.compile_config.regional_compilation:
+-                self._compile_methods()
+                 self.regional_compilation_layers_list = [RMSNorm, VocabParallelEmbedding]
+-                self._regional_compilation(self.model)
++                self._compile_model_regions(self.model)
++                if drafter_model is not None:
++                    self._compile_model_regions(drafter_model)
+                 # Run the logits-processor stage eagerly: it reads the growing
+                 # output_token_ids lists, which otherwise recompile the sampler
+                 # every decode step once penalties are active. Needs
+@@ -5534,8 +5536,15 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 self.sampler = self._compile(self.sampler, fullgraph=False)
+             else:
+                 self.model = self._compile(self.model)
++                if drafter_model is not None:
++                    self.drafter.model = self._compile(drafter_model)
+ 
+-    def _compile_methods(self):
++    def _compile_model_regions(self, model):
++        """Compile the methods and the regions of one model: the target, or the draft model."""
++        self._compile_methods(model)
++        self._regional_compilation(model)
++
++    def _compile_methods(self, model):
+         """
+         Compile methods which are not part of the compiled model i.e. those
+         which will not be compiled during model's compilation.
+@@ -5546,9 +5555,9 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+             'compute_logits',
+         ]
+         for method_name in compiled_methods:
+-            method = getattr_nested(self.model, method_name, None)
++            method = getattr_nested(model, method_name, None)
+             if method is not None:
+-                self._compile_region(self.model, method_name, method)
++                self._compile_region(model, method_name, method)
+ 
+     def _regional_compilation(self, module, parent_module=None, module_name=None):
+         """
+-- 
+2.43.0
+

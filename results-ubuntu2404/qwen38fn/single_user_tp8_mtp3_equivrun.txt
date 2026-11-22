@@ -1,17 +1,17 @@
-# TP=8 mtp3, plugin b53c7ac6
+# TP=8 mtp3, plugin 9ad4aeb4
 ## cold
-run 0: TTFT 0.95 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.8 tok/s
-run 1: TTFT 0.81 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.1 tok/s
-run 2: TTFT 0.78 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.9 tok/s
+run 0: TTFT 0.33 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 37.6 tok/s
+run 1: TTFT 0.26 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 32.6 tok/s
+run 2: TTFT 0.24 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 33.0 tok/s
 ## warm1
-run 0: TTFT 0.81 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.8 tok/s
-run 1: TTFT 0.78 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 14.9 tok/s
-run 2: TTFT 0.83 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.2 tok/s
+run 0: TTFT 0.30 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 36.5 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 31.7 tok/s
+run 2: TTFT 0.24 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.5 tok/s
 ## warm2
-run 0: TTFT 0.95 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.7 tok/s
-run 1: TTFT 0.78 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.1 tok/s
-run 2: TTFT 0.81 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.7 tok/s
+run 0: TTFT 0.31 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 37.1 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 35.1 tok/s
+run 2: TTFT 0.25 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 34.4 tok/s
 ## warm3
-run 0: TTFT 0.86 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.9 tok/s
-run 1: TTFT 0.75 s, 256 tokens in 102 chunks (2.51 tok/chunk), decode 15.3 tok/s
-run 2: TTFT 0.73 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 15.3 tok/s
+run 0: TTFT 0.31 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 38.3 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 33.1 tok/s
+run 2: TTFT 0.26 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 32.8 tok/s

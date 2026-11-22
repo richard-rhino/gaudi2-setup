@@ -493,7 +493,13 @@ To-do, in working order:
           is 1330 of 1812 and 953 of 1868 tokens, with 7 and 4 block crossings among them. Not tested: images,
           logprobs (crash), more than 4 users, contexts over ~1k tokens, PP=8, warm-up.
           Speed is unchanged: **15.3 tok/s** (14.9-15.9) vs 24.5 (24.2-25.6) without MTP, 1 launch each, single user;
-          ~171 ms per step against ~41, where break-even at 2.61 tokens per step is ~107 ms. Next: profile the step.
+          ~171 ms per step against ~41, where break-even at 2.61 tokens per step is ~107 ms.
+          Profile (`mtp_step_profile_tp8.txt`): drafting took 129 of 209 ms, because the plugin compiled only the target
+          model and ran the drafter op by op. **Patch 0018 compiles the drafter:** drafting 42 ms, step 108 ms (with timers).
+          Launch 8, with 0018: 9/16 and 8/16 identical (1 and 4 users), largest flips 0.4375 and 0.25, i.e. no worse;
+          draft acceptance 61.4% (62.2% before). **34.4 tok/s** single user (31.7-38.3), TTFT 0.25 s. That is one launch
+          against non-MTP launches of 24.5-29.2, so the size of the gain needs repeated launches. With 4 users the test
+          finished at about the same rate as without MTP (38 vs 39 tok/s, compiles included), so a multi-user gain is open.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
