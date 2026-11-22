@@ -1,0 +1,54 @@
+# PP=8, gather MoE, port 8 down: 1024 in / 256 out, concurrency 16
+== pass seed 1 n=32 03:42:04
+Successful requests:                     32
+Failed requests:                         0
+Benchmark duration (s):                  333.17
+Output token throughput (tok/s):         24.59
+Peak output token throughput (tok/s):    273.00
+Total token throughput (tok/s):          122.94
+P50 TTFT (ms):                           75791.65
+P99 TTFT (ms):                           291622.93
+P50 TPOT (ms):                           81.01
+P99 TPOT (ms):                           483.13
+P50 ITL (ms):                            72.98
+P99 ITL (ms):                            110.79
+== pass seed 2 n=96 03:47:50
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  120.05
+Output token throughput (tok/s):         204.71
+Peak output token throughput (tok/s):    278.00
+Total token throughput (tok/s):          1023.57
+P50 TTFT (ms):                           1345.64
+P99 TTFT (ms):                           2562.85
+P50 TPOT (ms):                           71.96
+P99 TPOT (ms):                           87.37
+P50 ITL (ms):                            67.71
+P99 ITL (ms):                            85.25
+== pass seed 3 n=96 03:50:02
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  122.44
+Output token throughput (tok/s):         200.73
+Peak output token throughput (tok/s):    280.00
+Total token throughput (tok/s):          1003.63
+P50 TTFT (ms):                           1616.55
+P99 TTFT (ms):                           2455.59
+P50 TPOT (ms):                           73.70
+P99 TPOT (ms):                           83.82
+P50 ITL (ms):                            71.32
+P99 ITL (ms):                            83.96
+== pass seed 4 n=96 03:52:16
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  130.95
+Output token throughput (tok/s):         187.68
+Peak output token throughput (tok/s):    278.00
+Total token throughput (tok/s):          938.39
+P50 TTFT (ms):                           1599.30
+P99 TTFT (ms):                           2603.99
+P50 TPOT (ms):                           83.47
+P99 TPOT (ms):                           91.92
+P50 ITL (ms):                            78.27
+P99 ITL (ms):                            91.33
+# port 9 link-downs during the test: 0, end 03:54:39

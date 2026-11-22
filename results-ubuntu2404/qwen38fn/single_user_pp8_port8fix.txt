@@ -1,0 +1,17 @@
+# PP=8 TP=1 pinned, gather MoE, port 8 down, start 2026-11-22 03:33:40 UTC
+## cold 03:33:40
+run 0: TTFT 141.74 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 13.0 tok/s
+run 1: TTFT 79.50 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.9 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.7 tok/s
+## warm1 03:37:57
+run 0: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.9 tok/s
+run 1: TTFT 0.20 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.5 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.5 tok/s
+## warm2 03:38:22
+run 0: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.7 tok/s
+run 1: TTFT 0.20 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.6 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.8 tok/s
+## warm3 03:38:47
+run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.8 tok/s
+run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.0 tok/s
+run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.3 tok/s

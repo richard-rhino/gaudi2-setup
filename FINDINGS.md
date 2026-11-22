@@ -410,12 +410,17 @@ So the larger factor is the gather MoE, and the link fix is what makes TP=8 stab
 **Soak, 16 users, 21 min** (random 1024 in / 256 out, 10 passes of 96 requests after a warm pass,
 `bench_tp8_port8fix_16users.txt` in the same directory):
 
-| | TP=8, port 8 fix | PP=8 gather (section 18, not re-run since) |
+| | TP=8, port 8 fix | PP=8, port 8 fix (re-run afterwards, `*pp8_port8fix*`) |
 |---|---|---|
-| Aggregate output | **214.8 tok/s** (213.5-218.8 over 10 passes) | 123 tok/s |
-| TPOT p50 | 66-68 ms | 120 ms |
-| TTFT p50 / p99 | ~2.0 s / 5.3-5.7 s | |
-| ITL p50 / p99 | 54-55 ms / 627-671 ms | |
+| Aggregate output | **214.8 tok/s** (213.5-218.8 over 10 passes) | **197.7 tok/s** (187.7-204.7 over 3 passes) |
+| Single user, median | 28.1 tok/s | **31.6 tok/s** (31.0-31.9, 9 runs) |
+| TPOT p50 | 66-68 ms | 72-83 ms |
+| TTFT p50 / p99 | ~2.0 s / 5.3-5.7 s | **1.3-1.6 s / 2.5-2.6 s** |
+| ITL p50 / p99 | 54-55 ms / 627-671 ms | 68-78 ms / **84-91 ms** |
+
+The 123 tok/s in section 18 is obsolete for PP=8. The two are close in throughput (TP ~9% ahead at 16 users); PP is ahead
+for one user and has far better tail latency. **PP=8 stays the default for interactive serving**; TP=8 is the simpler
+base for MTP. The PP soak was short (3 passes, the last one the slowest), so it is not a stability test.
 
 - 0 of 960 requests failed, 0 port 9 link-downs, no server errors.
 - The 10 s server-log windows under 100 tok/s all fall at the start of a pass (idle client, then 16 prefills at once) or
