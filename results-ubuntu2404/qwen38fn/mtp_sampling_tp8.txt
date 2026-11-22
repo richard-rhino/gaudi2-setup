@@ -1,0 +1,76 @@
+# TP=8 MTP=3, plugin d9a93321 (patch 0019), then the reference without MTP (same checks)
+#### mtp3fix ready=1 10:31:42 plugin d9a93321
+chat, all defaults                 ok   'User asks: "Name three rivers in Europe." Simple factual request. Need answer concise. Final: list three Europ'
+completion, temperature 0.7        ok   ' the largest ecosystem on Earth, and marine organisms provide an important source of protein for humans.\nHowev'
+top_p only                         ok   ' the greatest mystery of all.\nAs well as having an enormous influence on our climate and the weather, it cover'
+logprobs, greedy                   ok   64 logprobs, min -1.14
+logprobs, sampled                  ok   64 logprobs, min -4.25
+chat logprobs                      ok   40 rows
+repetition + frequency penalty     ok   '\n\n基本信息\n歌曲名 = ララリラリ\n演唱 = 中野三玖 (CV: M·A·O)\n音轨1 = -LOVE-\n作词 = Z'
+seeded twice                       ok   same=True ', in a faraway land called the United States, there was a big problem that people had been facing for a long t'
+16 mixed requests                  ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+16 mixed requests, again           ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+sampled single-user speed          ok   warm decode tok/s [20.0, 20.1, 22.0, 22.1, 23.0, 23.2]
+distribution samples               ok   960 samples
+mtp3fix seq: 2890 tokens
+mtp3fix c16a: 3608 tokens
+greedy single cold: run 0: TTFT 0.36 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 33.1 tok/s
+greedy single cold: run 1: TTFT 0.29 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 28.4 tok/s
+greedy single cold: run 2: TTFT 0.27 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 29.6 tok/s
+greedy single warm1: run 0: TTFT 0.32 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 34.5 tok/s
+greedy single warm1: run 1: TTFT 0.26 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 30.1 tok/s
+greedy single warm1: run 2: TTFT 0.29 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 29.1 tok/s
+greedy single warm2: run 0: TTFT 0.34 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 33.7 tok/s
+greedy single warm2: run 1: TTFT 0.35 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 29.4 tok/s
+greedy single warm2: run 2: TTFT 0.29 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 29.1 tok/s
+greedy single warm3: run 0: TTFT 0.34 s, 256 tokens in 91 chunks (2.81 tok/chunk), decode 34.3 tok/s
+greedy single warm3: run 1: TTFT 0.28 s, 256 tokens in 105 chunks (2.44 tok/chunk), decode 29.1 tok/s
+greedy single warm3: run 2: TTFT 0.29 s, 256 tokens in 104 chunks (2.46 tok/chunk), decode 28.5 tok/s
+real16 cold: 84.0 tok/s (48/48 ok, 10131 tokens, 120.7 s)
+real16 warm1: 118.3 tok/s (48/48 ok, 9129 tokens, 77.2 s)
+real16 warm2: 148.2 tok/s (48/48 ok, 9360 tokens, 63.1 s)
+--- compare with deb-ai (4 prompts, light)
+prompt    55 chars: prompt-token |dlogprob| mean=0.1891 max=0.932 (n=11); greedy identical for 23/294 chars
+prompt    62 chars: prompt-token |dlogprob| mean=0.0709 max=0.367 (n=14); greedy identical for 201/201 chars
+prompt    45 chars: prompt-token |dlogprob| mean=0.0839 max=0.321 (n=10); greedy identical for 294/318 chars
+prompt  3414 chars: prompt-token |dlogprob| mean=0.0227 max=1.488 (n=868); greedy identical for 154/281 chars
+json schema (last: may crash)      FAIL <HTTPError 500: 'Internal Server Error'>
+server alive afterwards            FAIL <HTTPError 500: 'Internal Server Error'>
+errors 2
+(Worker_TP0 pid=2914521) ERROR 11-22 11:01:54 [multiproc_executor.py:1223] UnboundLocalError: cannot access local variable 'sampling_metadata' where it is not associated with a value
+(Worker_TP0 pid=2914521) ERROR 11-22 11:01:54 [multiproc_executor.py:1223] UnboundLocalError: cannot access local variable 'sampling_metadata' where it is not associated with a value
+(Worker_TP3 pid=2914527) ERROR 11-22 11:01:54 [multiproc_executor.py:1223] UnboundLocalError: cannot access local variable 'sampling_metadata' where it is not associated with a value
+cards released
+#### reference: deb-ai compare without MTP
+prompt    55 chars: prompt-token |dlogprob| mean=0.1892 max=1.037 (n=11); greedy identical for 23/294 chars
+prompt    62 chars: prompt-token |dlogprob| mean=0.0748 max=0.367 (n=14); greedy identical for 201/201 chars
+prompt    45 chars: prompt-token |dlogprob| mean=0.0839 max=0.321 (n=10); greedy identical for 294/318 chars
+prompt  3414 chars: prompt-token |dlogprob| mean=0.0207 max=1.321 (n=868); greedy identical for 154/281 chars
+#### distribution
+token 0: TVD base vs mtp 0.0125, same-distribution median 0.0365, p=0.999
+token 1: TVD base vs mtp 0.0667, same-distribution median 0.0688, p=0.565
+token 2: TVD base vs mtp 0.1146, same-distribution median 0.0896, p=0.044
+token 3: TVD base vs mtp 0.1729, same-distribution median 0.1448, p=0.026
+token 4: TVD base vs mtp 0.2031, same-distribution median 0.1760, p=0.030
+#### equality and logprobs vs the saved non-MTP run
+seq: 9/16 identical, largest flip margin 0.4375, top-2 margin |diff| mean 0.1965 max 2.375 over 1955 tokens
+c16a: 3/16 identical, largest flip margin 0.75, top-2 margin |diff| mean 0.2008 max 2.312 over 1301 tokens
+noise, no MTP 1 vs 16 users: margin |diff| mean 0.2107 max 2.938 over 1547 tokens
+
+[exited with code 0]
+### without MTP
+#### base ready=1 10:17:25 plugin 33016cd4
+chat, all defaults                 ok   'User asks: "Name three rivers in Europe." Need answer concise. Ensure analysis here. Simple. Could say Danube,'
+completion, temperature 0.7        ok   ' the source of life on Earth.\nThe Committee recommends that the State party strengthen the collection of data '
+top_p only                         ok   ' the biggest natural resource in the world. It is a great source of food and energy. There are many minerals i'
+logprobs, greedy                   ok   64 logprobs, min -1.10
+logprobs, sampled                  ok   64 logprobs, min -2.74
+chat logprobs                      ok   40 rows
+repetition + frequency penalty     ok   '\n\n基本信息\n歌曲名 = ララリラリ\n演唱 = 中野三玖 (CV: 伊藤美来)\n音轨1 = あんさんぶるソングエ'
+seeded twice                       ok   same=True ', there was a person named John who decided to build a simple website. He thought it would be easy, but little'
+16 mixed requests                  ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+16 mixed requests, again           ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+sampled single-user speed          ok   warm decode tok/s [24.5, 24.6, 24.8, 25.1, 25.3, 25.7]
+distribution samples               ok   960 samples
+errors 0
+cards released

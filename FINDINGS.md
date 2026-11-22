@@ -531,6 +531,18 @@ To-do, in working order:
              and in a padded batch they would be read from other requests' rows (the vendored code expects compact rows).
           3. In a padded batch a request whose drafts were all accepted loses its bonus token (the padding counts as a
              mismatch): right tokens, fewer per step. The 16-user speeds above include that loss.
+          **Fix 0019 (local plugin commit d9a93321, not exported until the distribution question below is settled)**, on
+          the cards at TP=8, one launch each (`mtp_sampling_tp8.txt`):
+          - works: chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
+            requests at once. Logprobs agree with the non-MTP run as closely as that run agrees with itself (top-2 margin
+            difference 0.20 vs 0.21 mean), prompt logprobs vs deb-ai as without MTP. Greedy: 9/16 and 3/16 identical
+            (1 and 16 users), largest flips 0.4375 and 0.75, the latter what switching the MoE path does without MTP.
+          - **sampled requests are slower with MTP: 22.0 tok/s (20.0-23.2) vs 25.0 (24.5-25.7) without.** The +23% is
+            greedy only. Greedy was 29.4 tok/s in this launch (31.8-32.6 in the A/B before 0019), cause not known yet.
+          - **open: the sampled distribution.** 960 completions with and without MTP: p = 1.0, 0.57, 0.04, 0.03, 0.03 for
+            tokens 0-4 (dependent tests). The two runs also differ numerically, so this may or may not be the sampler.
+          - **still crashes: structured output (JSON schema)**, `UnboundLocalError: sampling_metadata`. The plugin's
+            structured-output path does not handle speculative decoding.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

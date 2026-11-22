@@ -18,7 +18,8 @@ TP=${TP:-8}; PP=${PP:-1}
 PROF=(); [ -n "${PROFILE:-}" ] && { export VLLM_TORCH_PROFILER_DIR="$PROFILE"
   PROF=(--profiler-config "{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$PROFILE\"}"); }
 # MTP=k: k drafted tokens per step (patches 0007-0018). The HPU runner has no async scheduling with spec decode.
-# WARNING: EXPERIMENTS ONLY, temperature=0 and no logprobs: other requests raise in the workers (FINDINGS 21).
+# WARNING: EXPERIMENTS ONLY. Up to 0018: temperature=0 and no logprobs, other requests raise in the workers.
+# Structured output (JSON schema) crashes MTP with every patch so far, 0019 included (FINDINGS 21).
 SPEC=(); [ "${MTP:-0}" -gt 0 ] && SPEC=(--no-async-scheduling
   --speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":$MTP}")
 vllm serve Qwen/Qwen3.8-Flash-Next --served-model-name qwen38fn \
