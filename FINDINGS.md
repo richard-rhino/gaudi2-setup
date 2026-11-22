@@ -398,8 +398,23 @@ The old 2.6-3.4 tok/s at TP=8 was measured with the fused MoE and the uncompiled
 links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single user.
 
 ## 21. Next steps
-- Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill
-  shapes (a new prompt length compiles for 1-4 minutes), and keep the PLE context tokens on the host.
-- Hardware: soak-test the port 8 fix (section 17) and check it across a reboot. With healthy links, TP=8 + gather
-  MoE should be compared against PP=8.
-- DeepSeek-V4.1-Flash (section 20): speed up the decode step, and compare logprobs with rack-n03.
+
+To-do, in working order:
+- [ ] **TP=8 soak** (16 users, 20 min) after the port 8 fix, then the same single-user test with the gather MoE off, to
+      separate the link fix from the MoE speed-up.
+- [ ] **DeepSeek-V4.1-Flash** (section 20): run `compare_modes.py` with the static-shape attention (speed, and whether
+      each speed-up changes the output), then compare logprobs with rack-n03.
+- [ ] **Qwen3.8-Flash-Next MTP** (requested 2026-11-22). All Gaudi numbers so far are without it; deb-ai gets 2.4-2.6
+      tokens per step with it. Scope, from reading the code (nothing run yet):
+  - The checkpoint has the head (31 `mtp.*` tensors); `qwen4_exp.py` drops them today (`"mtp.": None`).
+  - Port upstream `vllm/models/qwen4_exp/nvidia/mtp.py` (508 lines) to the HPU layers and register `Qwen4ExpMTP`.
+    It takes the hyper-connection streams (hc_count x hidden) before the final mixer and returns two hidden streams.
+  - The plugin has a generic path to build on: `hpu_model_runner` sends method `mtp` to `HpuEagleProposer`. To check:
+    the multi-stream hidden state through it, multi-token decode in the PLE and QSA state, and rewind of rejected
+    tokens. Speculative decoding is not supported with async scheduling, and not fully with torch.compile.
+  - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
+  - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
+    single and 16 users.
+- [ ] Qwen: warm up the common prefill shapes (a new prompt length compiles for 1-4 minutes); keep the PLE context
+      tokens on the host.
+- [ ] Check the port 8 fix across a reboot.
