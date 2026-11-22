@@ -659,7 +659,14 @@ To-do, in working order:
           0 errors, speeds as in the control (16 users 182.5 greedy, 149.0 sampled).
           **Use MTP at PP=8 for several users, not for a single sampled user.** Known issue: one 16-user pass in
           about every 7 drops to ~45-50 tok/s (seen 3 times, with and without the hook), cause not known.
-    - [ ] Model card in tests/models for the draft model, once it runs.
+    - [x] **Model cards (0025)**: `Qwen4ExpForConditionalGeneration` and `Qwen4ExpMTP` in `tests/models/registry.py`
+          (`model_cards_init.txt`, one layer, dummy weights, one card). The test helper predates this vLLM (import, block
+          count, KV layout, return type), so it ran through `ports/qwen4_exp/tests/run_card_test.py`, which adapts only
+          that. **The MTP card passes**; it found a draft-model bug, fixed in 0025: the draft layer is numbered after the
+          target's layers, which with one layer is in `ple_layer_ids`, so it asked for a PLE (no effect on the full model,
+          whose draft index 48 is not in the list). **The target-only card fails** in the KV cache coordinator
+          (`hash_block_size == block_size`) with prefix caching on, which the serve script always turns off; not looked
+          into, and prefix caching with this model is untested.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
     single and 16 users.

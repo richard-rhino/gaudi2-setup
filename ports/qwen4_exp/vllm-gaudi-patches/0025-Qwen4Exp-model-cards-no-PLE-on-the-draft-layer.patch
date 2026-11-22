@@ -1,0 +1,85 @@
+From 1294c210f55d1408ed98e586d93983a9e4324335 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 21:57:57 +0000
+Subject: [PATCH] Qwen4Exp: model cards, no PLE on the draft layer
+
+Add Qwen4ExpForConditionalGeneration and Qwen4ExpMTP to the test model
+registry. The MTP layer is numbered after the target's layers; with fewer
+layers, as the initialization test configures, that number can appear in
+ple_layer_ids and the draft layer then asked for a PLE it cannot have.
+Build the draft layer without PLE.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ tests/models/registry.py           | 3 +++
+ vllm_gaudi/models/qwen4_exp.py     | 4 ++--
+ vllm_gaudi/models/qwen4_exp_mtp.py | 8 ++++++--
+ 3 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/tests/models/registry.py b/tests/models/registry.py
+index a2bd0e54..bed1fdf0 100644
+--- a/tests/models/registry.py
++++ b/tests/models/registry.py
+@@ -199,6 +199,7 @@ _TEXT_GENERATION_EXAMPLE_MODELS = {
+                                          trust_remote_code=True),
+     "MiniCPM3ForCausalLM": _HfExamplesInfo("openbmb/MiniCPM3-4B",
+                                          trust_remote_code=True),
++    "Qwen4ExpForConditionalGeneration": _HfExamplesInfo("Qwen/Qwen3.8-Flash-Next", max_model_len=4096),
+     "MiniMaxText01ForCausalLM": _HfExamplesInfo("MiniMaxAI/MiniMax-Text-01",
+                                                 trust_remote_code=True),
+     "MistralForCausalLM": _HfExamplesInfo("mistralai/Mistral-7B-Instruct-v0.1"),
+@@ -405,6 +406,8 @@ _SPECULATIVE_DECODING_EXAMPLE_MODELS = {
+                                             is_available_online=False,
+                                             speculative_model="openbmb/MiniCPM-2B-sft-bf16",
+                                             tokenizer="openbmb/MiniCPM-2B-sft-bf16"),
++    "Qwen4ExpMTP": _HfExamplesInfo("Qwen/Qwen3.8-Flash-Next", speculative_model="Qwen/Qwen3.8-Flash-Next",
++                                   max_model_len=4096),
+     "MiMoMTPModel": _HfExamplesInfo("XiaomiMiMo/MiMo-7B-RL",
+                                     trust_remote_code=True,
+                                     speculative_model="XiaomiMiMo/MiMo-7B-RL")
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index cc7d8ca4..0a61704f 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -469,7 +469,7 @@ class PLEStepInputs(NamedTuple):
+ 
+ class HpuQwen4ExpDecoderLayer(nn.Module):
+ 
+-    def __init__(self, vllm_config: VllmConfig, layer_type: str, prefix: str):
++    def __init__(self, vllm_config: VllmConfig, layer_type: str, prefix: str, use_ple: bool = True):
+         super().__init__()
+         config = vllm_config.model_config.hf_text_config
+         self.layer_type = layer_type
+@@ -484,7 +484,7 @@ class HpuQwen4ExpDecoderLayer(nn.Module):
+         else:
+             raise ValueError(f"Invalid layer_type {layer_type}")
+         self.ple = None
+-        if (self.layer_idx + 1) in (config.ple_layer_ids or []):
++        if use_ple and (self.layer_idx + 1) in (config.ple_layer_ids or []):
+             if layer_type != "linear_attention":
+                 raise NotImplementedError("PLE state borrows the GDN state spec; PLE on an attention layer")
+             ple_index = sorted(config.ple_layer_ids).index(self.layer_idx + 1)
+diff --git a/vllm_gaudi/models/qwen4_exp_mtp.py b/vllm_gaudi/models/qwen4_exp_mtp.py
+index 558871e1..caf8c192 100644
+--- a/vllm_gaudi/models/qwen4_exp_mtp.py
++++ b/vllm_gaudi/models/qwen4_exp_mtp.py
+@@ -46,9 +46,13 @@ class HpuQwen4ExpPredictor(nn.Module):
+         self.pre_fc_norm_hidden = GroupedGemmaRMSNorm(self.hc * self.H, None, config.rms_norm_eps)
+         self.fc_embedding = nn.Linear(self.H, self.H, bias=False)
+         self.fc_hidden = nn.Linear(self.H, self.H, bias=False)
+-        # Numbered after the target's layers, so that KV cache and MoE layer ids do not collide
++        # Numbered after the target's layers, so that KV cache and MoE layer ids do not collide. No PLE: that index
++        # is not a target layer, even when it appears in ple_layer_ids (configs with fewer layers, as in tests).
+         self.layers = nn.ModuleList([
+-            HpuQwen4ExpDecoderLayer(vllm_config, "full_attention", prefix=f"mtp.layers.{config.num_hidden_layers}")
++            HpuQwen4ExpDecoderLayer(vllm_config,
++                                    "full_attention",
++                                    prefix=f"mtp.layers.{config.num_hidden_layers}",
++                                    use_ple=False)
+         ])
+         self.hyper_connection_mixer = GatedResidual(config, use_combine=False)
+ 
+-- 
+2.43.0
+

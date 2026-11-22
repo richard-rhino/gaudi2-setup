@@ -1,0 +1,10 @@
+# tests/models/test_initialization.py::test_can_initialize (one layer, dummy weights, one card), plugin 1294c210 (0001-0025).
+# Run through ports/qwen4_exp/tests/run_card_test.py: the test helper predates this vLLM in four ways, adapted there only.
+INFO 11-22 21:56:53 [hpu_model_runner.py:5451] Loading model weights took 2.5404 GB
+CARD FAIL Qwen4ExpForConditionalGeneration AssertionError('UnitaryKVCacheCoordinator assumes hash_block_size == block_size')
+AssertionError: UnitaryKVCacheCoordinator assumes hash_block_size == block_size
+INFO 11-22 21:57:25 [hpu_model_runner.py:5451] Loading model weights took 2.5404 GB
+INFO 11-22 21:57:27 [hpu_model_runner.py:5566] Loading drafter model weights took 2.6747 GB
+CARD pass Qwen4ExpMTP
+# Qwen4ExpMTP with the draft-layer fix of 0025 reverted:
+CARD FAIL Qwen4ExpMTP NotImplementedError('PLE state borrows the GDN state spec; PLE on an attention layer')

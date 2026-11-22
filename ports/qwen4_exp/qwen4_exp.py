@@ -469,7 +469,7 @@ class PLEStepInputs(NamedTuple):
 
 class HpuQwen4ExpDecoderLayer(nn.Module):
 
-    def __init__(self, vllm_config: VllmConfig, layer_type: str, prefix: str):
+    def __init__(self, vllm_config: VllmConfig, layer_type: str, prefix: str, use_ple: bool = True):
         super().__init__()
         config = vllm_config.model_config.hf_text_config
         self.layer_type = layer_type
@@ -484,7 +484,7 @@ class HpuQwen4ExpDecoderLayer(nn.Module):
         else:
             raise ValueError(f"Invalid layer_type {layer_type}")
         self.ple = None
-        if (self.layer_idx + 1) in (config.ple_layer_ids or []):
+        if use_ple and (self.layer_idx + 1) in (config.ple_layer_ids or []):
             if layer_type != "linear_attention":
                 raise NotImplementedError("PLE state borrows the GDN state spec; PLE on an attention layer")
             ple_index = sorted(config.ple_layer_ids).index(self.layer_idx + 1)
@@ -530,6 +530,7 @@ class HpuQwen4ExpModel(nn.Module):
             p.check_capacity()
             p.ple_slot = j
         self.ple_hasher = MultiNGramHasher([p.hasher for p in self.ple_layers]) if self.ple_layers else None
+        self.return_multi_stream = False  # MTP: the draft model starts from the pre-mixer hc streams
 
     @torch.no_grad()
     def _ple_prepare(self, input_ids: torch.Tensor) -> Optional[PLEStepInputs]:
@@ -641,6 +642,8 @@ class HpuQwen4ExpModel(nn.Module):
             self._layer_events(ev)
         if not pp.is_last_rank:
             return IntermediateTensors({"hidden_states": h})
+        if self.return_multi_stream:
+            return self.hyper_connection_mixer(h), [h]
         return self.hyper_connection_mixer(h)
 
 
@@ -689,6 +692,10 @@ class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, Su
 
     def compute_logits(self, hidden_states: torch.Tensor) -> torch.Tensor | None:
         return self.logits_processor(self.lm_head, hidden_states)
+
+    def enable_mtp_hidden_state_outputs(self) -> None:
+        """Make forward return ``(sample [.., H], [multi [.., hc * H]])``, as the MTP draft model needs."""
+        self.model.return_multi_stream = True
 
     def get_mrope_input_positions(self, input_tokens, mm_features):
         positions = torch.arange(len(input_tokens), dtype=torch.long)
