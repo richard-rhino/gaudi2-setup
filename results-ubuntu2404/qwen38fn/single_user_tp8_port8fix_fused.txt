@@ -1,0 +1,18 @@
+# TP=8 PP=1, VLLM_HPU_MOE_GATHER_BF16=0 (fused MoE), port 8 netdevs down, start 2026-11-22 03:16:33 UTC
+## cold 03:16:33
+run 0: TTFT 104.56 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 3.3 tok/s
+run 1: TTFT 64.32 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.7 tok/s
+run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.8 tok/s
+## warm1 03:22:07
+run 0: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 6.0 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 6.0 tok/s
+run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.6 tok/s
+## warm2 03:24:19
+run 0: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.9 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 6.0 tok/s
+run 2: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.7 tok/s
+## warm3 03:26:30
+run 0: TTFT 0.32 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.6 tok/s
+run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.7 tok/s
+run 2: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 5.5 tok/s
+# port 9 link-downs during the test: 0, end 03:28:48

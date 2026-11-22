@@ -397,6 +397,16 @@ Qwen3.8-Flash-Next, TP=8 PP=1, gather MoE, single user, 256 tokens: **27.7-29.7 
 The old 2.6-3.4 tok/s at TP=8 was measured with the fused MoE and the uncompiled PLE layer as well as the flapping
 links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single user.
 
+**Where the ~9x comes from** (single user, warm, 256 tokens, median):
+
+| TP=8 configuration | tok/s | ms per token | Step |
+|---|---|---|---|
+| Before: flapping links, fused MoE, eager PLE | 2.6-3.4 | 294-385 | |
+| Port 8 fix, fused MoE (`single_user_tp8_port8fix_fused.txt`) | **5.7** (5.5-6.0, 9 runs) | 175 | **1.7-2.2x**: the link fix, plus a little from the compiled PLE (~7 ms per token) |
+| Port 8 fix, gather MoE | **28.1** (27.7-29.7, 9 runs) | 36 | **4.9x**: the gather MoE alone |
+
+So the larger factor is the gather MoE, and the link fix is what makes TP=8 stable (no stalls, no hangs).
+
 **Soak, 16 users, 21 min** (random 1024 in / 256 out, 10 passes of 96 requests after a warm pass,
 `bench_tp8_port8fix_16users.txt` in the same directory):
 
@@ -420,7 +430,7 @@ links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single u
 
 To-do, in working order:
 - [x] **TP=8 soak** (16 users, 21 min) after the port 8 fix.
-- [ ] TP=8 single-user test with the gather MoE off, to separate the link fix from the MoE speed-up.
+- [x] TP=8 single-user test with the gather MoE off: 5.7 tok/s, so the gather MoE is 4.9x and the link fix ~2x.
 - [ ] **Qwen3.8-Flash-Next MTP** (requested 2026-11-22, ahead of DeepSeek). All Gaudi numbers so far are without it; deb-ai gets 2.4-2.6
       tokens per step with it. Scope, from reading the code (nothing run yet):
   - The checkpoint has the head (31 `mtp.*` tensors); `qwen4_exp.py` drops them today (`"mtp.": None`).
