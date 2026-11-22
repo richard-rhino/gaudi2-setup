@@ -1,0 +1,53 @@
+# TP=8, no MTP. base = plugin b09281d4, head = 67e8d59a. Fresh launch each.
+## base 04:11:55 loaded from /tmp/claude-1000/-home-ubun/b76d934c-fbc6-4641-94da-2017eb811fd3/scratchpad/vg-base
+cold run 0: TTFT 111.89 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 11.0 tok/s
+cold run 1: TTFT 65.95 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+cold run 2: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.4 tok/s
+warm1 run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.9 tok/s
+warm1 run 1: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+warm1 run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.6 tok/s
+warm2 run 0: TTFT 0.32 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.6 tok/s
+warm2 run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+warm2 run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.2 tok/s
+warm3 run 0: TTFT 0.30 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.5 tok/s
+warm3 run 1: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.7 tok/s
+warm3 run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+## head 04:21:01 loaded from /home/ubun/src/vllm-gaudi
+cold run 0: TTFT 100.76 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.6 tok/s
+cold run 1: TTFT 61.44 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.9 tok/s
+cold run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.8 tok/s
+warm1 run 0: TTFT 0.31 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.6 tok/s
+warm1 run 1: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.2 tok/s
+warm1 run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.9 tok/s
+warm2 run 0: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 28.2 tok/s
+warm2 run 1: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.2 tok/s
+warm2 run 2: TTFT 0.29 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.4 tok/s
+warm3 run 0: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.6 tok/s
+warm3 run 1: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+warm3 run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+## base 04:29:47 loaded from /tmp/claude-1000/-home-ubun/b76d934c-fbc6-4641-94da-2017eb811fd3/scratchpad/vg-base
+cold run 0: TTFT 104.33 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.1 tok/s
+cold run 1: TTFT 65.89 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.2 tok/s
+cold run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.2 tok/s
+warm1 run 0: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.2 tok/s
+warm1 run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 28.0 tok/s
+warm1 run 2: TTFT 0.25 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 28.6 tok/s
+warm2 run 0: TTFT 0.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.5 tok/s
+warm2 run 1: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 29.2 tok/s
+warm2 run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.4 tok/s
+warm3 run 0: TTFT 0.29 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 28.9 tok/s
+warm3 run 1: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.0 tok/s
+warm3 run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.0 tok/s
+## head 04:38:34 loaded from /home/ubun/src/vllm-gaudi
+cold run 0: TTFT 103.15 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 12.3 tok/s
+cold run 1: TTFT 62.99 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.1 tok/s
+cold run 2: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.9 tok/s
+warm1 run 0: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.4 tok/s
+warm1 run 1: TTFT 0.26 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.2 tok/s
+warm1 run 2: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 27.8 tok/s
+warm2 run 0: TTFT 0.28 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.8 tok/s
+warm2 run 1: TTFT 0.31 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.5 tok/s
+warm2 run 2: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 25.8 tok/s
+warm3 run 0: TTFT 0.29 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.2 tok/s
+warm3 run 1: TTFT 0.32 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.1 tok/s
+warm3 run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 26.0 tok/s

@@ -17,7 +17,10 @@ TP=${TP:-8}; PP=${PP:-1}
 # PROFILE=<dir>: enable the torch profiler (CPU + HPU activity); drive it with POST /start_profile and /stop_profile
 PROF=(); [ -n "${PROFILE:-}" ] && { export VLLM_TORCH_PROFILER_DIR="$PROFILE"
   PROF=(--profiler-config "{\"profiler\":\"torch\",\"torch_profiler_dir\":\"$PROFILE\"}"); }
+# MTP=k: k drafted tokens per step (patches 0007-0013). The HPU runner has no async scheduling with spec decode.
+SPEC=(); [ "${MTP:-0}" -gt 0 ] && SPEC=(--no-async-scheduling
+  --speculative-config "{\"method\":\"mtp\",\"num_speculative_tokens\":$MTP}")
 vllm serve Qwen/Qwen3.8-Flash-Next --served-model-name qwen38fn \
   --tensor-parallel-size $TP --pipeline-parallel-size $PP --dtype bfloat16 --max-model-len "$MAXLEN" --max-num-seqs ${SEQS:-32} \
   --limit-mm-per-prompt '{"image":0,"video":0}' --no-enable-prefix-caching \
-  --gpu-memory-utilization ${MEM:-0.85} --port 8000 "${PROF[@]}" 2>&1 | tee ~/gaudi2-setup/logs/serve-qwen38fn-tp${TP}pp${PP}-$(date +%m%d-%H%M).log
+  --gpu-memory-utilization ${MEM:-0.85} --port 8000 "${PROF[@]}" "${SPEC[@]}" 2>&1 | tee ~/gaudi2-setup/logs/serve-qwen38fn-tp${TP}pp${PP}-$(date +%m%d-%H%M).log

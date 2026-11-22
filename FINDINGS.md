@@ -403,7 +403,7 @@ links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single u
 |---|---|---|---|
 | Before: flapping links, fused MoE, eager PLE | 2.6-3.4 | 294-385 | |
 | Port 8 fix, fused MoE (`single_user_tp8_port8fix_fused.txt`) | **5.7** (5.5-6.0, 9 runs) | 175 | **1.7-2.2x**: the link fix, plus a little from the compiled PLE (~7 ms per token) |
-| Port 8 fix, gather MoE | **28.1** (27.7-29.7, 9 runs) | 36 | **4.9x**: the gather MoE alone |
+| Port 8 fix, gather MoE | **28.1** (27.7-29.7, 9 runs; other launches: medians 26.4-29.2) | 36 | **4.6-5.1x**: the gather MoE alone |
 
 So the larger factor is the gather MoE, and the link fix is what makes TP=8 stable (no stalls, no hangs).
 
@@ -413,13 +413,14 @@ So the larger factor is the gather MoE, and the link fix is what makes TP=8 stab
 | | TP=8, port 8 fix | PP=8, port 8 fix (re-run afterwards, `*pp8_port8fix*`) |
 |---|---|---|
 | Aggregate output | **214.8 tok/s** (213.5-218.8 over 10 passes) | **197.7 tok/s** (187.7-204.7 over 3 passes) |
-| Single user, median | 28.1 tok/s | **31.6 tok/s** (31.0-31.9, 9 runs) |
+| Single user, median | 26.4-29.2 tok/s by launch (28.1 in the soak's launch) | **31.6 tok/s** (31.0-31.9, 9 runs, 1 launch) |
 | TPOT p50 | 66-68 ms | 72-83 ms |
 | TTFT p50 / p99 | ~2.0 s / 5.3-5.7 s | **1.3-1.6 s / 2.5-2.6 s** |
 | ITL p50 / p99 | 54-55 ms / 627-671 ms | 68-78 ms / **84-91 ms** |
 
-The 123 tok/s in section 18 is obsolete for PP=8. The two are close in throughput (TP ~9% ahead at 16 users); PP is ahead
-for one user and has far better tail latency. **PP=8 stays the default for interactive serving**; TP=8 is the simpler
+The 123 tok/s in section 18 is obsolete for PP=8. At 16 users the two can't be ranked: TP measured 9% higher, but that
+is one launch each, and TP=8 alone varies by up to ~11% from launch to launch (the A/B in the to-do list). PP is ahead
+for one user (8-20%, against the slowest to fastest TP launch) and has far better tail latency. **PP=8 stays the default for interactive serving**; TP=8 is the simpler
 base for MTP. The PP soak was short (3 passes, the last one the slowest), so it is not a stability test.
 
 - 0 of 960 requests failed, 0 port 9 link-downs, no server errors.
@@ -450,8 +451,10 @@ To-do, in working order:
     - [x] The same for the PLE conv history and n-gram context tokens (patch 0008): 24/24 CPU cases.
     - [x] Runner and GDN layer: 1 + num_spec compact slots per request, load = last kept, store = one per token
           (patch 0009; slot arithmetic CPU-tested, speculative path not run on HPU).
-    - [ ] **Open: possible ~6% slowdown without MTP from patches 0007-0009.** TP=8 single user gave 26.4 tok/s median
-          (25.9-27.0) vs 28.1 (27.7-29.7), with identical generated text. A/B on fresh launches running.
+    - [x] Slowdown check for patches 0007-0009 without MTP: **none detectable** (`single_user_tp8_mtp_slots_ab.txt`).
+          Old/new/old/new fresh launches, 9 warm runs each: means 26.2 / 27.1 / 29.0 / 26.6 tok/s. New vs old is -2.6%,
+          old vs old 10.7%, so a difference of a few percent can't be ruled out. The generated text was identical.
+          Lesson: compare TP=8 speeds over several launches; runs within one launch understate the variation.
     - [x] Runner: positions and slots of padded multi-token decode steps (patch 0010, CPU-tested, not run on HPU).
           Two bugs in the existing plugin path, both only hit when a step decodes >1 token per request:
           padded tokens of shorter requests overwrote that request's position-0 KV slot, and mrope positions
