@@ -10,6 +10,7 @@ Differences from a naive port, all deliberate:
 * sparse_attn processes queries in chunks to bound the [chunk, topk, d] gather.
 Public functions keep the reference names/semantics; the GEMM/quant helpers take/return bf16-dequantized values.
 """
+import os
 import torch
 
 FP8_MAX = 448.0
@@ -82,19 +83,48 @@ def decode_e8m0(b: torch.Tensor) -> torch.Tensor:
     return torch.pow(2.0, b.float() - 127.0)
 
 
-def decode_e2m1_packed(b: torch.Tensor) -> torch.Tensor:
-    """uint8 [..., K//2] packed FP4 (low nibble first) -> bf16 [..., K]."""
+def _decode_e2m1_packed_arith(b: torch.Tensor) -> torch.Tensor:
+    """uint8 [..., K//2] packed FP4 (low nibble first) -> bf16 [..., K], by bit arithmetic (exact).
+    E2M1: sign | 2-bit exponent | 1-bit mantissa; e=0 is subnormal (m * 0.5). ~12x faster than a LUT gather on
+    Gaudi2 eager, ~27x compiled (a LUT index over 70M elements took 60 ms)."""
+    bi = b.to(torch.int16)
+    nib = torch.stack([bi & 0xF, (bi >> 4) & 0xF], dim=-1).flatten(-2)
+    e = (nib >> 1) & 3
+    m = (nib & 1).to(torch.bfloat16)
+    mag = torch.where(e == 0, m * 0.5, (1 + m * 0.5) * torch.exp2((e - 1).to(torch.bfloat16)))
+    return torch.where((nib & 8) != 0, -mag, mag)
+
+
+def _decode_e2m1_packed_lut(b: torch.Tensor) -> torch.Tensor:
     lut = _lut("e2m1", b.device)
     bi = b.int()
     lo, hi = lut[bi & 0x0F], lut[(bi >> 4) & 0x0F]
     return torch.stack([lo, hi], dim=-1).flatten(-2)
 
 
-def dequant_fp4_weight(w_u8: torch.Tensor, s_u8: torch.Tensor, block: int = 32) -> torch.Tensor:
-    """FP4 weight [N, K//2] + E8M0 scale [N, K//block] -> bf16 [N, K] (exact)."""
+def decode_e2m1_packed(b: torch.Tensor) -> torch.Tensor:
+    """uint8 [..., K//2] packed FP4 (low nibble first) -> bf16 [..., K] (exact)."""
+    return _decode_e2m1_packed_arith(b) if b.device.type == "hpu" else _decode_e2m1_packed_lut(b)
+
+
+def _dequant_fp4_weight(w_u8: torch.Tensor, s_u8: torch.Tensor, block: int = 32) -> torch.Tensor:
     w = decode_e2m1_packed(w_u8)
     s = decode_e8m0(s_u8).to(torch.bfloat16)
     return (w.unflatten(-1, (-1, block)) * s.unsqueeze(-1)).flatten(-2)
+
+
+_dequant_fp4_compiled = None
+
+
+def dequant_fp4_weight(w_u8: torch.Tensor, s_u8: torch.Tensor, block: int = 32) -> torch.Tensor:
+    """FP4 weight [..., N, K//2] + E8M0 scale [..., N, K//block] -> bf16 [..., N, K] (exact).
+    On HPU compiled (KT_COMPILE_DEQUANT=1, default): the arithmetic decode fuses into one graph."""
+    global _dequant_fp4_compiled
+    if w_u8.device.type == "hpu" and os.getenv("KT_COMPILE_DEQUANT", "1") == "1":
+        if _dequant_fp4_compiled is None:
+            _dequant_fp4_compiled = torch.compile(_dequant_fp4_weight, backend="hpu_backend", dynamic=False)
+        return _dequant_fp4_compiled(w_u8, s_u8, block)
+    return _dequant_fp4_weight(w_u8, s_u8, block)
 
 
 def dequant_fp8_weight(w_u8: torch.Tensor, s_u8: torch.Tensor, block: int = 32) -> torch.Tensor:

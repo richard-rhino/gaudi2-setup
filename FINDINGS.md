@@ -367,7 +367,7 @@ compiles for 1-4 minutes because `VLLM_SKIP_WARMUP=true`
 
 chat-16's p99 TTFT (79 s) is one more shape that still compiled in the second pass. With 10+ users the aggregate
 levels off at ~100-140 tok/s. Per decode step PP runs one micro-batch through 8 serial stages, so batching helps
-only until the gather MoE path (<= ~20 tokens) gives way to the fused op that reads all experts.
+probably only until the gather MoE path (<= ~20 tokens) gives way to the fused op that reads all experts (not measured yet).
 
 ## 20. Next steps
 - Qwen: done (section 19), ~32 tok/s steady. Left: warm up the common prefill

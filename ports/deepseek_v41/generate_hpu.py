@@ -119,6 +119,11 @@ def main():
     t0 = time.time()
     model, args = build(cfg, "hpu", tok)
     hpu_patches.load_checkpoint(model, a.ckpt_path, rank, ws)
+    if os.getenv("DSV41_MOE_STACK", "1") == "1":
+        hpu_patches.stack_experts(model)
+        hpu_patches.install_moe()
+    if os.getenv("DSV41_COMPILE", "0") == "1":
+        hpu_patches.install_compile()
     if rank == 0:
         print(f"model built + loaded in {time.time() - t0:.0f}s", flush=True)
     from encoding import encode_messages

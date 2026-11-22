@@ -124,8 +124,17 @@ def _apply_rotary_emb_real(x: torch.Tensor, freqs: torch.Tensor, inverse: bool =
 
 
 def _on_default_device(fn):
+    cache = {}
+
     def wrapper(*args, **kwargs):
-        return fn(*args, **kwargs).to(torch.get_default_device())
+        dev = torch.get_default_device()
+        key = (args, tuple(sorted(kwargs.items())), str(dev))
+        t = cache.get(key)
+        if t is None:  # a fresh H2D copy per call cost a host sync per layer
+            if len(cache) > 64:
+                cache.clear()
+            t = cache[key] = fn(*args, **kwargs).to(dev)
+        return t
     wrapper._on_default_device = True
     return wrapper
 
@@ -211,3 +220,112 @@ def load_checkpoint(model: nn.Module, path: str, rank: int = 0, mp: int = 1):
     missing = [k for k in params if k not in seen]
     if missing:
         raise KeyError(f"{len(missing)} parameters not in checkpoint, e.g. {missing[:5]}")
+
+
+# --------------------------------------------------------------------------- MoE: stacked experts, gather decode
+MOE_GATHER_MAX = int(os.getenv("DSV41_MOE_GATHER_MAX", "32"))  # T*topk up to this -> gather path
+
+
+@torch.no_grad()
+def stack_experts(model: nn.Module):
+    """After loading: stack each MoE's local FP4 experts into [E_local, ...] byte tensors (w1/w3/w2 + scales) and
+    free the per-expert copies, so the forward can gather routed experts without a data-dependent loop."""
+    for moe in [m for m in model.modules() if isinstance(m, M.MoE)]:
+        local = [moe.experts[i] for i in range(moe.experts_start_idx, moe.experts_end_idx)]
+        if not local or getattr(local[0].w1.weight, "qtype", None) != "fp4":
+            continue
+        for nm in ("w1", "w3", "w2"):
+            w = torch.stack([getattr(e, nm).weight.data for e in local])
+            sc = torch.stack([getattr(e, nm).scale.data for e in local])
+            for e in local:  # free the originals right away (peak = one extra matrix stack)
+                lin = getattr(e, nm)
+                lin.weight.data = torch.empty(0, dtype=_U8, device=w.device)
+                lin.scale.data = torch.empty(0, dtype=_U8, device=w.device)
+            setattr(moe, f"_{nm}", w)
+            setattr(moe, f"_{nm}_s", sc)
+        moe._stacked = True
+
+
+def _experts_apply(moe, x, w_idx, wts):
+    """Routed-expert FFN for row-aligned x [N, dim], expert ids w_idx [N] (local), weights wts [N, 1] (fp32).
+    Same numerics as Expert.forward + _linear: fp8 act fake-quant, FP4 weights decoded exactly, fp32 SwiGLU."""
+    blk4 = M.fp4_block_size
+    xq, _ = KT.act_quant(x, M.fp8_block_size, M.scale_fmt)
+    w1 = KT.dequant_fp4_weight(moe._w1.index_select(0, w_idx), moe._w1_s.index_select(0, w_idx), blk4)
+    w3 = KT.dequant_fp4_weight(moe._w3.index_select(0, w_idx), moe._w3_s.index_select(0, w_idx), blk4)
+    gate = torch.bmm(w1, xq.unsqueeze(-1)).squeeze(-1).to(torch.get_default_dtype()).float()
+    up = torch.bmm(w3, xq.unsqueeze(-1)).squeeze(-1).to(torch.get_default_dtype()).float()
+    lim = moe.experts[moe.experts_start_idx].swiglu_limit
+    if lim > 0:
+        up = torch.clamp(up, min=-lim, max=lim)
+        gate = torch.clamp(gate, max=lim)
+    h = (wts * (F.silu(gate) * up)).to(x.dtype)
+    hq, _ = KT.act_quant(h, M.fp8_block_size, M.scale_fmt)
+    w2 = KT.dequant_fp4_weight(moe._w2.index_select(0, w_idx), moe._w2_s.index_select(0, w_idx), blk4)
+    return torch.bmm(w2, hq.unsqueeze(-1)).squeeze(-1).to(torch.get_default_dtype())
+
+
+def _moe_forward(self, x: torch.Tensor, image_mask: torch.Tensor | None = None) -> torch.Tensor:
+    if not getattr(self, "_stacked", False):
+        return _orig_moe_forward(self, x, image_mask)
+    shape = x.size()
+    x = x.view(-1, self.dim)
+    weights, indices = self.gate(x, None if image_mask is None else image_mask.flatten())
+    T, K = indices.shape
+    E = self.experts_end_idx - self.experts_start_idx
+    local = indices - self.experts_start_idx
+    valid = (local >= 0) & (local < E)
+    y = torch.zeros_like(x, dtype=torch.float32)
+    if T * K <= MOE_GATHER_MAX:  # decode: every (token, k) pair at once, no host sync
+        y = _moe_gather_fn()(self, x, weights, local, valid)
+    else:  # prefill: loop over the experts that got tokens (as the reference), on the stacked weights
+        counts = torch.bincount(indices.flatten(), minlength=self.n_routed_experts).tolist()
+        for i in range(self.experts_start_idx, self.experts_end_idx):
+            if counts[i] == 0:
+                continue
+            idx, top = torch.where(indices == i)
+            li = torch.full((idx.numel(),), i - self.experts_start_idx, dtype=torch.long, device=x.device)
+            y[idx] += _experts_apply(self, x[idx], li, weights[idx, top, None].float()).float()
+    if M.world_size > 1:
+        torch.distributed.all_reduce(y)
+    y += self.shared_experts(x)
+    return y.type_as(x).view(shape)
+
+
+def _moe_gather(self, x, weights, local, valid):
+    T, K = local.shape
+    li = torch.where(valid, local, torch.zeros_like(local)).reshape(-1)
+    wts = (weights.float() * valid).reshape(-1, 1)
+    out = _experts_apply(self, x.repeat_interleave(K, 0), li, wts)  # [T*K, dim]
+    return (out.float() * valid.reshape(-1, 1)).view(T, K, -1).sum(1)
+
+
+def _moe_gather_fn():
+    return _COMPILED.get("moe_gather", _moe_gather)
+
+
+_COMPILED: dict = {}
+_orig_moe_forward = None
+
+
+def install_compile():
+    """DSV41_COMPILE=1: torch.compile (hpu_backend, static shapes) the pieces whose shapes do not depend on the
+    position: hyper-connection mixes/Sinkhorn, RMSNorm, the quantized linear, sparse attention, the MoE gather."""
+    import torch._dynamo
+    torch._dynamo.config.cache_size_limit = 1024
+    torch._dynamo.config.accumulated_cache_size_limit = 8192
+    c = lambda f: torch.compile(f, backend="hpu_backend", dynamic=False)
+    M.Block.hc_mixes = c(M.Block.hc_mixes)
+    M.Block.hc_pre = c(M.Block.hc_pre)
+    M.Block.hc_post = c(M.Block.hc_post)
+    M.RMSNorm.forward = c(M.RMSNorm.forward)
+    M.linear = c(_linear)
+    M.sparse_attn = c(KT.sparse_attn)
+    _COMPILED["moe_gather"] = c(_moe_gather)
+
+
+def install_moe():
+    global _orig_moe_forward
+    if _orig_moe_forward is None:
+        _orig_moe_forward = M.MoE.forward
+        M.MoE.forward = _moe_forward

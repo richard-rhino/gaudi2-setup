@@ -1,0 +1,72 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1122 01:02:53.379000 3246157 torch/distributed/run.py:874] 
+W1122 01:02:53.379000 3246157 torch/distributed/run.py:874] *****************************************
+W1122 01:02:53.379000 3246157 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1122 01:02:53.379000 3246157 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
+model built + loaded in 208s
+W1122 01:10:42.307000 3246157 torch/distributed/elastic/agent/server/api.py:753] Received 15 death signal, shutting down workers
+W1122 01:10:42.398000 3246157 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3246228 closing signal SIGTERM
+W1122 01:10:42.402000 3246157 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3246229 closing signal SIGTERM
+W1122 01:10:42.402000 3246157 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3246230 closing signal SIGTERM
+W1122 01:10:42.402000 3246157 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3246231 closing signal SIGTERM
+Traceback (most recent call last):
+  File "/home/ubun/vllm-venv/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1028, in main
+    run(args)
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1019, in run
+    elastic_launch(
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 194, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 374, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 745, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 923, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 85, in _terminate_process_handler
+    sigval = signal.Signals(signum)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/enum.py", line 726, in __call__
+    def __call__(cls, value, names=_not_given, *values, module=None, qualname=None, type=None, start=1, boundary=None):
+
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 3246157 got signal: 15

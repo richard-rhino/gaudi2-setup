@@ -1,0 +1,51 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1122 01:21:08.331000 3266694 torch/distributed/run.py:874] 
+W1122 01:21:08.331000 3266694 torch/distributed/run.py:874] *****************************************
+W1122 01:21:08.331000 3266694 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1122 01:21:08.331000 3266694 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
+model built + loaded in 203s
+{"prompt": 16, "prefill_s": 54.660640239715576, "decode_tok_s": 0.09213035219431844} 
+ The capital of Japan is Tokyo.<｜end▁of▁sentence｜> 
+
+{"prompt": 16, "prefill_s": 47.97062706947327, "decode_tok_s": 0.0942545815550269} 
+ # Fibonacci Function in Python
+
+Here are several implementations, from simple to optimized:
+
+## 1. Iterative (Recommended)
+
+```python
+def fibonacci(n):
+    """Return the n-th Fibonacci number (0-indexed)."""
+    if 
+
+{"prompt": 14, "prefill_s": 42.70800280570984, "decode_tok_s": 0.09597723435712914} 
+ The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue light) much more strongly than longer wavelengths (red light) — a process called Rayleigh scattering. When you look at the sky away from the sun, you see this scattered 
+

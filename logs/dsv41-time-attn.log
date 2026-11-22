@@ -1,0 +1,32 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1122 02:12:53.893000 3389382 torch/distributed/run.py:874] 
+W1122 02:12:53.893000 3389382 torch/distributed/run.py:874] *****************************************
+W1122 02:12:53.893000 3389382 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1122 02:12:53.893000 3389382 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
