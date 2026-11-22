@@ -46,7 +46,8 @@ def greedy(model, prompt_tokens: list[list[int]], max_new: int, eos: int, device
     for toks in prompt_tokens:
         x = torch.tensor([toks], device=device)
         t0 = time.time()
-        ids, logits, _ = model(x, 0)
+        with torch.device(device):
+            ids, logits, _ = model(x, 0)
         if device == "hpu":
             torch.hpu.synchronize()
         t_prefill = time.time() - t0
@@ -54,7 +55,8 @@ def greedy(model, prompt_tokens: list[list[int]], max_new: int, eos: int, device
         gen = [nxt]
         t1 = time.time()
         for i in range(max_new - 1):
-            ids, logits, _ = model(torch.tensor([[nxt]], device=device), len(toks) + i)
+            with torch.device(device):
+                ids, logits, _ = model(torch.tensor([[nxt]], device=device), len(toks) + i)
             nxt = int(logits[0].argmax()) if logits.dim() == 2 else int(logits[0, -1].argmax())
             gen.append(nxt)
             if nxt == eos:
@@ -89,10 +91,12 @@ def selftest():
                     state[k] = p
         model.load_state_dict(state, strict=False)
         x = torch.randint(0, args.vocab_size, (1, 150), generator=torch.Generator().manual_seed(2))
-        _, logits, _ = model(x[:, :128].to(dev), 0)
+        with torch.device(dev):
+            _, logits, _ = model(x[:, :128].to(dev), 0)
         steps = [logits.float().cpu()]
         for i in range(128, 140):
-            _, logits, _ = model(x[:, i:i + 1].to(dev), i)
+            with torch.device(dev):
+                _, logits, _ = model(x[:, i:i + 1].to(dev), i)
             steps.append(logits.float().cpu())
         res[dev] = steps
     for i, (a, b) in enumerate(zip(res["cpu"], res["hpu"])):
@@ -119,7 +123,8 @@ def main():
         print(f"model built + loaded in {time.time() - t0:.0f}s", flush=True)
     from encoding import encode_messages
     prompts = open(a.prompts).read().strip().split("\n\n")
-    toks = [tok.encode(encode_messages([{"role": "user", "content": p}], thinking_mode="chat")) for p in prompts]
+    toks = [tok.encode(encode_messages([{"role": "user", "content": p}], thinking_mode="chat"), add_special_tokens=False)
+            for p in prompts]
     outs, stats = greedy(model, toks, a.max_new_tokens, tok.eos_token_id, "hpu")
     if rank == 0:
         for p, o, s in zip(prompts, outs, stats):

@@ -88,12 +88,60 @@ def _engram_embed_forward(self, indices: torch.Tensor) -> torch.Tensor:
     scl = KT.decode_e8m0(s_rows).to(torch.bfloat16)  # [n, dim/32]
     out = (vals.unflatten(-1, (-1, self.block_size)) * scl.unsqueeze(-1)).flatten(-2)
     out = out.view(*indices.shape, self.dim).masked_fill(mask.unsqueeze(-1), 0)
+    if os.getenv("ENGRAM_DEBUG") == "1" and M.rank == 0 and not getattr(self, "_dbg_done", False):
+        self._dbg_done = True
+        f = lambda t: (tuple(t.shape), str(t.dtype), str(t.device), float(t.float().abs().max()), bool(torch.isfinite(t.float()).all()))
+        print("ENGRAM_DEBUG idx", indices.min().item(), indices.max().item(), "range", self.vocab_start_idx,
+              self.vocab_end_idx, "rows", self.weight.shape, self.weight.device, "block", self.block_size, flush=True)
+        for nm, t in (("w_rows", w_rows), ("s_rows", s_rows), ("vals", vals), ("scl", scl), ("out", out)):
+            print("ENGRAM_DEBUG", nm, f(t), flush=True)
+        print("ENGRAM_DEBUG s_rows bytes", s_rows.flatten()[:16].tolist(), "w bytes", w_rows.flatten()[:8].tolist(), flush=True)
     if M.world_size > 1:
         torch.distributed.all_reduce(out)
     return out
 
 
+def _precompute_freqs_real(*args, **kwargs):
+    """Gaudi has no complex dtype: the same frequencies as (cos, sin) pairs, [seq, rope_dim/2, 2] fp32."""
+    dev = torch.get_default_device()
+    with torch.device("cpu"):
+        f = _orig_precompute(*args, **kwargs)
+    return torch.view_as_real(f).contiguous().to(dev)
+
+
+def _apply_rotary_emb_real(x: torch.Tensor, freqs: torch.Tensor, inverse: bool = False) -> torch.Tensor:
+    """Real-arithmetic version of model.apply_rotary_emb (in place, adjacent pairs as (re, im))."""
+    y = x
+    xf = x.float().unflatten(-1, (-1, 2))
+    a, b = xf[..., 0], xf[..., 1]
+    c, s = freqs[..., 0], freqs[..., 1]
+    if inverse:
+        s = -s
+    shape = (1, x.size(1), -1) if x.ndim == 3 else (1, x.size(1), 1, -1)
+    c, s = c.reshape(shape), s.reshape(shape)
+    y.copy_(torch.stack([a * c - b * s, a * s + b * c], dim=-1).flatten(-2))
+    return y
+
+
+def _on_default_device(fn):
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs).to(torch.get_default_device())
+    wrapper._on_default_device = True
+    return wrapper
+
+
+_orig_precompute = None
+
+
 def install():
+    global _orig_precompute
+    if _orig_precompute is None:
+        _orig_precompute = M.precompute_freqs_cis
+    M.precompute_freqs_cis = _precompute_freqs_real
+    for fn in ("get_window_topk_idxs", "get_dspark_topk_idxs"):  # lru_cached; cache ignores the device
+        if hasattr(M, fn) and not getattr(getattr(M, fn), "_on_default_device", False):
+            setattr(M, fn, _on_default_device(getattr(M, fn)))
+    M.apply_rotary_emb = _apply_rotary_emb_real
     M.act_quant = KT.act_quant
     M.fp4_act_quant = KT.fp4_act_quant
     M.sparse_attn = KT.sparse_attn

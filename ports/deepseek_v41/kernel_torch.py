@@ -64,7 +64,11 @@ _LUTS: dict = {}
 def _lut(kind: str, device) -> torch.Tensor:
     key = (kind, str(device))
     if key not in _LUTS:
-        _LUTS[key] = (_e4m3_table() if kind == "e4m3" else _e2m1_table()).to(torch.bfloat16).to(device)
+        # Build on the CPU even under `with torch.device("hpu")`: computed on the HPU the table has inf entries
+        # (inexact integer/exp2 arithmetic there), which turned every engram row into inf.
+        with torch.device("cpu"):
+            table = _e4m3_table() if kind == "e4m3" else _e2m1_table()
+        _LUTS[key] = table.to(torch.bfloat16).to(device)
     return _LUTS[key]
 
 
@@ -143,6 +147,7 @@ def sparse_attn(q: torch.Tensor, kv: torch.Tensor, attn_sink: torch.Tensor, topk
     """q [b,m,h,d] bf16, kv [b,n,d] (shared K=V), attn_sink [h], topk_idxs [b,m,topk] (-1 = invalid).
     softmax over the selected keys plus a per-head sink term in the denominator; empty rows -> 0."""
     b, m, h, d = q.shape
+    topk_idxs = topk_idxs.to(q.device)  # model.get_window_topk_idxs builds them on the default (CPU) device
     out = torch.empty_like(q)
     sink = attn_sink.float().view(1, 1, h)
     bidx = torch.arange(b, device=q.device).view(b, 1, 1)

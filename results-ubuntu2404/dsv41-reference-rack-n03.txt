@@ -1,0 +1,3 @@
+{"prompt": "What is the capital of Japan? Answer in one sentence.", "text": "The capital of Japan is Tokyo."}
+{"prompt": "Write a Python function that returns the n-th Fibonacci numb", "text": "# Fibonacci Number Function\n\nHere are several implementations, each with different trade-offs:\n\n## 1. Iterative (Recommended)\n\n```python\ndef fibonacci(n: int) -> int:\n    \"\"\"Return the n-th Fibonacci number (0-index"}
+{"prompt": "Explain in two sentences why the sky is blue.", "text": "The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue) much more strongly than longer wavelengths (red) — a process called Rayleigh scattering. When you look at the sky away from the sun, you see this scattered blue light"}

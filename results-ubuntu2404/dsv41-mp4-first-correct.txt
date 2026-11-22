@@ -1,0 +1,18 @@
+model built + loaded in 199s
+{"prompt": 16, "prefill_s": 36.66015958786011, "decode_tok_s": 0.14646914809464923} 
+ The capital of Japan is Tokyo.<｜end▁of▁sentence｜> 
+
+{"prompt": 16, "prefill_s": 25.845974445343018, "decode_tok_s": 0.14340666383950837} 
+ # Fibonacci Function in Python
+
+Here are several implementations, from simple to optimized:
+
+## 1. Iterative (Recommended)
+
+```python
+def fibonacci(n: int) -> int:
+    """Return the n-th Fibonacci number (0-index 
+
+{"prompt": 14, "prefill_s": 24.35587215423584, "decode_tok_s": 0.1433458403242221} 
+ The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue light) much more strongly than longer wavelengths (red light) — a process called Rayleigh scattering. When you look at the sky, you're seeing this scattered blue light reaching 
+
