@@ -1,0 +1,141 @@
+From 51a8e7808f8b0ed3f176f7f6db86ce0aed4313e7 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 05:00:13 +0000
+Subject: [PATCH] GDN spec decode: read each state once and write it once
+
+Chaining the single-token kernels wrote every token's state into the cache and
+read it back for the next token, several in-place updates of one tensor in one
+compiled graph. In the decoder layer's graph the HPU compiler rejected that
+("missing a control edge"). The states are now chained in memory.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ vllm_gaudi/ops/hpu_gdn_spec_decode.py | 85 +++++++++++++++------------
+ 1 file changed, 46 insertions(+), 39 deletions(-)
+
+diff --git a/vllm_gaudi/ops/hpu_gdn_spec_decode.py b/vllm_gaudi/ops/hpu_gdn_spec_decode.py
+index efc145a5..014ba231 100644
+--- a/vllm_gaudi/ops/hpu_gdn_spec_decode.py
++++ b/vllm_gaudi/ops/hpu_gdn_spec_decode.py
+@@ -6,7 +6,10 @@ recurrent state (conv window and SSM state) cannot be rewound by position like a
+ token: token ``j`` of request ``i`` writes slot ``store[i, j]``. The next step loads the slot of the last token that
+ was kept, ``store[i, accepted - 1]``.
+ 
+-Both functions chain the single-token kernels, so the numerics are the same as decoding one token at a time.
++Each state is read once, carried from token to token in memory and written once. Writing after every token and reading
++that slot back for the next one puts several in-place updates of one tensor into a compiled graph, which the HPU graph
++compiler can reject ("missing a control edge"). The math is that of the single-token kernels, so the numerics are the
++same as decoding one token at a time.
+ Tokens are flat in request-major order, ``[N * L, ...]``, as the HPU runner lays out a decode batch with drafts.
+ """
+ 
+@@ -14,8 +17,8 @@ from __future__ import annotations
+ 
+ import torch
+ 
+-from vllm_gaudi.ops.causal_conv1d_pytorch import hpu_causal_conv1d_update
+-from vllm_gaudi.ops.hpu_gdn_pytorch import hpu_fused_recurrent_gated_delta_rule
++from vllm_gaudi.ops.causal_conv1d_pytorch import _apply_activation, _depthwise_conv1d_tpc, _normalize_activation
++from vllm_gaudi.ops.hpu_gdn_pytorch import _GDN_COMPUTE_DTYPE, _eager_read_state, _l2norm_last_dim
+ 
+ 
+ def spec_load_slots(store: torch.Tensor, accepted: torch.Tensor) -> torch.Tensor:
+@@ -23,6 +26,11 @@ def spec_load_slots(store: torch.Tensor, accepted: torch.Tensor) -> torch.Tensor
+     return store.gather(1, (accepted.long() - 1).view(-1, 1)).squeeze(1)
+ 
+ 
++def _slots(indices: torch.Tensor, num_slots: int) -> torch.Tensor:
++    # -1 (padding) goes to the last slot, as in the single-token kernels
++    return torch.remainder(indices.reshape(-1).long(), num_slots)
++
++
+ def hpu_causal_conv1d_spec_update(
+     x: torch.Tensor,
+     conv_state: torch.Tensor,
+@@ -34,23 +42,15 @@ def hpu_causal_conv1d_spec_update(
+ ) -> torch.Tensor:
+     """x [N * L, D] -> [N * L, D], saving the conv window after each of the L tokens."""
+     n, length = store.shape
+-    x = x.reshape(n, length, x.shape[-1])
+-    query_start_loc = torch.arange(n + 1, dtype=torch.int32, device=x.device)
+-    out, src = [], load
+-    for j in range(length):
+-        out.append(
+-            hpu_causal_conv1d_update(
+-                x=x[:, j],
+-                conv_state=conv_state,
+-                weight=weight,
+-                bias=bias,
+-                activation=activation,
+-                conv_state_indices=src,
+-                query_start_loc=query_start_loc,
+-                store_cache_indices=store[:, j],
+-            ))
+-        src = store[:, j]
+-    return torch.stack(out, dim=1).flatten(0, 1)
++    dtype, num_slots, keep = conv_state.dtype, conv_state.shape[0], weight.shape[1] - 1
++    tokens = x.reshape(n, length, x.shape[-1]).to(dtype)
++    history = conv_state.index_select(0, _slots(load, num_slots))[:, -keep:]
++    seq = torch.cat([history, tokens], dim=1)  # [N, keep + L, D]
++    out = _depthwise_conv1d_tpc(seq.transpose(1, 2), weight.to(dtype), bias.to(dtype) if bias is not None else None)
++    out = _apply_activation(out, _normalize_activation(activation)).transpose(1, 2)
++    windows = torch.stack([seq[:, j + 1:j + 1 + keep] for j in range(length)], dim=1).flatten(0, 1)
++    conv_state[_slots(store, num_slots), -keep:, :] = windows
++    return out.reshape(n * length, x.shape[-1]).to(x.dtype)
+ 
+ 
+ def hpu_gdn_spec_recurrent(
+@@ -66,23 +66,30 @@ def hpu_gdn_spec_recurrent(
+ ) -> torch.Tensor:
+     """q/k/v/g/beta [1, N * L, ...] -> [1, N * L, HV, Vdim], saving the SSM state after each of the L tokens."""
+     n, length = store.shape
+-    q, k, v, g, beta = (t.reshape(n, length, *t.shape[2:]) for t in (q, k, v, g, beta))
+-    cu_seqlens = torch.arange(n + 1, dtype=torch.int32, device=q.device)
+-    out, src = [], load
++    _, _, heads, kdim = q.shape
++    _, _, hv, vdim = v.shape
++    if heads != hv:
++        if hv % heads:
++            raise ValueError(f"value heads ({hv}) must be a multiple of the q/k heads ({heads})")
++        q, k = (t.repeat_interleave(hv // heads, dim=2) for t in (q, k))
++    num_slots = state.shape[0]
++    h = _eager_read_state(state, _slots(load, num_slots), _GDN_COMPUTE_DTYPE)
++
++    qf, kf = (t.reshape(n, length, hv, kdim).to(_GDN_COMPUTE_DTYPE) for t in (q, k))
++    if use_qk_l2norm_in_kernel:
++        qf, kf = _l2norm_last_dim(qf), _l2norm_last_dim(kf)
++    qf = qf * kdim**-0.5
++    vf = v.reshape(n, length, hv, vdim).to(_GDN_COMPUTE_DTYPE)
++    gf = g.reshape(n, length, hv).to(torch.float32)
++    bf = beta.reshape(n, length, hv).to(_GDN_COMPUTE_DTYPE)
++
++    out, states = [], []
+     for j in range(length):
+-        step, _ = hpu_fused_recurrent_gated_delta_rule(
+-            q=q[None, :, j],
+-            k=k[None, :, j],
+-            v=v[None, :, j],
+-            g=g[None, :, j],
+-            beta=beta[None, :, j],
+-            initial_state=state,
+-            inplace_final_state=True,
+-            cu_seqlens=cu_seqlens,
+-            ssm_state_indices=src,
+-            use_qk_l2norm_in_kernel=use_qk_l2norm_in_kernel,
+-            ssm_store_indices=store[:, j],
+-        )
+-        out.append(step.squeeze(0))
+-        src = store[:, j]
+-    return torch.stack(out, dim=1).flatten(0, 1).unsqueeze(0)
++        h = h * torch.exp(gf[:, j]).to(h.dtype).unsqueeze(-1).unsqueeze(-1)
++        proj = torch.matmul(h, kf[:, j].unsqueeze(-1)).squeeze(-1)
++        v_new = (vf[:, j] - proj) * bf[:, j].unsqueeze(-1)
++        h = h + v_new.unsqueeze(-1) * kf[:, j].unsqueeze(2)
++        out.append(torch.matmul(h, qf[:, j].unsqueeze(-1)).squeeze(-1))
++        states.append(h)
++    state.index_copy_(0, _slots(store, num_slots), torch.stack(states, dim=1).flatten(0, 1).to(state.dtype))
++    return torch.stack(out, dim=1).flatten(0, 1).unsqueeze(0).to(v.dtype)
+-- 
+2.43.0
+
