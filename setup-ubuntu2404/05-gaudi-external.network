@@ -1,0 +1,8 @@
+# Gaudi2 external (scale-out) ports have no cables here: keep systemd-networkd from bringing them up.
+# An admin-up, cable-less port 8 makes the driver reset its PHY every ~30 s, and each reset forces a
+# re-init of internal port 9 (same NIC macro, shared clock). See gaudi2-setup NIC-LINK-FLAPPING.md.
+[Match]
+Driver=habanalabs_en
+
+[Link]
+Unmanaged=yes

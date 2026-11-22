@@ -1,0 +1,262 @@
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+W1122 02:22:37.911000 3397691 torch/distributed/run.py:874] 
+W1122 02:22:37.911000 3397691 torch/distributed/run.py:874] *****************************************
+W1122 02:22:37.911000 3397691 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W1122 02:22:37.911000 3397691 torch/distributed/run.py:874] *****************************************
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling add_step_closure function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+Calling iter_mark_step function does not have any effect. It's lazy mode only functionality. (warning logged once)
+============================= HPU PT BRIDGE CONFIGURATION ON RANK = 0 ============= 
+ PT_HPU_LAZY_MODE = 0
+ PT_HPU_RECIPE_CACHE_CONFIG = ,false,1024,false
+ PT_HPU_MAX_COMPOUND_OP_SIZE = 9223372036854775807
+ PT_HPU_LAZY_ACC_PAR_MODE = 1
+ PT_HPU_ENABLE_REFINE_DYNAMIC_SHAPES = 0
+ PT_HPU_EAGER_PIPELINE_ENABLE = 1
+ PT_HPU_EAGER_COLLECTIVE_PIPELINE_ENABLE = 1
+ PT_HPU_ENABLE_LAZY_COLLECTIVES = 0
+---------------------------: System Configuration :---------------------------
+Num CPU Cores : 160
+CPU RAM       : 503 GB
+------------------------------------------------------------------------------
+02:22:48 n= 3712 p50=    249us p90=    305us max=   20.3ms
+02:22:49 n= 4326 p50=    219us p90=    252us max=    3.2ms
+02:22:50 n= 4134 p50=    225us p90=    295us max=    1.0ms
+02:22:51 n= 4319 p50=    225us p90=    252us max=    2.2ms
+02:22:52 n= 3920 p50=    248us p90=    283us max=    1.1ms
+02:22:53 n= 3878 p50=    247us p90=    296us max=    5.1ms
+02:22:54 n= 3876 p50=    250us p90=    281us max=    1.9ms
+02:22:55 n= 3995 p50=    246us p90=    265us max=    1.0ms
+02:22:56 n= 4007 p50=    245us p90=    265us max=    1.7ms
+02:22:57 n= 4322 p50=    222us p90=    248us max=    6.3ms
+02:22:58 n= 4403 p50=    220us p90=    241us max=    1.8ms
+02:22:59 n= 4289 p50=    227us p90=    258us max=    2.2ms
+02:23:00 n= 3406 p50=    296us p90=    317us max=    7.0ms
+02:23:01 n= 3406 p50=    293us p90=    317us max=    3.9ms
+02:23:02 n= 4061 p50=    237us p90=    270us max=    2.3ms
+02:23:03 n= 4092 p50=    235us p90=    264us max=    2.7ms
+02:23:04 n= 4105 p50=    229us p90=    294us max=    8.1ms
+02:23:05 n= 3297 p50=    307us p90=    331us max=    1.6ms
+02:23:06 n= 3158 p50=    310us p90=    328us max=    3.9ms
+02:23:07 n= 3178 p50=    309us p90=    329us max=    2.1ms
+02:23:08 n= 3211 p50=    307us p90=    327us max=    1.0ms
+02:23:09 n= 3195 p50=    308us p90=    328us max=    1.7ms
+02:23:10 n= 3178 p50=    308us p90=    326us max=   10.2ms
+02:23:11 n= 3195 p50=    306us p90=    326us max=    8.9ms
+02:23:12 n= 4063 p50=    228us p90=    309us max=    1.1ms
+02:23:13 n= 4336 p50=    225us p90=    240us max=    1.1ms
+02:23:14 n= 3805 p50=    245us p90=    308us max=    3.9ms
+02:23:15 n= 4050 p50=    228us p90=    311us max=    0.9ms
+02:23:16 n= 4355 p50=    225us p90=    246us max=    0.9ms
+02:23:17 n= 4310 p50=    226us p90=    245us max=    1.7ms
+02:23:18 n= 4176 p50=    231us p90=    267us max=    1.1ms
+02:23:19 n= 4321 p50=    224us p90=    249us max=    0.9ms
+02:23:20 n= 3966 p50=    237us p90=    301us max=    1.3ms
+02:23:21 n= 4365 p50=    223us p90=    244us max=    0.9ms
+02:23:22 n= 4481 p50=    217us p90=    234us max=    1.6ms
+02:23:23 n= 4395 p50=    222us p90=    240us max=    1.8ms
+02:23:24 n= 4420 p50=    217us p90=    243us max=    1.4ms
+02:23:25 n= 4240 p50=    229us p90=    257us max=    1.3ms
+02:23:26 n= 4312 p50=    220us p90=    284us max=    0.8ms
+02:23:27 n= 4318 p50=    225us p90=    245us max=    1.3ms
+02:23:28 n= 3935 p50=    238us p90=    306us max=    1.8ms
+02:23:29 n= 3851 p50=    261us p90=    296us max=    1.1ms
+02:23:30 n= 4479 p50=    217us p90=    237us max=    1.8ms
+02:23:31 n= 3635 p50=    280us p90=    304us max=    1.3ms
+02:23:32 n= 3422 p50=    301us p90=    322us max=    1.3ms
+02:23:33 n= 3198 p50=    307us p90=    326us max=    1.1ms
+02:23:34 n= 3358 p50=    301us p90=    322us max=    1.3ms
+02:23:35 n= 3401 p50=    296us p90=    319us max=    1.0ms
+02:23:36 n= 3953 p50=    239us p90=    299us max=    1.8ms
+02:23:37 n= 4283 p50=    227us p90=    252us max=    1.7ms
+02:23:38 n= 4084 p50=    240us p90=    262us max=    1.0ms
+02:23:39 n= 3741 p50=    258us p90=    308us max=    0.9ms
+02:23:40 n= 3676 p50=    281us p90=    307us max=    2.2ms
+02:23:41 n= 3955 p50=    237us p90=    298us max=    1.8ms
+02:23:42 n= 3578 p50=    292us p90=    316us max=    1.7ms
+02:23:43 n= 4241 p50=    227us p90=    266us max=    0.8ms
+02:23:44 n= 4365 p50=    222us p90=    247us max=    1.0ms
+02:23:45 n= 4354 p50=    224us p90=    242us max=    1.0ms
+02:23:46 n= 4371 p50=    223us p90=    239us max=    1.3ms
+02:23:47 n= 4371 p50=    223us p90=    240us max=    1.9ms
+02:23:48 n= 4430 p50=    221us p90=    237us max=    0.9ms
+02:23:49 n= 4510 p50=    217us p90=    231us max=    1.1ms
+02:23:50 n= 4390 p50=    221us p90=    249us max=    0.9ms
+02:23:51 n= 4525 p50=    216us p90=    230us max=    0.9ms
+02:23:52 n= 4090 p50=    242us p90=    274us max=    1.2ms
+02:23:53 n= 3526 p50=    298us p90=    331us max=    1.7ms
+02:23:54 n= 3948 p50=    248us p90=    278us max=    0.9ms
+02:23:55 n= 4103 p50=    240us p90=    261us max=    0.8ms
+02:23:56 n= 3868 p50=    236us p90=    325us max=    1.8ms
+02:23:57 n= 4000 p50=    235us p90=    300us max=    1.2ms
+02:23:58 n= 3332 p50=    309us p90=    338us max=    1.1ms
+02:23:59 n= 3885 p50=    235us p90=    307us max=    0.9ms
+02:24:00 n= 3847 p50=    245us p90=    309us max=    1.8ms
+02:24:01 n= 4115 p50=    223us p90=    294us max=    0.9ms
+02:24:02 n= 4003 p50=    229us p90=    300us max=    0.8ms
+02:24:03 n= 3741 p50=    278us p90=    306us max=    1.2ms
+02:24:04 n= 3970 p50=    235us p90=    297us max=    1.1ms
+02:24:05 n= 3238 p50=    305us p90=    322us max=    1.0ms
+02:24:06 n= 4087 p50=    234us p90=    291us max=    1.3ms
+02:24:07 n= 4250 p50=    220us p90=    285us max=    1.0ms
+02:24:08 n= 4029 p50=    231us p90=    288us max=    1.7ms
+02:24:09 n= 4532 p50=    215us p90=    232us max=    0.9ms
+02:24:10 n= 4363 p50=    218us p90=    261us max=    0.9ms
+02:24:11 n= 3920 p50=    251us p90=    269us max=    0.9ms
+02:24:12 n= 4256 p50=    228us p90=    263us max=    1.3ms
+02:24:13 n= 4308 p50=    229us p90=    247us max=    1.3ms
+02:24:14 n= 4070 p50=    224us p90=    300us max=    1.1ms
+02:24:15 n= 4528 p50=    215us p90=    232us max=    2.2ms
+02:24:16 n= 4500 p50=    218us p90=    235us max=    1.6ms
+02:24:17 n= 4326 p50=    223us p90=    258us max=    1.0ms
+02:24:18 n= 3967 p50=    236us p90=    298us max=    1.2ms
+02:24:19 n= 4382 p50=    220us p90=    245us max=    0.9ms
+02:24:20 n= 4037 p50=    230us p90=    299us max=    1.3ms
+02:24:21 n= 3366 p50=    302us p90=    322us max=    1.6ms
+02:24:22 n= 4260 p50=    222us p90=    285us max=    0.8ms
+02:24:23 n= 4230 p50=    237us p90=    260us max=    0.8ms
+02:24:24 n= 4194 p50=    222us p90=    295us max=    1.6ms
+02:24:25 n= 3970 p50=    253us p90=    270us max=    0.8ms
+02:24:26 n= 3854 p50=    258us p90=    272us max=    0.8ms
+02:24:27 n= 3887 p50=    256us p90=    270us max=    1.0ms
+02:24:28 n= 3798 p50=    257us p90=    302us max=    1.7ms
+02:24:29 n= 3972 p50=    246us p90=    264us max=    0.9ms
+02:24:30 n= 3808 p50=    248us p90=    303us max=    0.9ms
+02:24:31 n= 4025 p50=    241us p90=    281us max=    1.6ms
+02:24:32 n= 4248 p50=    231us p90=    247us max=    1.6ms
+02:24:33 n= 4209 p50=    227us p90=    290us max=    1.0ms
+02:24:34 n= 4024 p50=    236us p90=    303us max=    1.3ms
+02:24:35 n= 4047 p50=    234us p90=    296us max=    2.1ms
+02:24:36 n= 3198 p50=    310us p90=    327us max=    0.9ms
+02:24:37 n= 3191 p50=    310us p90=    328us max=    1.0ms
+02:24:38 n= 3263 p50=    310us p90=    329us max=    0.9ms
+02:24:39 n= 4043 p50=    231us p90=    315us max=    0.9ms
+02:24:40 n= 3160 p50=    313us p90=    334us max=    1.5ms
+02:24:41 n= 3918 p50=    232us p90=    319us max=    0.9ms
+02:24:42 n= 3540 p50=    297us p90=    329us max=    1.0ms
+02:24:43 n= 3168 p50=    312us p90=    331us max=    0.9ms
+02:24:44 n= 3333 p50=    304us p90=    328us max=    1.4ms
+02:24:45 n= 3952 p50=    250us p90=    265us max=    0.9ms
+02:24:46 n= 3554 p50=    284us p90=    315us max=    0.9ms
+02:24:47 n= 4198 p50=    220us p90=    301us max=    1.7ms
+02:24:48 n= 4038 p50=    225us p90=    307us max=    1.0ms
+02:24:49 n= 3265 p50=    303us p90=    323us max=    0.9ms
+02:24:50 n= 4189 p50=    221us p90=    298us max=    1.0ms
+02:24:51 n= 3891 p50=    240us p90=    303us max=    1.7ms
+02:24:52 n= 4146 p50=    231us p90=    281us max=    0.9ms
+02:24:53 n= 4263 p50=    228us p90=    254us max=    0.9ms
+02:24:54 n= 4215 p50=    227us p90=    268us max=    1.0ms
+02:24:55 n= 3838 p50=    239us p90=    303us max=    1.0ms
+02:24:56 n= 3812 p50=    239us p90=    316us max=    1.2ms
+02:24:57 n= 4132 p50=    232us p90=    284us max=    0.9ms
+02:24:58 n= 3928 p50=    229us p90=    312us max=    1.6ms
+02:24:59 n= 3868 p50=    241us p90=    307us max=    0.9ms
+02:25:00 n= 4269 p50=    231us p90=    250us max=    1.0ms
+02:25:01 n= 4172 p50=    234us p90=    264us max=    0.9ms
+02:25:02 n= 4299 p50=    225us p90=    256us max=    0.9ms
+02:25:03 n= 4251 p50=    223us p90=    269us max=    1.9ms
+02:25:04 n= 3799 p50=    251us p90=    303us max=    1.6ms
+02:25:05 n= 3699 p50=    248us p90=    327us max=    1.3ms
+02:25:06 n= 4011 p50=    236us p90=    305us max=    1.9ms
+02:25:07 n= 4340 p50=    225us p90=    247us max=    1.5ms
+02:25:08 n= 4430 p50=    220us p90=    241us max=    1.0ms
+02:25:09 n= 4252 p50=    220us p90=    284us max=    2.1ms
+02:25:10 n= 4470 p50=    213us p90=    249us max=    1.5ms
+02:25:11 n= 4247 p50=    218us p90=    287us max=    1.0ms
+02:25:12 n= 3924 p50=    238us p90=    313us max=    1.5ms
+02:25:13 n= 3974 p50=    233us p90=    317us max=    1.4ms
+02:25:14 n= 4035 p50=    226us p90=    310us max=    1.2ms
+02:25:15 n= 4488 p50=    217us p90=    234us max=    1.3ms
+02:25:16 n= 3331 p50=    307us p90=    325us max=    1.0ms
+02:25:17 n= 4250 p50=    218us p90=    281us max=    1.1ms
+02:25:18 n= 4011 p50=    229us p90=    311us max=    1.2ms
+02:25:19 n= 3768 p50=    273us p90=    314us max=    1.0ms
+02:25:20 n= 3881 p50=    240us p90=    303us max=    0.9ms
+02:25:21 n= 3965 p50=    238us p90=    302us max=    1.2ms
+02:25:22 n= 3865 p50=    264us p90=    300us max=    1.4ms
+02:25:23 n= 3837 p50=    274us p90=    298us max=    1.0ms
+02:25:24 n= 4519 p50=    216us p90=    232us max=    1.0ms
+02:25:25 n= 4431 p50=    216us p90=    245us max=    2.3ms
+02:25:26 n= 4396 p50=    221us p90=    247us max=    1.0ms
+02:25:27 n= 4324 p50=    223us p90=    254us max=    1.9ms
+02:25:28 n= 4039 p50=    241us p90=    278us max=    2.6ms
+02:25:29 n= 4134 p50=    236us p90=    260us max=    0.9ms
+02:25:30 n= 4128 p50=    230us p90=    288us max=    1.0ms
+02:25:31 n= 4000 p50=    236us p90=    298us max=    1.9ms
+02:25:32 n= 4220 p50=    233us p90=    251us max=    1.2ms
+02:25:33 n= 4354 p50=    225us p90=    244us max=    1.8ms
+02:25:34 n= 4038 p50=    231us p90=    308us max=    1.3ms
+02:25:35 n= 4164 p50=    235us p90=    252us max=    2.3ms
+02:25:36 n= 4042 p50=    242us p90=    267us max=    1.0ms
+02:25:37 n= 4116 p50=    239us p90=    257us max=    1.0ms
+02:25:38 n= 3440 p50=    296us p90=    321us max=    0.9ms
+02:25:39 n= 3678 p50=    273us p90=    318us max=    1.2ms
+02:25:40 n= 3456 p50=    302us p90=    324us max=    1.4ms
+02:25:41 n= 3187 p50=    311us p90=    329us max=    1.0ms
+02:25:42 n= 3187 p50=    311us p90=    329us max=    1.0ms
+02:25:43 n= 3691 p50=    286us p90=    324us max=    2.0ms
+02:25:44 n= 4426 p50=    218us p90=    238us max=    1.2ms
+02:25:45 n= 4402 p50=    223us p90=    238us max=    1.1ms
+02:25:46 n= 4135 p50=    224us p90=    303us max=    1.2ms
+W1122 02:27:34.724000 3397691 torch/distributed/elastic/agent/server/api.py:753] Received 15 death signal, shutting down workers
+W1122 02:27:34.729000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397758 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397759 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397760 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397761 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397762 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397763 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397764 closing signal SIGTERM
+W1122 02:27:34.732000 3397691 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 3397765 closing signal SIGTERM
+W1122 02:28:04.733000 3397691 torch/distributed/elastic/multiprocessing/api.py:1047] Unable to shutdown process 3397758 via 15, forcefully exiting via 9
+W1122 02:28:08.657000 3397691 torch/distributed/elastic/multiprocessing/api.py:1047] Unable to shutdown process 3397759 via 15, forcefully exiting via 9
+Traceback (most recent call last):
+  File "/home/ubun/vllm-venv/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1028, in main
+    run(args)
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1019, in run
+    elastic_launch(
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 194, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 374, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 745, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 923, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/ubun/vllm-venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 3397691 got signal: 15
