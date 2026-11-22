@@ -507,7 +507,22 @@ To-do, in working order:
           - 16 users, random tokens 1024/256 (one launch each): 204.5 -> 123.7 tok/s; TTFT p50 2.0 -> 0.72 s, p99 5.4 -> 7.0-7.5 s.
           - **Output at 16 users is NOT verified, and something is off:** from the same 48 requests MTP wrote 9718 tokens
             per pass against 9206 (12 passes each, all three MTP launches above all three others), at 74% draft acceptance
-            (53% on the single-user prompts). The equality test only went to 4 users and 128 tokens. Being tested.
+            (53% on the single-user prompts). The equality test only went to 4 users and 128 tokens.
+          - **Tested afterwards at 16 users and 256 tokens** (`mtp_equivalence256_*.json`): no sign of an MTP bug.
+
+            | Pair | Identical | Tokens before first diff | Largest margin at a flip | Output tokens |
+            |---|---|---|---|---|
+            | no MTP vs no MTP, 16 users twice | 7/16 | 1500 | 0.25 | 3385, 2790 |
+            | no MTP: gather vs fused MoE, 16 users | 5/16 | 1353 | 0.75 | 3385, 3273 |
+            | MTP vs no MTP, 1 user | 9/16 | 1955 | 0.4375 | 2890, 3097 |
+            | MTP vs no MTP, 16 users, run a | 6/16 | 1757 | 0.25 | 3317, 3385 |
+            | MTP vs no MTP, 16 users, run b | 5/16 | 1281 | 0.5 | 3296, 2790 |
+
+            Answer lengths hang on near ties (one prompt ends after 6 tokens or runs to 256, with or without MTP), so
+            ~512 extra tokens is 2-3 of the 48 requests taking the long branch; MTP's totals here are inside the range
+            without it. No extra repetition (the one new looping prompt also loops on fused MoE without MTP). The high
+            acceptance is the prompts: launch 8 already accepted 70.8% on them with 1 and 4 users. Limit: after a
+            prompt's first difference nothing is compared.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
