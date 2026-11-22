@@ -473,7 +473,9 @@ To-do, in working order:
           reproduce it. Patch 0015 writes each state once.
           Launch 3: failed in the first attention layer of the drafted decode step, which the plugin took for a
           prompt of 4 tokens (it reads the batch size from a per-request length tensor). Fixed in patch 0016.
-          That failure comes after the early GDN layers, whether 0015 is enough for all of them is not known yet.
+          Launch 4: first text with MTP, 0015 holds in the full model. **The output is wrong:** it matches deb-ai
+          for 28 of 32 tokens, then derails ("Portugal is" -> "<think>" instead of "Lisbon"). Requests with
+          logprobs crash in the rejection sampler (token ids on the CPU). No speed is quoted until output matches.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
