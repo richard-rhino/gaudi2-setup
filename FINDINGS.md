@@ -460,7 +460,10 @@ To-do, in working order:
           model forward CPU-tested with stub layers, not run on HPU).
     - [x] Proposer: each draft step gets the previous step's multi streams, and 3-axis positions work, text only
           (patch 0012; CPU-tested with a stub draft model, not run on HPU).
-    - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.
+    - [x] Draft model written: one attention layer (dense on HPU, like the target), no GDN, no PLE (patch 0013;
+          weight routing and input fusion CPU-tested, never loaded).
+    - [ ] First run on HPU: load, then compare greedy output and logprobs with the non-MTP run.
+    - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
     single and 16 users.
