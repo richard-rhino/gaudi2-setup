@@ -452,7 +452,10 @@ To-do, in working order:
           (patch 0009; slot arithmetic CPU-tested, speculative path not run on HPU).
     - [ ] **Open: possible ~6% slowdown without MTP from patches 0007-0009.** TP=8 single user gave 26.4 tok/s median
           (25.9-27.0) vs 28.1 (27.7-29.7), with identical generated text. A/B on fresh launches running.
-    - [ ] Runner: mrope positions for drafted tokens (the decode path builds one position per request today).
+    - [x] Runner: positions and slots of padded multi-token decode steps (patch 0010, CPU-tested, not run on HPU).
+          Two bugs in the existing plugin path, both only hit when a step decodes >1 token per request:
+          padded tokens of shorter requests overwrote that request's position-0 KV slot, and mrope positions
+          were replaced by plain ones. Single-token steps are identical to before (2000 random steps).
     - [ ] Target model: return the pre-mixer streams. Proposer: feed each draft step the previous step's streams
           (today it takes only a single hidden stream and reuses the target's hidden states for the later steps).
     - [ ] Draft model: one attention layer (dense on HPU, like the target), no GDN, no PLE.

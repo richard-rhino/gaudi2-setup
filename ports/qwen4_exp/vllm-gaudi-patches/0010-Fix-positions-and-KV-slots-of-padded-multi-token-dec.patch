@@ -1,0 +1,171 @@
+From b54a934c076fad7f069c6a924f848e3adb26e49b Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 04:10:51 +0000
+Subject: [PATCH] Fix positions and KV slots of padded multi-token decode steps
+
+When requests schedule different token counts in one decode step (speculative
+decode), the padded tokens of the shorter requests had position 0, so their
+keys and values overwrote the slot of the request's first token. They now go to
+the pad row.
+
+For models with mrope the same step replaced the 3-axis positions with plain
+ones. They are now built per token, flat [3, batch * num_tokens].
+
+Single-token steps are unchanged. Tested on CPU only, not run on HPU.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../worker/test_decode_token_padding.py       | 34 +++++++++++++++++++
+ vllm_gaudi/v1/worker/decode_token_padding.py  | 30 ++++++++++++++++
+ vllm_gaudi/v1/worker/hpu_model_runner.py      | 34 ++++++-------------
+ 3 files changed, 74 insertions(+), 24 deletions(-)
+ create mode 100644 tests/unit_tests/worker/test_decode_token_padding.py
+ create mode 100644 vllm_gaudi/v1/worker/decode_token_padding.py
+
+diff --git a/tests/unit_tests/worker/test_decode_token_padding.py b/tests/unit_tests/worker/test_decode_token_padding.py
+new file mode 100644
+index 00000000..06b40efb
+--- /dev/null
++++ b/tests/unit_tests/worker/test_decode_token_padding.py
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: Apache-2.0
++"""CPU tests for the padding of multi-token decode steps."""
++
++from __future__ import annotations
++
++import itertools
++import random
++
++import pytest
++import torch
++
++from vllm_gaudi.v1.worker.decode_token_padding import mrope_decode_positions, redirect_padded_tokens
++
++
++@pytest.mark.parametrize("width", [1, 2, 4])
++@pytest.mark.parametrize("seed", range(50))
++def test_only_scheduled_tokens_reach_live_slots(width, seed):
++    rng = random.Random(seed)
++    n, pad_rows = rng.randint(1, 8), rng.randint(0, 3)
++    counts = [rng.randint(1, width) for _ in range(n)]
++    starts = [rng.randint(0, 5000) for _ in range(n)]
++    deltas = [rng.randint(-9, 9) for _ in range(n)]
++    pos = mrope_decode_positions(starts, counts, deltas, n + pad_rows, width)
++    assert pos.shape == (3, (n + pad_rows) * width)
++    live = torch.arange(1, n * width + 1).view(n, width)
++    slots = live.clone()
++    redirect_padded_tokens(slots, counts, itertools.cycle(range(90000, 90128)))
++    for i in range(n + pad_rows):
++        for j in range(width):
++            real = i < n and j < counts[i]
++            want = starts[i] + deltas[i] + j if real else -1
++            assert pos[:, i * width + j].tolist() == [want] * 3
++            if i < n:
++                assert int(slots[i, j]) == int(live[i, j]) if real else 90000 <= int(slots[i, j]) < 90128
+diff --git a/vllm_gaudi/v1/worker/decode_token_padding.py b/vllm_gaudi/v1/worker/decode_token_padding.py
+new file mode 100644
+index 00000000..9fbb67de
+--- /dev/null
++++ b/vllm_gaudi/v1/worker/decode_token_padding.py
+@@ -0,0 +1,30 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Positions and KV slots for decode steps where requests schedule different numbers of tokens (speculative decode).
++
++Such a step is padded to ``[batch, width]``, width being the longest request's token count, and then flattened.
++"""
++
++from __future__ import annotations
++
++from collections.abc import Iterator, Sequence
++
++import torch
++
++
++def mrope_decode_positions(context_lens: Sequence[int], token_counts: Sequence[int], deltas: Sequence[int],
++                           batch: int, width: int) -> torch.Tensor:
++    """``[3, batch * width]`` positions of the scheduled tokens, -1 for padding. Past the prompt all axes are equal."""
++    positions = torch.full((batch, width), -1, dtype=torch.int32, device='cpu')
++    for i, (start, count, delta) in enumerate(zip(context_lens, token_counts, deltas)):
++        first = int(start) + int(delta)
++        positions[i, :count] = torch.arange(first, first + count, dtype=torch.int32, device='cpu')
++    return positions.flatten().repeat(3, 1)
++
++
++def redirect_padded_tokens(slot_mapping: torch.Tensor, token_counts: Sequence[int],
++                           pad_slots: Iterator[int]) -> None:
++    """Point each request's padded tokens at the pad row. Their position is 0, whose slot is a live cache entry."""
++    width = slot_mapping.shape[1]
++    for i, count in enumerate(token_counts):
++        for j in range(count, width):
++            slot_mapping[i, j] = next(pad_slots)
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 0b53aec0..5fb5c62c 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -102,6 +102,7 @@ from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
+ from vllm.v1.worker.utils import (AttentionGroup, prepare_kernel_block_sizes, sanity_check_mm_encoder_outputs)
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
+ from vllm_gaudi.v1._vendored.spec_decode.eagle import EagleProposer
++from vllm_gaudi.v1.worker.decode_token_padding import mrope_decode_positions, redirect_padded_tokens
+ from vllm_gaudi.v1.worker.recurrent_state_slots import RecurrentStateSlots
+ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ from vllm_gaudi.v1._vendored.spec_decode.ngram_proposer import NgramProposer
+@@ -3584,30 +3585,13 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         index = positions.to(torch.int64)[:num_decodes]
+         padded_index[:num_decodes] = index
+ 
+-        input_mrope_positions_list: list[list[int]] = [[] for _ in range(3)]
+         if self.uses_mrope:
+-            for idx, req_id in enumerate(self.input_batch.req_ids[:num_decodes]):
+-                seq_data = self.requests[req_id]
+-                context_len = context_lens[idx]
+-                position = context_len
+-                if seq_data.mrope_position_delta is not None:
+-                    seq_data.mrope_position_delta = int(seq_data.mrope_position_delta)
+-                    pos_for_mrope = MRotaryEmbedding \
+-                        .get_next_input_positions(
+-                            seq_data.mrope_position_delta,
+-                            context_len=context_len,
+-                            seq_len=context_len + 1)
+-                else:
+-                    pos_for_mrope = [[position]] * 3
+-                for idx in range(3):
+-                    input_mrope_positions_list[idx].extend(pos_for_mrope[idx])
+-
+-            positions = torch.tensor(input_mrope_positions_list, dtype=torch.int32, device='cpu')
+-
+-            # Pad the right side of input_mrope_positions by padded_batch_size
+-            pad_size = padded_batch_size - positions.size(1)
+-            if pad_size > 0:
+-                positions = F.pad(positions, (0, pad_size), value=-1, mode='constant')
++            deltas = [
++                int(self.requests[req_id].mrope_position_delta or 0)
++                for req_id in self.input_batch.req_ids[:num_decodes]
++            ]
++            positions = mrope_decode_positions(context_lens[:num_decodes], num_tokens_per_req[:num_decodes], deltas,
++                                               padded_batch_size, num_tokens)
+ 
+         ###################################
+         # initialize token_ids with padding
+@@ -3644,6 +3628,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         # decode_block_size is attn_block_size, so the pad row (kernel-block units, see attn_pad_ids) is exactly
+         # decode_block_size slots starting at _PAD_SLOT_ID: cycling over it keeps padding tokens in the pad row.
+         dummy_slots = pad_slot_cycle(self._PAD_SLOT_ID, decode_block_size)
++        redirect_padded_tokens(slot_mapping, num_tokens_per_req[:num_decodes], dummy_slots)
+         slot_mapping[num_decodes:].apply_(lambda _, ds=dummy_slots: next(ds))
+ 
+         #####################################
+@@ -3651,7 +3636,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         # convert to [batch_size * num_tokens, 1]
+         if num_tokens > 1:
+             token_ids = token_ids.view(-1, 1)
+-            positions = padded_index.view(-1, 1)
++            if not self.uses_mrope:  # mrope positions are built flat, [3, batch * num_tokens]
++                positions = padded_index.view(-1, 1)
+             slot_mapping = slot_mapping.view(-1, 1)
+ 
+         logits_indices = torch.zeros(padded_batch_size, dtype=torch.int32, device='cpu')
+-- 
+2.43.0
+
