@@ -552,6 +552,20 @@ To-do, in working order:
           (p = 0.34, 0.94; all rejection-step positions p >= 0.57; seeded 0.69 over 72000 draws), and two cards still
           draw identical tokens from one seed, which TP needs. Greedy results are not affected. Not checked: lazy mode,
           other Gaudi software versions. Not reported upstream.
+    - [ ] **0020 on the full server (TP=8, 6400 completions per launch): the bias is confirmed and mostly verified
+          fixed, not exported yet** (`results-ubuntu2404/qwen38fn/mtp_sampling_dist_tp8.txt`).
+          - Without 0020: 2 of the 4 non-trivial checks fail (p = 0.002, 0.007). With it those two pass (p >= 0.55, with
+            MTP p >= 0.42).
+          - **One check fails with 0020: p = 0.006** (n = 349; with MTP 0.089). Two tokens that the reference puts just
+            outside the top-p cutoff are sampled 1.0-1.4% each, also without 0020. The reference came from the prefill
+            path, whose logits differ from decode. That is a likely cause, not a proven one: rerun against each
+            launch's own decode-step probabilities.
+          - **0020 as first written was a speed regression: seeded single-user sampling 14.6 tok/s (25.0 before).** It
+            drew every row per generator as soon as one request had a seed: 26-28 ms instead of 5.5 ms per sampler
+            call. 0019's target-token draw had the same loop, so the sampled MTP speeds reported so far (22.0, seeded)
+            are too low by an unknown amount. Fixed in 0021 (`results-ubuntu2404/hpu-seeded-sampling-speed.txt`, one
+            card: 5.8 ms); full-server speed not measured yet. All requests seeded still costs ~27 ms, as before 0020.
+          - `ruff` and `yapf` are not installed here, so 0019-0021 were not lint-checked.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

@@ -1,0 +1,29 @@
+# One card, compiled Sampler and target-token draw, batches of 16. old = exponential_, new = torch.rand
+T old seeded random_sample eager, 1 rows             median    0.70 ms  p10    0.50  p90    1.19
+T old seeded random_sample eager, 16 rows            median    9.07 ms  p10    8.11  p90   14.34
+T old compiled Sampler, 1 of 16 rows seeded          median    5.58 ms  p10    5.47  p90    5.74
+T old compiled Sampler, 16 of 16 rows seeded         median   28.16 ms  p10   25.65  p90   28.44
+T new seeded random_sample eager, 1 rows             median    3.07 ms  p10    1.23  p90    4.80
+T new seeded random_sample eager, 16 rows            median   28.15 ms  p10   23.01  p90   29.23
+T new compiled Sampler, 1 of 16 rows seeded          median   26.26 ms  p10   25.03  p90   27.87
+T new compiled Sampler, 16 of 16 rows seeded         median   25.70 ms  p10   25.00  p90   27.91
+T old seeded random_sample eager, 1 rows             median    0.75 ms  p10    0.54  p90    1.21
+T old seeded random_sample eager, 16 rows            median   22.10 ms  p10   10.04  p90   24.19
+T old compiled Sampler, 1 of 16 rows seeded          median    5.51 ms  p10    5.41  p90    5.62
+T old compiled Sampler, 16 of 16 rows seeded         median   27.07 ms  p10   25.71  p90   28.50
+T new seeded random_sample eager, 1 rows             median    1.55 ms  p10    0.84  p90    4.42
+T new seeded random_sample eager, 16 rows            median   25.96 ms  p10   19.20  p90   27.66
+T new compiled Sampler, 1 of 16 rows seeded          median   27.73 ms  p10   27.43  p90   28.10
+T new compiled Sampler, 16 of 16 rows seeded         median   27.56 ms  p10   27.30  p90   27.81
+## after the fix
+T new seeded random_sample eager, 1 rows             median    4.07 ms  p10    1.26  p90    4.65
+T new seeded random_sample eager, 16 rows            median   28.13 ms  p10   20.07  p90   28.85
+T new compiled Sampler, 1 of 16 rows seeded          median    5.78 ms  p10    5.64  p90    5.84
+T new compiled Sampler, 16 of 16 rows seeded         median   27.73 ms  p10   27.42  p90   28.07
+M 1 of 16 seeded: the seeded row                 n=  5000 TVD 0.0133 null 0.0158 p=0.740 outside 0.00000
+M 1 of 16 seeded: the unseeded rows              n= 75000 TVD 0.0029 null 0.0041 p=0.883 outside 0.00000
+R target tokens, no seed: median 3.27 ms
+R target tokens, no seed: all                    n= 28800 TVD 0.0093 null 0.0066 p=0.094 outside 0.00000
+R target tokens, 1 of 16 seeded: median 7.59 ms
+R target tokens, 1 of 16 seeded: all             n= 96000 TVD 0.0026 null 0.0036 p=0.872 outside 0.00000
+R target tokens, 1 of 16 seeded: the seeded request n=  6000 TVD 0.0198 null 0.0146 p=0.103 outside 0.00000

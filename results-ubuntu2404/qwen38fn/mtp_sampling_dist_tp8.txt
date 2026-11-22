@@ -1,0 +1,63 @@
+# TP=8 at plugin 328e5979 (0019 + 0020), before the seeded-draw fix. 'before0020' = 0020 disabled.
+# Reference: greedy prefill-path logprobs of one launch. It is off near the top-p cutoff, see FINDINGS 21.
+# The speed check is seeded and shows the regression fixed afterwards.
+#### before0020 ready=1 11:22:16 plugin 328e5979 no0020=1
+before0020: 6400 samples
+errors 0
+cards released
+#### base ready=1 11:53:17 plugin 328e5979 no0020=0
+chat, all defaults                 ok   'User asks: "Name three rivers in Europe." Simple factual request. Need final answer concise. Three major Europ'
+completion, temperature 0.7        ok   ' a powerful teacher. It can humble the mightiest vessel and make even the most experienced sailor feel small. '
+top_p only                         ok   ' an immense source of nutrients and many are used in cosmetics, both for skin and hair care. Seaweed is one of'
+logprobs, greedy                   ok   64 logprobs, min -1.10
+logprobs, sampled                  ok   10 logprobs, min -2.74
+chat logprobs                      ok   33 rows
+repetition + frequency penalty     ok   '\n\n基本信息\n歌曲名 = ララリラリ\n演唱 = 中野三玖 (CV: 伊藤美来)\n音轨1 = あんさんぶるソングエ'
+seeded twice                       ok   same=True ', in a magical land inside our bodies, there was a very important place called the Gut Kingdom. This Gut Kingd'
+16 mixed requests                  ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+16 mixed requests, again           ok   16/16, last: '\n\n<think>\n\n</think>\n\nThe sea is a vast, breathing entity, its surface shimmering under the sun while hiding pr'
+sampled single-user speed          ok   warm decode tok/s [14.6, 14.6, 14.6, 14.6, 14.7, 14.7]
+distribution samples               ok   960 samples
+base: 6400 samples
+exact: 5 prefixes
+errors 0
+cards released
+#### mtp3 ready=1 12:32:33 plugin 328e5979 no0020=0
+chat, all defaults                 ok   'User asks: "Name three rivers in Europe." Simple factual request. Need answer concise. Final: list three Europ'
+completion, temperature 0.7        ok   ' rough, and the wind is strong, but the boat sails on.'
+top_p only                         ok   ' an important element of the landscape, and also a way of life, in Póvoa de Varzim.\nThe facilities of this 4-s'
+logprobs, greedy                   ok   64 logprobs, min -1.14
+logprobs, sampled                  ok   10 logprobs, min -2.74
+chat logprobs                      ok   40 rows
+repetition + frequency penalty     ok   '\n\n基本信息\n歌曲名 = ララリラリ\n演唱 = 中野三玖 (CV: M·A·O)\n音轨1 = -LOVE-\n作词 = Z'
+seeded twice                       ok   same=True ', in a faraway land called the United States, there was a big problem that people had been facing for a long, '
+16 mixed requests                  ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+16 mixed requests, again           ok   16/16, last: '\n\n<think>\nThe user wants me to write one short paragraph about the sea. This is a straightforward creative/des'
+sampled single-user speed          ok   warm decode tok/s [14.9, 14.9, 16.2, 16.2, 17.1, 17.3]
+distribution samples               ok   960 samples
+mtp3: 6400 samples
+errors 0
+cards released
+#### server vs the model's own probabilities
+prefix [] token 0 before0020 n= 6400 TVD 0.0221 null 0.0096 p=0.002
+prefix [] token 0 base       n= 6400 TVD 0.0093 null 0.0096 p=0.552
+prefix [] token 0 mtp3       n= 6400 TVD 0.0102 null 0.0096 p=0.422
+prefix [279] token 1 before0020 n= 4159 TVD 0.0000 null 0.0000 p=1.000
+prefix [279] token 1 base       n= 4258 TVD 0.0000 null 0.0000 p=1.000
+prefix [279] token 1 mtp3       n= 4231 TVD 0.0000 null 0.0000 p=1.000
+prefix [524] token 1 before0020 n=  565 TVD 0.0507 null 0.0429 p=0.272
+prefix [524] token 1 base       n=  616 TVD 0.0477 null 0.0412 p=0.297
+prefix [524] token 1 mtp3       n=  616 TVD 0.0531 null 0.0405 p=0.163
+prefix [279, 799] token 2 before0020 n= 4159 TVD 0.0197 null 0.0052 p=0.007
+prefix [279, 799] token 2 base       n= 4258 TVD 0.0024 null 0.0052 p=0.756
+prefix [279, 799] token 2 mtp3       n= 4231 TVD 0.0037 null 0.0051 p=0.630
+prefix [799, 421] token 2 before0020 n=  451 TVD 0.0595 null 0.0656 p=0.673
+prefix [799, 421] token 2 base       n=  349 TVD 0.1204 null 0.0745 p=0.006
+prefix [799, 421] token 2 mtp3       n=  361 TVD 0.0950 null 0.0735 p=0.089
+#### base vs mtp, 960 completions (the check that was borderline)
+token 0: TVD base vs mtp 0.0125, same-distribution median 0.0354, p=0.998
+token 1: TVD base vs mtp 0.0625, same-distribution median 0.0656, p=0.620
+token 2: TVD base vs mtp 0.0948, same-distribution median 0.0854, p=0.276
+token 3: TVD base vs mtp 0.1240, same-distribution median 0.1448, p=0.951
+token 4: TVD base vs mtp 0.1531, same-distribution median 0.1719, p=0.948
+
