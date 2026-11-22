@@ -1,0 +1,21 @@
+# PP=8 without MTP at plugin e3b40ad1 (0007-0023): single-user speed, and sampled tokens against their own step's probabilities.
+#### pp8mtp0 ready=1 16:54:55 plugin e3b40ad1
+equal pp8mtp0: 128 tokens, 0 not top-1: ' Paris. The capital of Germany is Berlin. The capital of Italy is Rome. The capital of Spain is Madr'
+equal pp8mtp0: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking me to explain how a transistor works. This is a fundamental electronics'
+equal pp8mtp0: 128 tokens, 0 not top-1: '\n    if len(a) <= 1:\n        return a\n    else:\n        pivot = a[0]\n        less = [x for x in a[1:'
+equal pp8mtp0: 128 tokens, 0 not top-1: ', in a magical land called Schoolville, there was a group of little kids who were learning all about'
+equal pp8mtp0: 128 tokens, 0 not top-1: ' the one that you know best.\n\n## 1. Introduction\n\nIn this tutorial, we’ll explore the differences be'
+equal pp8mtp0: 128 tokens, 0 not top-1: '\n\n<think>\nThe user is asking for a simple list of the planets in our solar system. This is straightf'
+equal pp8mtp0: 128 tokens, 0 not top-1: ' une source d’inspiration inépuisable pour les artistes. Les peintres, les photographes, les sculpte'
+equal pp8mtp0: 128 tokens, 0 not top-1: ' 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75'
+speed pp8mtp0    greedy   single user, warm decode tok/s [31.1, 31.1, 31.1, 31.2, 31.4, 31.4]
+speed pp8mtp0    sampled  single user, warm decode tok/s [30.1, 30.2, 30.3, 30.3, 30.3, 30.4]
+speed pp8mtp0    seeded   single user, warm decode tok/s [31.0, 31.2, 31.2, 31.4, 31.4, 31.5]
+pp8mtp0: 6400 samples
+pp8mtp0    token 0 prefix [] n= 6400 TVD 0.0061 null 0.0096 p=0.917 outside own top-p 0
+pp8mtp0    token 1 prefix [279] n= 4283 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+pp8mtp0    token 1 prefix [524] n=  577 TVD 0.0387 null 0.0436 p=0.651 outside own top-p 0
+pp8mtp0    token 2 prefix [279, 799] n= 4283 TVD 0.0046 null 0.0050 p=0.553 outside own top-p 0
+pp8mtp0    token 2 prefix [799, 421] n=  372 TVD 0.0779 null 0.0748 p=0.415 outside own top-p 0
+errors 0
+cards released

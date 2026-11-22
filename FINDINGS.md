@@ -597,6 +597,15 @@ To-do, in working order:
             measurable here. **MTP is still no faster for sampled requests.** The seeded loop in 0019 was suspected for
             that and is not the reason (22.0 before 0021, 22.55 after).
           - `ruff` and `yapf` are not installed here, so 0019-0021 were not lint-checked.
+    - [x] **0020-0021 at PP=8 without MTP: sampling is correct** (`results-ubuntu2404/qwen38fn/sampling_dist_pp8.txt`,
+          6400 completions): p = 0.42-0.92 in the 4 checks, no draw outside its top-p set. Single user 31.2 tok/s greedy,
+          30.3 sampled, 31.2 seeded.
+    - [ ] **MTP at PP=8 kills the engine on the first decode step (tried with 0023).** With a batch queue (PP without
+          async scheduling) the engine stores the drafts before it processes the output of their step, so the next step
+          is scheduled with the drafts but without the sampled token (`mtp_pp8_scheduler_order.txt`, reproduced with
+          the real scheduler), and the drafter gets 3 slots for 4 rows. The same ordering makes the engine wait for
+          each step's drafts and can label drafts with a later batch. With a queue of 1 the scheduler output is right;
+          being tried on the cards.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for

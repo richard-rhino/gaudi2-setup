@@ -1,0 +1,4 @@
+# vLLM's real scheduler, MTP k=3, PP=8, no model: the first decode step after a prefill.
+# The drafts are stored before (batch queue) or after (step()) the prefill's output is processed.
+S batch queue (PP=8)    : scheduled 3 tokens, drafts [51, 52, 53], new tokens [], max_concurrent_batches 8
+S queue of 1 (step())   : scheduled 4 tokens, drafts [51, 52, 53], new tokens [42], max_concurrent_batches 8
