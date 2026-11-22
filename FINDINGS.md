@@ -397,11 +397,30 @@ Qwen3.8-Flash-Next, TP=8 PP=1, gather MoE, single user, 256 tokens: **27.7-29.7 
 The old 2.6-3.4 tok/s at TP=8 was measured with the fused MoE and the uncompiled PLE layer as well as the flapping
 links, so not all of the ~9x is the link fix. PP=8 still does ~32 tok/s single user.
 
+**Soak, 16 users, 21 min** (random 1024 in / 256 out, 10 passes of 96 requests after a warm pass,
+`bench_tp8_port8fix_16users.txt` in the same directory):
+
+| | TP=8, port 8 fix | PP=8 gather (section 18, not re-run since) |
+|---|---|---|
+| Aggregate output | **214.8 tok/s** (213.5-218.8 over 10 passes) | 123 tok/s |
+| TPOT p50 | 66-68 ms | 120 ms |
+| TTFT p50 / p99 | ~2.0 s / 5.3-5.7 s | |
+| ITL p50 / p99 | 54-55 ms / 627-671 ms | |
+
+- 0 of 960 requests failed, 0 port 9 link-downs, no server errors.
+- The 10 s server-log windows under 100 tok/s all fall at the start of a pass (idle client, then 16 prefills at once) or
+  in the single-user test afterwards. None is mid-pass, so there was no sign of the old 4-16 s all-reduce stalls.
+- Single user afterwards: 28.0-28.7 tok/s, no degradation.
+- Against deb-ai, prompt-token |dlogprob| means are 0.02-0.19, in line with PP=8
+  (`compare_vs_deb-ai-tp8-port8fix.txt`).
+- The cold warm-up pass was 29 tok/s aggregate with a 56 s median TTFT: first-use compiles are still the weak spot.
+- All without MTP.
+
 ## 21. Next steps
 
 To-do, in working order:
-- [ ] **TP=8 soak** (16 users, 20 min) after the port 8 fix, then the same single-user test with the gather MoE off, to
-      separate the link fix from the MoE speed-up.
+- [x] **TP=8 soak** (16 users, 21 min) after the port 8 fix.
+- [ ] TP=8 single-user test with the gather MoE off, to separate the link fix from the MoE speed-up.
 - [ ] **Qwen3.8-Flash-Next MTP** (requested 2026-11-22, ahead of DeepSeek). All Gaudi numbers so far are without it; deb-ai gets 2.4-2.6
       tokens per step with it. Scope, from reading the code (nothing run yet):
   - The checkpoint has the head (31 `mtp.*` tensors); `qwen4_exp.py` drops them today (`"mtp.": None`).

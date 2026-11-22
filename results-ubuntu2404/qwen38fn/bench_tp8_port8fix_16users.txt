@@ -1,0 +1,156 @@
+# TP=8, gather MoE, port 8 down: 1024 in / 256 out, concurrency 16; start 02:45:42
+== warm pass 02:45:42
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     32
+Failed requests:                         0
+Benchmark duration (s):                  278.07
+Output token throughput (tok/s):         29.46
+Peak output token throughput (tok/s):    240.00
+Total token throughput (tok/s):          147.30
+P50 TTFT (ms):                           56175.38
+P99 TTFT (ms):                           234019.56
+P50 TPOT (ms):                           91.54
+P99 TPOT (ms):                           561.76
+P50 ITL (ms):                            70.30
+P99 ITL (ms):                            896.28
+== soak pass 1 02:50:32
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.27
+Output token throughput (tok/s):         215.06
+Peak output token throughput (tok/s):    304.00
+Total token throughput (tok/s):          1075.31
+P50 TTFT (ms):                           2026.86
+P99 TTFT (ms):                           5376.74
+P50 TPOT (ms):                           66.25
+P99 TPOT (ms):                           73.84
+P50 ITL (ms):                            54.97
+P99 ITL (ms):                            644.70
+== soak pass 2 02:52:40
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.89
+Output token throughput (tok/s):         213.90
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1069.50
+P50 TTFT (ms):                           2033.81
+P99 TTFT (ms):                           5373.38
+P50 TPOT (ms):                           67.11
+P99 TPOT (ms):                           74.02
+P50 ITL (ms):                            54.76
+P99 ITL (ms):                            663.58
+== soak pass 3 02:54:47
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.98
+Output token throughput (tok/s):         213.74
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1068.70
+P50 TTFT (ms):                           2019.96
+P99 TTFT (ms):                           5718.02
+P50 TPOT (ms):                           66.87
+P99 TPOT (ms):                           74.30
+P50 ITL (ms):                            54.59
+P99 ITL (ms):                            666.64
+== soak pass 4 02:56:54
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  115.11
+Output token throughput (tok/s):         213.49
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1067.47
+P50 TTFT (ms):                           2042.70
+P99 TTFT (ms):                           5377.50
+P50 TPOT (ms):                           67.25
+P99 TPOT (ms):                           74.67
+P50 ITL (ms):                            55.28
+P99 ITL (ms):                            659.39
+== soak pass 5 02:59:01
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.95
+Output token throughput (tok/s):         213.80
+Peak output token throughput (tok/s):    304.00
+Total token throughput (tok/s):          1069.02
+P50 TTFT (ms):                           1882.61
+P99 TTFT (ms):                           5379.68
+P50 TPOT (ms):                           67.52
+P99 TPOT (ms):                           73.51
+P50 ITL (ms):                            55.24
+P99 ITL (ms):                            661.39
+== soak pass 6 03:01:07
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.05
+Output token throughput (tok/s):         215.48
+Peak output token throughput (tok/s):    304.00
+Total token throughput (tok/s):          1077.41
+P50 TTFT (ms):                           2023.51
+P99 TTFT (ms):                           5380.55
+P50 TPOT (ms):                           66.10
+P99 TPOT (ms):                           72.86
+P50 ITL (ms):                            54.42
+P99 ITL (ms):                            665.94
+== soak pass 7 03:03:12
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  115.07
+Output token throughput (tok/s):         213.58
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1067.91
+P50 TTFT (ms):                           2029.20
+P99 TTFT (ms):                           5556.73
+P50 TPOT (ms):                           66.91
+P99 TPOT (ms):                           73.98
+P50 ITL (ms):                            55.18
+P99 ITL (ms):                            663.57
+== soak pass 8 03:05:20
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  114.91
+Output token throughput (tok/s):         213.87
+Peak output token throughput (tok/s):    304.00
+Total token throughput (tok/s):          1069.33
+P50 TTFT (ms):                           2059.26
+P99 TTFT (ms):                           5402.50
+P50 TPOT (ms):                           66.86
+P99 TPOT (ms):                           73.64
+P50 ITL (ms):                            54.57
+P99 ITL (ms):                            671.34
+== soak pass 9 03:07:26
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  112.31
+Output token throughput (tok/s):         218.83
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1094.15
+P50 TTFT (ms):                           1919.62
+P99 TTFT (ms):                           5281.63
+P50 TPOT (ms):                           65.71
+P99 TPOT (ms):                           72.33
+P50 ITL (ms):                            54.09
+P99 ITL (ms):                            626.57
+== soak pass 10 03:09:30
+Failed to import from vllm._C: ModuleNotFoundError("No module named 'vllm._C'")
+Successful requests:                     96
+Failed requests:                         0
+Benchmark duration (s):                  113.75
+Output token throughput (tok/s):         216.04
+Peak output token throughput (tok/s):    320.00
+Total token throughput (tok/s):          1080.22
+P50 TTFT (ms):                           1986.24
+P99 TTFT (ms):                           5564.47
+P50 TPOT (ms):                           66.43
+P99 TPOT (ms):                           73.64
+P50 ITL (ms):                            54.74
+P99 ITL (ms):                            645.32
+# port 9 link-downs since 2026-11-22 02:43:26: 0; end 03:12:03
