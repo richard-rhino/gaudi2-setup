@@ -523,15 +523,15 @@ To-do, in working order:
             without it. No extra repetition (the one new looping prompt also loops on fused MoE without MTP). The high
             acceptance is the prompts: launch 8 already accepted 70.8% on them with 1 and 4 users. Limit: after a
             prompt's first difference nothing is compared.
-    - [ ] **MTP is not servable yet: the plugin's HPU rejection sampler (`v1/sample/hpu_rejection_sampler.py`).** Found by
-          reading it, reproduced on CPU with the real code, not yet sent to the cards:
+    - [ ] **MTP is not servable yet (JSON schema crashes it). The plugin's HPU rejection sampler (`v1/sample/hpu_rejection_sampler.py`).** Found by
+          reading it, reproduced on CPU with the real code, fixed by 0019:
           1. `assert sampling_metadata.all_greedy`: any request with temperature > 0 raises in the workers. This model's
              default is temperature 1.0, so that includes a plain chat request. **Every MTP result above is temperature 0.**
           2. Logprobs: token ids are left on the CPU (the crash of launch 4), the runner drops the spec-decode logprobs,
              and in a padded batch they would be read from other requests' rows (the vendored code expects compact rows).
           3. In a padded batch a request whose drafts were all accepted loses its bonus token (the padding counts as a
              mismatch): right tokens, fewer per step. The 16-user speeds above include that loss.
-          **Fix 0019 (local plugin commit d9a93321, not exported until the distribution question below is settled)**, on
+          **Fix 0019 (exported)**, on
           the cards at TP=8, one launch each (`mtp_sampling_tp8.txt`):
           - works: chat with defaults, temperature, top_p, logprobs (greedy, sampled, chat), penalties, seeds, 16 mixed
             requests at once. Logprobs agree with the non-MTP run as closely as that run agrees with itself (top-2 margin
@@ -539,8 +539,8 @@ To-do, in working order:
             (1 and 16 users), largest flips 0.4375 and 0.75, the latter what switching the MoE path does without MTP.
           - **sampled requests are slower with MTP: 22.0 tok/s (20.0-23.2) vs 25.0 (24.5-25.7) without.** The +23% is
             greedy only. Greedy was 29.4 tok/s in this launch (31.8-32.6 in the A/B before 0019), cause not known yet.
-          - **open: the sampled distribution.** 960 completions with and without MTP: p = 1.0, 0.57, 0.04, 0.03, 0.03 for
-            tokens 0-4 (dependent tests). The two runs also differ numerically, so this may or may not be the sampler.
+          - the sampled distribution, open at first (960 completions, p = 0.03-0.04 for tokens 2-4), was the stock
+            sampler's bias, see the next item. Correct since 0020.
           - **still crashes: structured output (JSON schema)**, `UnboundLocalError: sampling_metadata`. The plugin's
             structured-output path does not handle speculative decoding.
     - [ ] **All sampled output on this stack is biased, with or without MTP: `Tensor.exponential_` on HPU.** Found while
@@ -548,23 +548,35 @@ To-do, in working order:
           The values have the right marginal distribution but are not independent within a row, and vLLM samples with
           `argmax(probs / exponential noise)`. In a test distribution the compiled stock sampler was off by TVD
           0.054-0.065 (about 5-6% of the probability on the wrong tokens; unbiased would be 0.008). CPU is exact, and so
-          is HPU `torch.rand`. **Fix 0020** (local until checked on the full server): noise from `torch.rand`; then exact
+          is HPU `torch.rand`. **Fix 0020** (exported): noise from `torch.rand`; then exact
           (p = 0.34, 0.94; all rejection-step positions p >= 0.57; seeded 0.69 over 72000 draws), and two cards still
           draw identical tokens from one seed, which TP needs. Greedy results are not affected. Not checked: lazy mode,
           other Gaudi software versions. Not reported upstream.
-    - [ ] **0020 on the full server (TP=8, 6400 completions per launch): the bias is confirmed and mostly verified
-          fixed, not exported yet** (`results-ubuntu2404/qwen38fn/mtp_sampling_dist_tp8.txt`).
-          - Without 0020: 2 of the 4 non-trivial checks fail (p = 0.002, 0.007). With it those two pass (p >= 0.55, with
-            MTP p >= 0.42).
-          - **One check fails with 0020: p = 0.006** (n = 349; with MTP 0.089). Two tokens that the reference puts just
-            outside the top-p cutoff are sampled 1.0-1.4% each, also without 0020. The reference came from the prefill
-            path, whose logits differ from decode. That is a likely cause, not a proven one: rerun against each
-            launch's own decode-step probabilities.
-          - **0020 as first written was a speed regression: seeded single-user sampling 14.6 tok/s (25.0 before).** It
-            drew every row per generator as soon as one request had a seed: 26-28 ms instead of 5.5 ms per sampler
-            call. 0019's target-token draw had the same loop, so the sampled MTP speeds reported so far (22.0, seeded)
-            are too low by an unknown amount. Fixed in 0021 (`results-ubuntu2404/hpu-seeded-sampling-speed.txt`, one
-            card: 5.8 ms); full-server speed not measured yet. All requests seeded still costs ~27 ms, as before 0020.
+    - [x] **0019-0021 on the full server (TP=8): sampling is now correct in every check, with and without MTP**
+          (`results-ubuntu2404/qwen38fn/mtp_sampling_dist2_tp8.txt`; 6400 completions per launch, each token against
+          the probabilities of its own step; 4 non-trivial checks per launch).
+          - before 0020: fails 2 of 4 (p = 0.000 and 0.002; first token TVD 0.029, unbiased would be 0.010).
+          - with 0020+0021: p = 0.50-0.99. With MTP: p = 0.44-0.90.
+          - A first run against a prefill-path reference had one failure with 0020 (p = 0.006,
+            `mtp_sampling_dist_tp8.txt`). With each launch's own probabilities the same check gives p = 0.99, so that
+            was the reference.
+          - 15 draws of the three launches (5 of them without 0020) are one or two ranks outside their computed top-p
+            set. The stock top-k keeps tokens tied with the 20th, and 1-2 ties would explain each one; the API returns
+            20 logprobs, so the ties themselves were not seen.
+          - **0020 as first written was a speed regression, fixed by 0021:** one seeded request made it draw every row
+            per generator (26-28 ms instead of 5.5 ms per call; seeded single user 14.6 tok/s at TP=8,
+            `results-ubuntu2404/hpu-seeded-sampling-speed.txt`). All requests seeded still costs ~27 ms, as before 0020.
+          - Single user, median tok/s, one launch each (launches differ by up to ~19%):
+
+            | Request | old sampler | 0020+0021 | 0020+0021, MTP k=3 |
+            |---|---|---|---|
+            | greedy | 27.9 | 25.45 | 29.3 |
+            | sampled | 27.25 | 25.55 | 23.85 |
+            | sampled, seeded | 24.45 | 23.0 | 22.55 |
+
+            Greedy does not use the changed code and dropped as much as the sampled columns, so 0020+0021 cost nothing
+            measurable here. **MTP is still no faster for sampled requests.** The seeded loop in 0019 was suspected for
+            that and is not the reason (22.0 before 0021, 22.55 after).
           - `ruff` and `yapf` are not installed here, so 0019-0021 were not lint-checked.
     - [ ] Model card in tests/models for the draft model, once it runs.
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.

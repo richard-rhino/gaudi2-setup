@@ -1,0 +1,41 @@
+# TP=8 at plugin 05f78821 (0019-0021), one launch per arm. 'before0020' = exponential_ noise as before 0020.
+# Each sampled token against the probabilities from the logprobs of its own step. Speed: no seed and seeded.
+# 15 of the draws are just outside their computed top-p set, also without 0020: see FINDINGS 21.
+#### before0020 ready=1 13:36:30 plugin 05f78821 no0020=1
+speed before0020 greedy   single user, warm decode tok/s [26.8, 27.2, 27.5, 28.3, 28.3, 28.5]
+speed before0020 sampled  single user, warm decode tok/s [25.6, 26.7, 27.1, 27.4, 27.9, 27.9]
+speed before0020 seeded   single user, warm decode tok/s [24.3, 24.4, 24.4, 24.5, 24.6, 24.7]
+before0020: 6400 samples
+errors 0
+cards released
+#### base ready=1 14:10:22 plugin 05f78821 no0020=0
+speed base       greedy   single user, warm decode tok/s [24.2, 24.7, 25.2, 25.7, 25.7, 26.2]
+speed base       sampled  single user, warm decode tok/s [25.1, 25.2, 25.2, 25.9, 26.0, 26.4]
+speed base       seeded   single user, warm decode tok/s [22.7, 22.7, 22.8, 23.2, 23.2, 23.6]
+base: 6400 samples
+errors 0
+cards released
+#### mtp3 ready=1 14:46:30 plugin 05f78821 no0020=0
+speed mtp3       greedy   single user, warm decode tok/s [29.1, 29.2, 29.3, 29.3, 33.2, 33.7]
+speed mtp3       sampled  single user, warm decode tok/s [22.0, 22.6, 23.8, 23.9, 24.8, 25.7]
+speed mtp3       seeded   single user, warm decode tok/s [20.1, 20.3, 22.5, 22.6, 24.0, 24.1]
+mtp3: 6400 samples
+errors 0
+cards released
+#### each launch against its own decode-step probabilities
+before0020 token 0 prefix [] n= 6400 TVD 0.0287 null 0.0097 p=0.000 outside own top-p 0
+before0020 token 1 prefix [279] n= 4161 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+before0020 token 1 prefix [799] n=  581 TVD 0.0265 null 0.0148 p=0.089 outside own top-p 0
+before0020 token 2 prefix [279, 799] n= 4161 TVD 0.0110 null 0.0048 p=0.154 outside own top-p 0
+before0020 token 2 prefix [799, 421] n=  489 TVD 0.1125 null 0.0647 p=0.002 outside own top-p 5
+base       token 0 prefix [] n= 6400 TVD 0.0071 null 0.0096 p=0.823 outside own top-p 0
+base       token 1 prefix [279] n= 4221 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+base       token 1 prefix [524] n=  606 TVD 0.0327 null 0.0414 p=0.771 outside own top-p 0
+base       token 2 prefix [279, 799] n= 4221 TVD 0.0051 null 0.0051 p=0.501 outside own top-p 0
+base       token 2 prefix [799, 421] n=  378 TVD 0.0413 null 0.0729 p=0.992 outside own top-p 1
+mtp3       token 0 prefix [] n= 6400 TVD 0.0078 null 0.0096 p=0.730 outside own top-p 0
+mtp3       token 1 prefix [279] n= 4222 TVD 0.0000 null 0.0000 p=1.000 outside own top-p 0
+mtp3       token 1 prefix [524] n=  618 TVD 0.0418 null 0.0402 p=0.439 outside own top-p 0
+mtp3       token 2 prefix [279, 799] n= 4222 TVD 0.0010 null 0.0052 p=0.899 outside own top-p 0
+mtp3       token 2 prefix [799, 421] n=  389 TVD 0.0565 null 0.0729 p=0.891 outside own top-p 4
+

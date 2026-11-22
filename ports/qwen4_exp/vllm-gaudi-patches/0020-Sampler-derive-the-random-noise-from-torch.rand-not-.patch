@@ -1,0 +1,112 @@
+From 328e5979e74184199544b532acdc82238fc9a272 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 11:19:11 +0000
+Subject: [PATCH] Sampler: derive the random noise from torch.rand, not
+ exponential_
+
+On HPU, the values of Tensor.exponential_ are not independent within a row,
+although their marginal distribution is right. Sampling with
+argmax(probs / noise) then does not follow the probabilities, for every
+request with a temperature, with or without speculative decoding.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ tests/unit_tests/worker/test_random_sample.py | 32 +++++++++++++++++++
+ vllm_gaudi/__init__.py                        |  1 +
+ vllm_gaudi/v1/sample/hpu_random_sample.py     | 32 +++++++++++++++++++
+ 3 files changed, 65 insertions(+)
+ create mode 100644 tests/unit_tests/worker/test_random_sample.py
+ create mode 100644 vllm_gaudi/v1/sample/hpu_random_sample.py
+
+diff --git a/tests/unit_tests/worker/test_random_sample.py b/tests/unit_tests/worker/test_random_sample.py
+new file mode 100644
+index 00000000..0c9e0192
+--- /dev/null
++++ b/tests/unit_tests/worker/test_random_sample.py
+@@ -0,0 +1,32 @@
++# SPDX-License-Identifier: Apache-2.0
++"""The sampler's random draw follows its probabilities and does not use exponential_."""
++
++from unittest import mock
++
++import torch
++
++from vllm_gaudi.v1._vendored.sample.ops import topk_topp_sampler
++from vllm_gaudi.v1.sample.hpu_random_sample import random_sample
++
++PROBS = torch.tensor([0.35, 0.25, 0.0, 0.15, 0.1, 0.08, 0.07, 0.0])
++
++
++def test_sampler_uses_the_replacement():
++    assert topk_topp_sampler.random_sample is random_sample
++    with mock.patch.object(torch.Tensor, "exponential_", side_effect=AssertionError("exponential_ used")):
++        random_sample(PROBS.repeat(4, 1), {})
++        random_sample(PROBS.repeat(4, 1), {1: torch.Generator().manual_seed(0)})
++
++
++def test_follows_the_probabilities():
++    torch.manual_seed(0)
++    sampled = random_sample(PROBS.repeat(400000, 1), {})
++    got = torch.bincount(sampled, minlength=len(PROBS)) / len(sampled)
++    assert not got[PROBS == 0].any()
++    assert float((got - PROBS).abs().sum() / 2) < 0.005
++
++
++def test_seeded_rows_repeat():
++    rows = PROBS.repeat(64, 1)
++    first, second = (random_sample(rows, {i: torch.Generator().manual_seed(i) for i in range(64)}) for _ in range(2))
++    assert first.tolist() == second.tolist()
+diff --git a/vllm_gaudi/__init__.py b/vllm_gaudi/__init__.py
+index f04f6eab..5e435003 100755
+--- a/vllm_gaudi/__init__.py
++++ b/vllm_gaudi/__init__.py
+@@ -101,6 +101,7 @@ def register_ops():
+     """Register custom PluggableLayers for the HPU platform"""
+     import vllm_gaudi.attention.oot_mla  # noqa: F401
+     """Register custom ops for the HPU platform."""
++    import vllm_gaudi.v1.sample.hpu_random_sample  # noqa: F401
+     import vllm_gaudi.v1.sample.hpu_rejection_sampler  # noqa: F401
+     import vllm_gaudi.distributed.kv_transfer.kv_connector.v1.hpu_nixl_connector  # noqa: F401
+ 
+diff --git a/vllm_gaudi/v1/sample/hpu_random_sample.py b/vllm_gaudi/v1/sample/hpu_random_sample.py
+new file mode 100644
+index 00000000..b4b745f9
+--- /dev/null
++++ b/vllm_gaudi/v1/sample/hpu_random_sample.py
+@@ -0,0 +1,32 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Random sampling without ``Tensor.exponential_``.
++
++On HPU the values of ``exponential_`` have the right marginal distribution, but are not independent within a row:
++sampling by ``argmax(probs / noise)`` with them does not follow ``probs``. The same noise derived from ``torch.rand``
++does.
++"""
++
++import torch
++
++from vllm_gaudi.v1._vendored.sample.ops import topk_topp_sampler
++
++
++def random_sample(
++    probs: torch.Tensor,
++    generators: dict[int, torch.Generator],
++    use_fp64_gumbel: bool = False,
++) -> torch.Tensor:
++    """One token per row of ``probs``. ``use_fp64_gumbel`` is accepted for parity, HPU has no float64."""
++    if generators:
++        uniform = torch.stack([
++            torch.rand(probs.shape[-1], dtype=probs.dtype, device=probs.device, generator=generators.get(i))
++            for i in range(probs.shape[0])
++        ])
++    else:
++        uniform = torch.rand(probs.shape, dtype=probs.dtype, device=probs.device)
++    # Exponential(1). Not zero, so that a filtered token (probability 0) keeps the score 0
++    noise = (-torch.log1p(-uniform)).clamp(min=1e-20)
++    return (probs / noise).argmax(dim=-1).view(-1)
++
++
++topk_topp_sampler.random_sample = random_sample
+-- 
+2.43.0
+

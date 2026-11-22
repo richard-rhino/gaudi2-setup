@@ -1,0 +1,478 @@
+From d9a9332157b9620613e73a84527b9013828bd1ff Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 10:08:30 +0000
+Subject: [PATCH] Spec decode: sampled requests, logprobs and padded batches in
+ rejection sampling
+
+The HPU rejection sampler only took greedy requests and asserted otherwise.
+It now samples each position from the target distribution, which is rejection
+sampling without draft probabilities.
+
+The logits of a decode batch are padded per request, while the sampler indexed
+them as compact rows. The sampler now gets metadata in the padded layout, so
+sampling constraints, penalties and logprobs read their own rows, and padding
+no longer costs a request its bonus token.
+
+The logprobs of speculative steps are returned, with a row per emitted token.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../worker/test_spec_decode_sampling.py       | 174 ++++++++++++++++++
+ vllm_gaudi/v1/sample/hpu_rejection_sampler.py |  96 +++++++++-
+ vllm_gaudi/v1/worker/hpu_model_runner.py      |  60 +++++-
+ 3 files changed, 312 insertions(+), 18 deletions(-)
+ create mode 100644 tests/unit_tests/worker/test_spec_decode_sampling.py
+
+diff --git a/tests/unit_tests/worker/test_spec_decode_sampling.py b/tests/unit_tests/worker/test_spec_decode_sampling.py
+new file mode 100644
+index 00000000..0cd707f5
+--- /dev/null
++++ b/tests/unit_tests/worker/test_spec_decode_sampling.py
+@@ -0,0 +1,174 @@
++# SPDX-License-Identifier: Apache-2.0
++"""The HPU rejection sampler on padded batches: tokens, distribution, penalties and logprobs."""
++
++from types import SimpleNamespace
++
++import numpy as np
++import torch
++
++from vllm.v1.outputs import LogprobsTensors
++from vllm_gaudi.v1._vendored.sample.metadata import SamplingMetadata
++from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
++from vllm_gaudi.v1._vendored.sample.sampler import Sampler
++from vllm_gaudi.v1.sample.hpu_rejection_sampler import grid_metadata
++from vllm_gaudi.v1.worker.hpu_model_runner import HPUModelRunner
++
++VOCAB = 12
++
++
++def _params(batch_size, temperature=None, top_k=None, top_p=None, **kwargs):
++    temperature = torch.zeros(batch_size) if temperature is None else temperature
++    ones = torch.ones(batch_size)
++    fields = dict(temperature=temperature,
++                  all_greedy=bool((temperature == 0).all()),
++                  all_random=bool((temperature > 0).all()),
++                  top_p=top_p,
++                  top_k=top_k,
++                  generators={},
++                  max_num_logprobs=None,
++                  no_penalties=True,
++                  prompt_token_ids=None,
++                  frequency_penalties=ones * 0,
++                  presence_penalties=ones * 0,
++                  repetition_penalties=ones,
++                  output_token_ids=[[] for _ in range(batch_size)],
++                  allowed_token_ids_mask=None,
++                  bad_words_token_ids={},
++                  logitsprocs=SimpleNamespace(non_argmax_invariant=[], argmax_invariant=[]))
++    fields.update(kwargs)
++    return SamplingMetadata(**fields)
++
++
++def _sample(logits, drafts, width, params):
++    """What the runner does, from its [batch * width, 1] token ids to the parsed output."""
++    batch_size = len(drafts)
++    runner = SimpleNamespace(device=torch.device("cpu"),
++                             arange_np=np.arange(batch_size * width),
++                             input_batch=SimpleNamespace(req_id_to_index={str(i): i for i in range(batch_size)}))
++    runner._get_cumsum_and_arange = lambda *a, **k: HPUModelRunner._get_cumsum_and_arange(runner, *a, **k)
++    scheduled = SimpleNamespace(scheduled_spec_decode_tokens={str(i): d for i, d in enumerate(drafts) if d})
++    token_ids = torch.tensor([[t] for d in drafts for t in ([0] + d + [0] * width)[:width]], dtype=torch.int32)
++    logits_indices, metadata = HPUModelRunner._prepare_spec_decode_inputs(runner, scheduled, torch.arange(batch_size),
++                                                                          token_ids, width)
++    if metadata is None:
++        # No drafts at all: not a speculative step
++        return None
++    # The padded rows hold the last row, as after hidden_states[logits_indices]
++    logits = logits[logits_indices]
++    width = logits.shape[0] // batch_size
++    out = RejectionSampler(Sampler())(grid_metadata(metadata, width), None, logits.clone(), params)
++    return RejectionSampler.parse_output(out.sampled_token_ids, VOCAB)[0], out.logprobs_tensors
++
++
++def _expected(best, drafts, width):
++    result = []
++    for i, draft in enumerate(drafts):
++        tokens = []
++        for j in range(len(draft) + 1):
++            tokens.append(int(best[i * width + j]))
++            if j < len(draft) and tokens[-1] != draft[j]:
++                break
++        result.append(tokens)
++    return result
++
++
++def _random_case(rng):
++    batch_size, width = int(torch.randint(1, 6, (1, ), generator=rng)), int(torch.randint(2, 6, (1, ), generator=rng))
++    logits = torch.randn(batch_size * width, VOCAB, generator=rng)
++    drafts = []
++    for i in range(batch_size):
++        n = width - 1 if i == batch_size // 2 else int(torch.randint(0, width, (1, ), generator=rng))
++        drafts.append([
++            int(logits[i * width + j].argmax()) if torch.rand(1, generator=rng) < 0.8 else j for j in range(n)
++        ])
++    return batch_size, width, logits, drafts
++
++
++def test_greedy_tokens_and_logprobs_of_padded_batches():
++    rng = torch.Generator().manual_seed(0)
++    for _ in range(500):
++        batch_size, width, logits, drafts = _random_case(rng)
++        tokens, lp = _sample(logits, drafts, width, _params(batch_size, max_num_logprobs=2))
++        assert tokens == _expected(logits.argmax(-1), drafts, width)
++        want = logits.log_softmax(-1)
++        for i, emitted in enumerate(tokens):
++            for j, token in enumerate(emitted):
++                row = i * width + j
++                assert int(lp.logprob_token_ids[row, 0]) == token
++                assert abs(float(lp.logprobs[row, 0]) - float(want[row, token])) < 1e-5
++                assert lp.logprob_token_ids[row, 1:].tolist() == want[row].topk(2).indices.tolist()
++
++
++def test_penalties_see_the_drafts_ahead():
++    rng = torch.Generator().manual_seed(1)
++    for _ in range(300):
++        batch_size, width, logits, drafts = _random_case(rng)
++        prompt = torch.randint(0, VOCAB, (batch_size, 2), generator=rng)
++        outputs = [[int(torch.randint(0, VOCAB, (1, ), generator=rng))] for _ in range(batch_size)]
++        params = _params(batch_size,
++                         no_penalties=False,
++                         repetition_penalties=torch.full((batch_size, ), 1.8),
++                         prompt_token_ids=prompt,
++                         output_token_ids=outputs,
++                         spec_token_ids=[list(d) for d in drafts])
++        best = logits.clone()
++        for i, draft in enumerate(drafts):
++            for j in range(len(draft) + 1):
++                row = best[i * width + j]
++                for token in set(prompt[i].tolist() + outputs[i] + draft[:j]):
++                    row[token] = row[token] / 1.8 if row[token] > 0 else row[token] * 1.8
++        assert _sample(logits, drafts, width, params)[0] == _expected(best.argmax(-1), drafts, width)
++
++
++def test_sampled_requests_follow_the_target_distribution():
++    batch_size, width = 60000, 3
++    base = torch.randn(width, VOCAB, generator=torch.Generator().manual_seed(2))
++    temperature, top_k, top_p = torch.full((batch_size, ), 0.8), torch.full((batch_size, ), 6), torch.full(
++        (batch_size, ), 0.95)
++    first, second = base[:2].argmax(-1).tolist()
++    # Every other request has one draft and a padded row
++    drafts = [[first, second] if i % 2 == 0 else [first] for i in range(batch_size)]
++    torch.manual_seed(3)
++    tokens, _ = _sample(base.repeat(batch_size, 1), drafts, width, _params(batch_size, temperature, top_k, top_p))
++
++    want = base / 0.8
++    want = want.masked_fill(want < want.topk(6).values[:, -1:], -torch.inf).softmax(-1)
++    ordered, order = want.sort(descending=True)
++    keep = ordered.cumsum(-1) - ordered < 0.95
++    want = (ordered * keep / (ordered * keep).sum(-1, keepdim=True)).gather(1, order.argsort(-1))
++    for parity in (0, 1):
++        rows = tokens[parity::2]
++        for position in range(3 if parity == 0 else 2):
++            seen = np.array([t[position] for t in rows if len(t) > position])
++            got = np.bincount(seen, minlength=VOCAB) / len(seen)
++            assert np.abs(got - want[position].numpy()).sum() / 2 < 0.025, (parity, position, len(seen))
++
++
++def test_greedy_requests_next_to_sampled_ones():
++    rng = torch.Generator().manual_seed(4)
++    for _ in range(300):
++        batch_size, width, logits, drafts = _random_case(rng)
++        temperature = torch.tensor([0.0 if i % 2 == 0 else 0.7 for i in range(batch_size)])
++        tokens, _ = _sample(logits, drafts, width, _params(batch_size, temperature))
++        assert tokens[::2] == _expected(logits.argmax(-1), drafts, width)[::2]
++
++
++def test_seeded_requests_repeat():
++    logits = torch.randn(8, VOCAB, generator=torch.Generator().manual_seed(5))
++    runs = []
++    for _ in range(2):
++        generators = {i: torch.Generator().manual_seed(7 + i) for i in range(2)}
++        runs.append(_sample(logits, [[1, 2, 3], [4]], 4, _params(2, torch.ones(2), generators=generators))[0])
++    assert runs[0] == runs[1]
++
++
++def test_logprobs_output_has_a_row_per_token():
++    runner = SimpleNamespace(input_batch=SimpleNamespace(req_id_to_index={"a": 0, "b": 1, "c": 2, "d": 3}))
++    grid = torch.arange(8)
++    spec = HPUModelRunner._spec_decode_logprobs(["b", "a"], [3, 1], 4,
++                                                LogprobsTensors(grid[:, None], grid[:, None].float(), grid))
++    prefill = (["d"], LogprobsTensors(torch.tensor([[90]]), torch.tensor([[9.0]]), torch.tensor([9])))
++    out = HPUModelRunner._build_logprobs_output(runner, [spec, prefill], 4)
++    assert out.slice_request(0, 1).logprob_token_ids.tolist() == [[4]]
++    assert out.slice_request(1, 3).logprob_token_ids.tolist() == [[0], [1], [2]]
++    assert out.slice_request(3, 1).logprob_token_ids.tolist() == [[90]]
+diff --git a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+index 43501c1d..2417ebbc 100644
+--- a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
++++ b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+@@ -1,6 +1,9 @@
+ # SPDX-License-Identifier: Apache-2.0
+ 
++from dataclasses import replace
++
+ from vllm_gaudi.v1._vendored.sample import rejection_sampler
++from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ import torch
+ from typing import Optional
+ from vllm_gaudi.v1._vendored.sample.metadata import SamplingMetadata
+@@ -9,6 +12,78 @@ PLACEHOLDER_TOKEN_ID = rejection_sampler.PLACEHOLDER_TOKEN_ID
+ GREEDY_TEMPERATURE = rejection_sampler.GREEDY_TEMPERATURE
+ 
+ 
++def grid_metadata(metadata: SpecDecodeMetadata, width: int) -> SpecDecodeMetadata:
++    """The metadata in the layout of the HPU logits, for the rejection sampler only.
++
++    The logits are ``[batch * width]`` rows, padded per request, while the sampler expects compact rows. Here every
++    request has ``width - 1`` drafts, of which the padded ones are -1, so that the compact indexing is right.
++    """
++    num_draft_tokens, depth = metadata.num_draft_tokens, width - 1
++    batch_size, device = len(num_draft_tokens), metadata.bonus_logits_indices.device
++    # All rows of a request but its bonus row
++    targets = [i * width + j + (j >= n) for i, n in enumerate(num_draft_tokens) for j in range(depth)]
++    padding = torch.tensor([j >= n for n in num_draft_tokens for j in range(depth)], dtype=torch.bool)
++    steps = torch.arange(1, batch_size + 1, dtype=torch.int32)
++    return replace(metadata,
++                   draft_token_ids=metadata.draft_token_ids.cpu().reshape(-1).masked_fill(padding, PLACEHOLDER_TOKEN_ID),
++                   num_draft_tokens=[depth] * batch_size,
++                   cu_num_draft_tokens=(steps * depth).to(device),
++                   cu_num_sampled_tokens=(steps * width).to(device),
++                   target_logits_indices=torch.tensor(targets, dtype=torch.int32).to(device))
++
++
++def expand_batch_to_tokens(
++    x: torch.Tensor,
++    cu_num_tokens: torch.Tensor,
++    num_tokens: int,
++    replace_from: int = 0,
++    replace_to: int = 0,
++) -> torch.Tensor:
++    """Replaces the Triton kernel. In the grid layout every request has the same number of rows."""
++    assert num_tokens % x.shape[0] == 0, "expected the grid layout, see grid_metadata"
++    if replace_from != replace_to:
++        x = x.masked_fill(x == replace_from, replace_to)
++    return x.repeat_interleave(num_tokens // x.shape[0])
++
++
++def combine_outputs_with_spec_tokens(
++    output_token_ids: list[list[int]],
++    spec_token_ids: Optional[list[list[int]]] = None,
++) -> list[list[int]]:
++    """The tokens ahead of each row of the grid layout."""
++    if spec_token_ids is None:
++        return output_token_ids
++    depth = max(len(spec) for spec in spec_token_ids)
++    return [[*out, *spec[:j]] for out, spec in zip(output_token_ids, spec_token_ids) for j in range(depth)]
++
++
++def sample_target_tokens(target_logits: torch.Tensor, sampling_metadata: SamplingMetadata,
++                         batch_size: int) -> torch.Tensor:
++    """One token per row from the target distribution: argmax, or Gumbel-max for requests with a temperature.
++
++    Accepting a draft iff it equals this token, and otherwise emitting this token, is rejection sampling without
++    draft probabilities: the draft is accepted with its target probability, the replacement follows the rest.
++    """
++    if sampling_metadata.all_greedy:
++        return target_logits.argmax(dim=-1).cpu()
++    depth, vocab_size = target_logits.shape[0] // batch_size, target_logits.shape[-1]
++    generators = sampling_metadata.generators
++    if generators:
++        noise = torch.cat([
++            torch.rand((depth, vocab_size), generator=generators.get(i), device=target_logits.device)
++            for i in range(batch_size)
++        ])
++    else:
++        noise = torch.rand(target_logits.shape, device=target_logits.device)
++    noise = -torch.log(-torch.log(noise.clamp(min=1e-20, max=1 - 1e-7)))
++    sampled = (target_logits + noise).argmax(dim=-1).cpu()
++    if sampling_metadata.all_random:
++        return sampled
++    # Chosen on the CPU: torch.where on integer tensors is not reliable on HPU
++    greedy = (sampling_metadata.temperature.cpu() == GREEDY_TEMPERATURE).repeat_interleave(depth)
++    return torch.where(greedy, target_logits.argmax(dim=-1).cpu(), sampled)
++
++
+ def rejection_sample_pytorch(
+     padded_draft_token_ids: torch.Tensor,
+     padded_target_token_ids: torch.Tensor,
+@@ -71,11 +146,12 @@ def rejection_sample_pytorch(
+     # 3. Find the first mismatch, ignoring padding tokens
+     # Create a mask to only consider valid tokens for each sequence
+     pos = torch.arange(max_draft_tokens, device=device)
+-    valid_token_mask = pos < num_draft_tokens_per_seq.unsqueeze(-1)
++    valid_token_mask = (pos < num_draft_tokens_per_seq.unsqueeze(-1)) & (padded_draft_token_ids >= 0)
++    num_draft_tokens_per_seq = valid_token_mask.sum(dim=1)
+ 
+     matches = (padded_draft_token_ids == padded_target_token_ids)
+ 
+-    mismatches = ~matches
++    mismatches = ~matches & valid_token_mask
+     any_mismatch = mismatches.any(dim=1)
+     # For sequence that the num draft tokens is 0, always consider all match
+     any_mismatch[num_draft_tokens_per_seq == 0] = False
+@@ -146,20 +222,22 @@ def rejection_sample(
+     fly_entropy_threshold: Optional[float] = None,
+     fly_entropy_top_k: int = 3,
+ ) -> torch.Tensor:
+-    # NOTE: HPU spec decode only supports greedy sampling, so the
+-    # `use_fp64_gumbel` knob (used by the random/gumbel recovery path upstream)
++    # NOTE: the `use_fp64_gumbel` knob (used by the random/gumbel recovery path upstream)
+     # is accepted for signature parity but intentionally unused here.
+     # The FLy deferred-verification knobs are likewise accepted for parity;
+     # FLy itself is not supported on HPU.
+-    assert sampling_metadata.all_greedy, "Only greedy sampling is supported."
++    assert draft_probs is None, "Draft probabilities are not supported on HPU."
+     assert fly_window_size is None, "FLy speculative decoding is not supported on HPU."
+ 
+-    # Rejection sampling for greedy sampling requests.
+-
+-    target_argmax = target_probs.argmax(dim=-1)
+-    output_token_ids = rejection_sample_pytorch(draft_token_ids, target_argmax, bonus_token_ids, num_draft_tokens,
++    target_token_ids = sample_target_tokens(target_probs, sampling_metadata, len(num_draft_tokens))
++    output_token_ids = rejection_sample_pytorch(draft_token_ids, target_token_ids, bonus_token_ids, num_draft_tokens,
+                                                 cu_num_draft_tokens)
++    if sampling_metadata.max_num_logprobs is not None:
++        # The logprobs are gathered with these ids on the device of the logits
++        output_token_ids = output_token_ids.to(target_probs.device)
+     return output_token_ids
+ 
+ 
+ rejection_sampler.rejection_sample = rejection_sample
++rejection_sampler.expand_batch_to_tokens = expand_batch_to_tokens
++rejection_sampler.RejectionSampler._combine_outputs_with_spec_tokens = staticmethod(combine_outputs_with_spec_tokens)
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 7f668ab5..80d70dd1 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -12,7 +12,7 @@ import os
+ import time
+ from contextlib import suppress
+ from tqdm import tqdm
+-from dataclasses import dataclass, field, fields
++from dataclasses import dataclass, field, fields, replace
+ from typing import (TYPE_CHECKING, Any, Callable, NamedTuple, Optional, TypeAlias, Union, cast)
+ if os.getenv("QUANT_CONFIG", None) is not None:
+     from neural_compressor.torch.quantization import finalize_calibration
+@@ -101,6 +101,7 @@ from vllm.model_executor.models.interfaces_base import (VllmModelForPooling, is_
+ from vllm.tasks import GenerationTask, PoolingTask, SupportedTask
+ from vllm.v1.worker.utils import (AttentionGroup, prepare_kernel_block_sizes, sanity_check_mm_encoder_outputs)
+ from vllm_gaudi.v1._vendored.sample.rejection_sampler import RejectionSampler
++from vllm_gaudi.v1.sample.hpu_rejection_sampler import grid_metadata
+ from vllm_gaudi.v1._vendored.spec_decode.eagle import EagleProposer
+ from vllm_gaudi.v1.worker.decode_token_padding import (decode_row_num_blocks, flat_decode_seq_lens,
+                                                        mrope_decode_positions, redirect_padded_tokens)
+@@ -4348,6 +4349,15 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+ 
+         return LogprobsTensors(indices, combined_logprobs, token_ranks)
+ 
++    @staticmethod
++    def _spec_decode_logprobs(req_ids: list[str], num_tokens: list[int], width: int,
++                              logprobs: LogprobsTensors) -> tuple[list[str], LogprobsTensors]:
++        """The emitted rows of a ``[batch * width]`` logprobs grid, with a request id per row."""
++        rows = torch.tensor([i * width + j for i, n in enumerate(num_tokens) for j in range(n)], dtype=torch.int64)
++        return ([r for r, n in zip(req_ids, num_tokens) for _ in range(n)],
++                LogprobsTensors(logprobs.logprob_token_ids.cpu()[rows], logprobs.logprobs.cpu()[rows],
++                                logprobs.selected_token_ranks.cpu()[rows]))
++
+     def _build_logprobs_output(
+         self,
+         logprobs_segments: list[tuple[list[str], LogprobsTensors | None]],
+@@ -4358,7 +4368,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+ 
+         Args:
+             logprobs_segments: list of (req_ids, logprobs_tensors) pairs.
+-                Each pair maps sampler output rows to request IDs.
++                Each pair maps sampler output rows to request IDs. With speculative
++                decoding a request has a row for each of its tokens.
+                 logprobs_tensors may be None if no logprobs were computed.
+             num_output_rows: total number of rows in the output array
+                 (typically max_req_index + 1).
+@@ -4376,6 +4387,18 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         # active segment
+         num_cols = active_segments[0][1].logprob_token_ids.shape[1]
+ 
++        # A request with several tokens gets consecutive rows, located by cu_num_generated_tokens
++        counts = np.zeros(num_output_rows, dtype=np.int64)
++        for req_ids, _ in active_segments:
++            for req_id in req_ids:
++                counts[self.input_batch.req_id_to_index[req_id]] += 1
++        cu_num_generated_tokens = None
++        next_row = np.arange(num_output_rows)
++        if counts.max() > 1:
++            cu_num_generated_tokens = [0] + np.maximum(counts, 1).cumsum().tolist()
++            next_row = np.array(cu_num_generated_tokens[:-1])
++            num_output_rows = cu_num_generated_tokens[-1]
++
+         # Pre-allocate output arrays
+         combined_token_ids = np.zeros((num_output_rows, num_cols), dtype=np.int64)
+         combined_logprobs = np.zeros((num_output_rows, num_cols), dtype=np.float32)
+@@ -4385,12 +4408,14 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         for req_ids, lp_tensors in active_segments:
+             lp_lists = lp_tensors.tolists()
+             for i, req_id in enumerate(req_ids):
+-                idx = self.input_batch.req_id_to_index[req_id]
++                req_index = self.input_batch.req_id_to_index[req_id]
++                idx = next_row[req_index]
++                next_row[req_index] += 1
+                 combined_token_ids[idx] = lp_lists.logprob_token_ids[i]
+                 combined_logprobs[idx] = lp_lists.logprobs[i]
+                 combined_ranks[idx] = lp_lists.sampled_token_ranks[i]
+ 
+-        return LogprobsLists(combined_token_ids, combined_logprobs, combined_ranks)
++        return LogprobsLists(combined_token_ids, combined_logprobs, combined_ranks, cu_num_generated_tokens)
+ 
+     def _is_quant_with_inc(self):
+         quant_config = os.getenv("QUANT_CONFIG", None) is not None
+@@ -5073,10 +5098,23 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 with self.profiler.record_event('internal', "sampler"):
+                     ##### Sampling Start #####
+                     spec_decode_metadata = decode_data.spec_decode_metadata
+-                    sampler_output, sampling_metadata = self._run_sampling(
+-                        batch_changed, logits_device
+-                        if spec_decode_metadata is None else logits_device[spec_decode_metadata.bonus_logits_indices],
+-                        pd_info.decode_req_ids, logits_device.shape[0])
++                    if spec_decode_metadata is None:
++                        sampler_output, sampling_metadata = self._run_sampling(batch_changed, logits_device,
++                                                                               pd_info.decode_req_ids,
++                                                                               logits_device.shape[0])
++                    else:
++                        # The rejection sampler samples the bonus tokens itself. One metadata row per request.
++                        spec_batch_size = len(spec_decode_metadata.num_draft_tokens)
++                        spec_width = logits_device.shape[0] // spec_batch_size
++                        htorch.core.mark_step()
++                        self.input_batch.update_async_output_token_ids()
++                        sampling_metadata = self._prepare_sampling(batch_changed, pd_info.decode_req_ids,
++                                                                   spec_batch_size)
++                        if not sampling_metadata.no_penalties or sampling_metadata.bad_words_token_ids:
++                            drafted = scheduler_output.scheduled_spec_decode_tokens
++                            spec_token_ids = [list(drafted.get(r, [])) for r in pd_info.decode_req_ids]
++                            spec_token_ids += [[]] * (spec_batch_size - len(spec_token_ids))
++                            sampling_metadata = replace(sampling_metadata, spec_token_ids=spec_token_ids)
+ 
+                     if spec_decode_metadata is None:
+                         decode_sampled_token_ids.append(sampler_output.sampled_token_ids.flatten())
+@@ -5084,7 +5122,7 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                     else:
+                         # Handling spec decode sampling.
+                         sampler_output = self.rejection_sampler(
+-                            spec_decode_metadata,
++                            grid_metadata(spec_decode_metadata, spec_width),
+                             None,  # draft_probs
+                             logits_device,
+                             sampling_metadata,
+@@ -5101,6 +5139,10 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                         decode_sampled_token_ids = decode_sampled_token_ids[:num_decodes]
+                         # convert decode_sampled_token_ids as list of tensor
+                         spec_decode_num_tokens = [len(v) for v in decode_sampled_token_ids]
++                        if sampler_output.logprobs_tensors is not None:
++                            logprobs_segments.append(
++                                self._spec_decode_logprobs(pd_info.decode_req_ids, spec_decode_num_tokens, spec_width,
++                                                           sampler_output.logprobs_tensors))
+                         decode_sampled_token_ids = [
+                             torch.tensor(v, device="cpu").int() for v in decode_sampled_token_ids
+                         ]
+-- 
+2.43.0
+

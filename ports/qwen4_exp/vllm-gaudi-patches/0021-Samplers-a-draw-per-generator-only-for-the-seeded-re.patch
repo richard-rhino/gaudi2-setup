@@ -1,0 +1,148 @@
+From 05f788216d33cc9b37a7ae41c59a98c492ef7287 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Sun, 22 Nov 2026 13:33:29 +0000
+Subject: [PATCH] Samplers: a draw per generator only for the seeded requests
+
+A draw per generator is slow on HPU. The sampler and the rejection sampler
+drew every row that way as soon as one request of the batch had a seed.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ tests/unit_tests/worker/test_random_sample.py | 18 +++++++++++++
+ vllm_gaudi/v1/sample/hpu_noise.py             | 26 +++++++++++++++++++
+ vllm_gaudi/v1/sample/hpu_random_sample.py     |  9 ++-----
+ vllm_gaudi/v1/sample/hpu_rejection_sampler.py | 11 +++-----
+ 4 files changed, 49 insertions(+), 15 deletions(-)
+ create mode 100644 vllm_gaudi/v1/sample/hpu_noise.py
+
+diff --git a/tests/unit_tests/worker/test_random_sample.py b/tests/unit_tests/worker/test_random_sample.py
+index 0c9e0192..e15c61f4 100644
+--- a/tests/unit_tests/worker/test_random_sample.py
++++ b/tests/unit_tests/worker/test_random_sample.py
+@@ -1,12 +1,14 @@
+ # SPDX-License-Identifier: Apache-2.0
+ """The sampler's random draw follows its probabilities and does not use exponential_."""
+ 
++from types import SimpleNamespace
+ from unittest import mock
+ 
+ import torch
+ 
+ from vllm_gaudi.v1._vendored.sample.ops import topk_topp_sampler
+ from vllm_gaudi.v1.sample.hpu_random_sample import random_sample
++from vllm_gaudi.v1.sample.hpu_rejection_sampler import sample_target_tokens
+ 
+ PROBS = torch.tensor([0.35, 0.25, 0.0, 0.15, 0.1, 0.08, 0.07, 0.0])
+ 
+@@ -30,3 +32,19 @@ def test_seeded_rows_repeat():
+     rows = PROBS.repeat(64, 1)
+     first, second = (random_sample(rows, {i: torch.Generator().manual_seed(i) for i in range(64)}) for _ in range(2))
+     assert first.tolist() == second.tolist()
++
++
++def test_only_seeded_rows_get_their_own_draw():
++    rows = PROBS.repeat(16, 1)
++    alone = random_sample(PROBS.repeat(1, 1), {0: torch.Generator().manual_seed(7)})
++    with mock.patch.object(torch, "rand", wraps=torch.rand) as rand:
++        mixed = random_sample(rows, {5: torch.Generator().manual_seed(7)})
++    assert rand.call_count == 2
++    assert mixed[5] == alone[0]
++
++
++def test_spec_decode_draws_per_seeded_request_only():
++    metadata = SimpleNamespace(all_greedy=False, all_random=True, generators={5: torch.Generator().manual_seed(7)})
++    with mock.patch.object(torch, "rand", wraps=torch.rand) as rand:
++        sample_target_tokens(PROBS.log().repeat(16 * 3, 1), metadata, 16)
++    assert rand.call_count == 2
+diff --git a/vllm_gaudi/v1/sample/hpu_noise.py b/vllm_gaudi/v1/sample/hpu_noise.py
+new file mode 100644
+index 00000000..e77328a4
+--- /dev/null
++++ b/vllm_gaudi/v1/sample/hpu_noise.py
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: Apache-2.0
++"""Random noise for the samplers, with the seeds of the requests."""
++
++import torch
++
++
++def seeded_uniform(
++    num_requests: int,
++    shape: tuple[int, ...],
++    generators: dict[int, torch.Generator],
++    device: torch.device,
++    dtype: torch.dtype = torch.float32,
++) -> torch.Tensor:
++    """``[num_requests, *shape]`` uniform values, from the request's own generator where it has one.
++
++    A draw per generator is slow on HPU, so only the requests with a generator get one.
++    """
++    all_seeded = len(generators) == num_requests
++    uniform = None if all_seeded else torch.rand((num_requests, *shape), device=device, dtype=dtype)
++    if not generators:
++        return uniform
++    rows = sorted(generators)
++    seeded = torch.stack([torch.rand(shape, generator=generators[i], device=device, dtype=dtype) for i in rows])
++    if all_seeded:
++        return seeded
++    return uniform.index_copy(0, torch.tensor(rows, device=device), seeded)
+diff --git a/vllm_gaudi/v1/sample/hpu_random_sample.py b/vllm_gaudi/v1/sample/hpu_random_sample.py
+index b4b745f9..4b8909ed 100644
+--- a/vllm_gaudi/v1/sample/hpu_random_sample.py
++++ b/vllm_gaudi/v1/sample/hpu_random_sample.py
+@@ -9,6 +9,7 @@ does.
+ import torch
+ 
+ from vllm_gaudi.v1._vendored.sample.ops import topk_topp_sampler
++from vllm_gaudi.v1.sample.hpu_noise import seeded_uniform
+ 
+ 
+ def random_sample(
+@@ -17,13 +18,7 @@ def random_sample(
+     use_fp64_gumbel: bool = False,
+ ) -> torch.Tensor:
+     """One token per row of ``probs``. ``use_fp64_gumbel`` is accepted for parity, HPU has no float64."""
+-    if generators:
+-        uniform = torch.stack([
+-            torch.rand(probs.shape[-1], dtype=probs.dtype, device=probs.device, generator=generators.get(i))
+-            for i in range(probs.shape[0])
+-        ])
+-    else:
+-        uniform = torch.rand(probs.shape, dtype=probs.dtype, device=probs.device)
++    uniform = seeded_uniform(probs.shape[0], probs.shape[1:], generators, probs.device, probs.dtype)
+     # Exponential(1). Not zero, so that a filtered token (probability 0) keeps the score 0
+     noise = (-torch.log1p(-uniform)).clamp(min=1e-20)
+     return (probs / noise).argmax(dim=-1).view(-1)
+diff --git a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+index 2417ebbc..fbb01f6a 100644
+--- a/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
++++ b/vllm_gaudi/v1/sample/hpu_rejection_sampler.py
+@@ -7,6 +7,7 @@ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ import torch
+ from typing import Optional
+ from vllm_gaudi.v1._vendored.sample.metadata import SamplingMetadata
++from vllm_gaudi.v1.sample.hpu_noise import seeded_uniform
+ 
+ PLACEHOLDER_TOKEN_ID = rejection_sampler.PLACEHOLDER_TOKEN_ID
+ GREEDY_TEMPERATURE = rejection_sampler.GREEDY_TEMPERATURE
+@@ -67,14 +68,8 @@ def sample_target_tokens(target_logits: torch.Tensor, sampling_metadata: Samplin
+     if sampling_metadata.all_greedy:
+         return target_logits.argmax(dim=-1).cpu()
+     depth, vocab_size = target_logits.shape[0] // batch_size, target_logits.shape[-1]
+-    generators = sampling_metadata.generators
+-    if generators:
+-        noise = torch.cat([
+-            torch.rand((depth, vocab_size), generator=generators.get(i), device=target_logits.device)
+-            for i in range(batch_size)
+-        ])
+-    else:
+-        noise = torch.rand(target_logits.shape, device=target_logits.device)
++    noise = seeded_uniform(batch_size, (depth, vocab_size), sampling_metadata.generators,
++                           target_logits.device).flatten(0, 1)
+     noise = -torch.log(-torch.log(noise.clamp(min=1e-20, max=1 - 1e-7)))
+     sampled = (target_logits + noise).argmax(dim=-1).cpu()
+     if sampling_metadata.all_random:
+-- 
+2.43.0
+
