@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PP=8 no MTP, one launch per config: LABEL ENV... ; single-user speed (repo script), greedy eq3 (alone/batched),
+# Default PP=8 TP=1 no MTP (override with TP=.. PP=..), one launch per config: LABEL ENV... ; single-user speed (repo script), greedy eq3 (alone/batched),
 # host timing lines and PLE host-check lines. Usage: pp8_ab.sh LABEL [VAR=VAL ...]
 S=$(cd "$(dirname "$0")" && pwd)
 cd ~/gaudi2-setup
@@ -8,7 +8,8 @@ lab=$1; shift
 [ -z "$(sudo fuser /dev/accel/* 2>/dev/null)" ] || { echo "cards busy" | tee -a $OUT; exit 9; }
 trap 'bash setup-ubuntu2404/stop-vllm.sh' EXIT
 L=logs/pp8ab-$lab-$(date +%m%d-%H%M).log
-env "$@" PYTHONPATH=$S/hosttime  # dir holding hosttime_sitecustomize.py as sitecustomize.py MTP=0 TP=1 PP=8 bash experiments-ubuntu2404/qwen38fn-serve.sh > $L 2>&1 &
+# $S/hosttime holds hosttime_sitecustomize.py saved as sitecustomize.py (host timers per step)
+env PYTHONPATH=$S/hosttime MTP=0 TP=1 PP=8 "$@" bash experiments-ubuntu2404/qwen38fn-serve.sh > $L 2>&1 &
 pid=$!
 for i in $(seq 1 300); do curl -sf -m 3 localhost:8000/v1/models >/dev/null && break; kill -0 $pid 2>/dev/null || { echo "$lab server exited" | tee -a $OUT; tail -5 $L; exit 1; }; sleep 5; done
 echo "#### $lab $* $(date +%H:%M:%S) plugin $(git -C ~/src/vllm-gaudi rev-parse --short HEAD)+$(git -C ~/src/vllm-gaudi diff | md5sum | cut -c1-8)" | tee -a $OUT

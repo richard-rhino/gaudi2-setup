@@ -767,7 +767,7 @@ old path. `QWEN4_PLE_HOST_CHECK=1` reads both copies and compares: 0 mismatches 
 | A: `QWEN4_PLE_HOST_TOKENS=0` | 30.7-31.2 | identical 24/24 |
 | B: patch 0026 (default) | **33.1-34.7** | identical 24/24 |
 
-+9%; stage 0's host time per step went from ~14 to ~4.3 ms
++9%; in the single-user runs stage 0's host time per step went from 7.5 to 3.9 ms and a token from 32.4 to 28.8 ms
 (`results-ubuntu2404/qwen38fn/gap_host_tokens_ab.txt`).
 
 **Tried, no gain: MoE without the weight copy.** The gather MoE copies the 10 routed experts' weights
