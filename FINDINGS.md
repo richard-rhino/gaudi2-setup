@@ -700,3 +700,36 @@ To-do, in working order:
 - [ ] Qwen: warm up the common prefill shapes (a new prompt length compiles for 1-4 minutes); keep the PLE context
       tokens on the host.
 - [ ] Check the port 8 fix across a reboot.
+
+## 22. Gaudi2 vs the LAN Nvidia servers (2026-11-23)
+Same models, one user, greedy, 256 tokens. Nvidia side: two light requests per server, one at a time
+(`results-ubuntu2404/nvidia-servers-speed-1123.txt`, `experiments-ubuntu2404/nvidia_single_user_speed.py`); no load
+tests on those hosts, so there is no multi-user ratio.
+
+| Model, one user | Nvidia server | Gaudi2 (this box), best so far | Gaudi slower by |
+|---|---|---|---|
+| Qwen3.8-Flash-Next | deb-ai: **152-154 tok/s** (MTP k=3) | **32 tok/s** PP=8; 35.4-36 with MTP k=3 (greedy) | **4.2-4.8x** |
+| DeepSeek-V4.1-Flash | rack-n03: **90-91 tok/s** (no spec decode) | **1.29 tok/s**, 4 cards, DeepSeek's reference code (not vLLM) | ~70x |
+| TTFT, short prompt | 0.12-0.19 s | ~0.25 s (Qwen) | |
+
+Qwen at 16 users on Gaudi: 110 tok/s aggregate without MTP, 182 with (PP=8, section 21).
+
+**The two setups:**
+
+| | deb-ai (Qwen) | rack-n03 (DeepSeek) | Gaudi box |
+|---|---|---|---|
+| Accelerators | Nvidia A100 per the owner; **count and memory size not known** (no shell access; the API does not report them) | same | 8x Gaudi2 HL-225, 96 GB HBM2e each |
+| Host | not known | not known | 2x Xeon Platinum 8380, 503 GB RAM, Ubuntu 24.04 |
+| Inference software | vLLM 0.13.1 (`/version`) | vLLM dev build `0.1.dev1+g29e66dad4` | vLLM 0.34.0rc0 (34b780fe66) + vllm-gaudi with patches 0001-0025; Gaudi SW 1.24.2, PyTorch 2.13 (Intel), eager + regional torch.compile |
+| Speculative decoding | MTP, 3 draft tokens; lifetime acceptance 58.6%, 2.76 tokens per step (`/metrics`) | none (no spec-decode metrics) | MTP k=3 optional (section 21) |
+| Max context | 262144 | 1048576 | 32768 (serve script) |
+| KV cache | 2.25M tokens, prefix caching on, gpu_memory_utilization 0.92 | 6.08M tokens, prefix caching on, 0.90 | prefix caching off |
+| Kernels | upstream Nvidia path (Triton / CuTe) | same | this port: PyTorch ops, dense QSA attention, gather MoE |
+
+**This is not a chip comparison.** On paper Gaudi2 and the A100 are peers (Gaudi2 96 GB at ~2.45 TB/s vs A100 40/80 GB at
+1.6-2.0 TB/s), and one-user decode is mostly limited by memory bandwidth. The gap comes from the software:
+- PP=8 runs a token through the 8 cards one after another, so for one user only one card works at a time.
+- TP=8, which uses all cards at once, pays ~98 all-reduces per step over the internal NIC links (section 18).
+- The ports use plain PyTorch ops where the Nvidia path has fused kernels (attention, MoE, norms), and QSA attention
+  runs dense.
+- DeepSeek on Gaudi is DeepSeek's reference script with torch stand-ins for its kernels, on 4 of the 8 cards, not vLLM.

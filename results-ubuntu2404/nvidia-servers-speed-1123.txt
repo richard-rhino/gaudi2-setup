@@ -1,0 +1,16 @@
+# Light single-user check of the LAN Nvidia servers, 2026-11-23: 2 requests each, run one at a time.
+# /v1/completions, prompt 'Write a long story about a lighthouse keeper.
+', 256 tokens, ignore_eos, temperature 0, streamed.
+# decode tok/s = 255 / (last chunk - first chunk). Script: experiments-ubuntu2404/nvidia_single_user_speed.py
+deb-ai run 0: TTFT 0.19 s, 95 chunks, decode 152.1 tok/s
+deb-ai run 1: TTFT 0.15 s, 95 chunks, decode 154.0 tok/s
+rack-n03 run 0: TTFT 0.18 s, 256 chunks, decode 89.9 tok/s
+rack-n03 run 1: TTFT 0.12 s, 256 chunks, decode 91.0 tok/s
+# Server self-description (GET /version, /v1/models, /metrics), same day:
+## 10.40.0.248:8000 version {"version":"0.13.1"} max_model_len 262144
+block_size="1600" enable_prefix_caching="True" gpu_memory_utilization="0.92" kv_cache_size_tokens="2245936" num_gpu_blocks="1585" sliding_window="None"
+vllm:spec_decode_num_drafts_total 178137.0
+vllm:spec_decode_num_draft_tokens_total 534393.0
+vllm:spec_decode_num_accepted_tokens_total 312951.0
+## 10.40.3.193:8300 version {"version":"0.1.dev1+g29e66dad4"} max_model_len 1048576
+block_size="32" enable_prefix_caching="True" gpu_memory_utilization="0.9" kv_cache_size_tokens="6082149" num_gpu_blocks="56548" sliding_window="128"

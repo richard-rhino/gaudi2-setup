@@ -2,13 +2,14 @@
 
 **Ubuntu 24.04 server (2026-11-20):** setup in [setup-ubuntu2404/](setup-ubuntu2404/README.md), the Qwen3.8-Flash-Next
 HPU port in [ports/qwen4_exp/](ports/qwen4_exp/), the DeepSeek-V4.1 port in [ports/deepseek_v41/](ports/deepseek_v41/),
-results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md sections 13-21](FINDINGS.md), and
+results in [results-ubuntu2404/](results-ubuntu2404/), write-up in [FINDINGS.md sections 13-22](FINDINGS.md) (section 22: speed against the LAN Nvidia servers), and
 [recovery steps after the driver crash](setup-ubuntu2404/AFTER-CRASH.md), [firmware re-flash guide](setup-ubuntu2404/FIRMWARE-UPDATE.md).
 
 Current state: Qwen3.8-Flash-Next runs on all 8 cards with pipeline parallelism (PP=8), output agrees with the Nvidia
 reference, single-user decode ~32 tok/s, ~200 tok/s aggregate with 16 users at 1k in / 256 out ([FINDINGS 18-20](FINDINGS.md)).
-DeepSeek-V4.1-Flash runs on 4 cards with coherent output that is close to, but not the same as, the Nvidia reference;
-it is still very slow ([FINDINGS 20](FINDINGS.md)). TP=8 (Qwen) now runs at ~28 tok/s
+DeepSeek-V4.1-Flash runs on 4 cards (DeepSeek's reference code with torch kernels, compiled): 1.29 tok/s, and 96-98.5% of
+the Nvidia server's greedy tokens are its top-1 ([FINDINGS 20](FINDINGS.md)). Against the Nvidia servers, Gaudi is
+4.2-4.8x slower on Qwen and ~70x on DeepSeek for one user, mostly software ([FINDINGS 22](FINDINGS.md)). TP=8 (Qwen) now runs at ~28 tok/s
 single user and ~215 tok/s with 16 users; it was ~3 (single user) while the internal NIC links stalled all-reduces (fixed 2026-11-22; details: [setup-ubuntu2404/NIC-LINK-FLAPPING.md](setup-ubuntu2404/NIC-LINK-FLAPPING.md)). The rest of this README is the Debian server.
 
 
