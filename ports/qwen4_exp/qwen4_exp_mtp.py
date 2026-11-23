@@ -56,17 +56,25 @@ class HpuQwen4ExpPredictor(nn.Module):
         ])
         self.hyper_connection_mixer = GatedResidual(config, use_combine=False)
 
+    # Compiled as regions of their own by the HPU runner (regional compilation); eager, each of their ops would be a
+    # separate graph launch for every draft token.
+    hpu_compile_regions = ("input_streams", "hyper_connection_mixer")
+
+    def input_streams(self, embeds: torch.Tensor, hidden_states: torch.Tensor) -> torch.Tensor:
+        """Token embedding + the target's hidden streams -> the MTP layer's input streams."""
+        embeds = self.fc_embedding(self.pre_fc_norm_embedding(embeds))
+        streams = hidden_states.reshape(*embeds.shape[:-1], self.hc * self.H)  # [T] or [B, L] tokens
+        streams = self.pre_fc_norm_hidden(streams).unflatten(-1, (self.hc, self.H))
+        # The token is a residual of unit weight on every stream
+        return (self.fc_hidden(streams) + embeds.unsqueeze(-2)).flatten(-2)
+
     def forward(self,
                 input_ids: torch.Tensor,
                 positions: torch.Tensor,
                 hidden_states: torch.Tensor,
                 inputs_embeds: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor]:
         embeds = self.embed_tokens(input_ids) if inputs_embeds is None else inputs_embeds
-        embeds = self.fc_embedding(self.pre_fc_norm_embedding(embeds))
-        streams = hidden_states.reshape(*embeds.shape[:-1], self.hc * self.H)  # [T] or [B, L] tokens
-        streams = self.pre_fc_norm_hidden(streams).unflatten(-1, (self.hc, self.H))
-        # The token is a residual of unit weight on every stream
-        streams = (self.fc_hidden(streams) + embeds.unsqueeze(-2)).flatten(-2)
+        streams = self.input_streams(embeds, hidden_states)
         streams = self.layers[0](streams, positions, None)
         return self.hyper_connection_mixer(streams), streams
 

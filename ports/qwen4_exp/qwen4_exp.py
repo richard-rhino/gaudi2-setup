@@ -511,6 +511,8 @@ class HpuQwen4ExpDecoderLayer(nn.Module):
 
 
 class HpuQwen4ExpModel(nn.Module):
+    # Last PP rank: compile the final stream mixer as a region of its own (HPU regional compilation)
+    hpu_compile_regions = ("hyper_connection_mixer", )
 
     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
         super().__init__()

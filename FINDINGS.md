@@ -708,7 +708,7 @@ tests on those hosts, so there is no multi-user ratio.
 
 | Model, one user | Nvidia server | Gaudi2 (this box), best so far | Gaudi slower by |
 |---|---|---|---|
-| Qwen3.8-Flash-Next | deb-ai: **152-154 tok/s** (MTP k=3) | **32 tok/s** PP=8 (34 with patch 0026, section 23); 35.4-36 with MTP k=3 (greedy) | **4.2-4.8x** |
+| Qwen3.8-Flash-Next | deb-ai: **152-154 tok/s** (MTP k=3) | **32 tok/s** PP=8; 35.4-36 with MTP k=3 (greedy). After section 23 (patches 0026-0027): 34, and **46-48** with MTP k=3 | **4.2-4.8x**, now **3.2x** |
 | DeepSeek-V4.1-Flash | rack-n03: **90-91 tok/s** (no spec decode) | **1.29 tok/s**, 4 cards, DeepSeek's reference code (not vLLM) | ~70x |
 | TTFT, short prompt | 0.12-0.19 s | ~0.25 s (Qwen) | |
 
@@ -781,6 +781,39 @@ layers and their 2-card all-reduces; stage 0's host time per step is ~7 ms again
 halving each card's reads saves. Greedy outputs differ from PP=8 in 22 of 24 prompts (other reduction order) and
 every token is still the argmax of its own logprobs (`results-ubuntu2404/qwen38fn/gap_tp2pp4.txt`). PP=8 stays.
 
-**Next:** the host time of stage 0 and stage 7 that is left (input preparation ~0.8-1 ms each, layer launches,
+**Fix 2: a cheaper MTP step (patch 0027).** With MTP k=3 at PP=8 a step took ~70 ms for 2.6 tokens (acceptance
+53%, deb-ai: 2.76 tokens per step), so MTP gained only ~10%. Rank 7's device timeline for one step
+(`results-ubuntu2404/qwen38fn/gap_mtp_rank7_timeline.txt`):
+
+| Rank 7, one MTP step (before 0027) | span ms | device busy ms |
+|---|---|---|
+| waiting for stages 0-6 to run the 4-token verify | ~37 | 0 |
+| stage 7 verify (4 tokens) | 5.6 | 4.9 |
+| rejection sampling | 5.3 | 0.1 |
+| draft pass 1 (4 tokens) | 3.8 | 1.3 |
+| draft passes 2 and 3 (1 token each) | 9.4 + 8.4 | 1.1 + 1.1 |
+
+The 1-token draft passes were 45-48 separate graph launches each, ~0.17 ms apart on the device: the draft model's
+glue around its one decoder layer (input norms and projections, stream reshape, final mixer) was in no compiled
+region, so each op launched on its own. 0027 lets a module name extra compiled regions (`hpu_compile_regions`) and
+uses it for that glue and for the target's final mixer; it also passes the drafter host copies of the positions,
+removing a sync after the first draft pass.
+
+| PP=8, one user, greedy, 256 tokens | warm decode tok/s (6 runs) | MTP step on rank 7 |
+|---|---|---|
+| MTP=3, before (0026) | 35.8-37.7 | ~70 ms (drafter 14 ms + 9 ms until the next step) |
+| MTP=3, 0027 | **45.6-48.0** | ~56 ms (drafter 6.6 ms + 2.7 ms) |
+| no MTP, 0027 | 33.5-34.3 (unchanged) | |
+
+Without MTP the outputs are unchanged (24/24 identical). With MTP, 19 of 24 prompts are identical to the run
+before; the other 5 flip at margins of at most 0.125 logprob (other drafts mean other verify batch shapes, which
+shifts bf16 rounding, section 21), and every token is still the argmax of its own logprobs
+(`results-ubuntu2404/qwen38fn/gap_mtp_drafter_ab.txt`).
+
+**So far:** one user at PP=8, from 32 to **46-48 tok/s** (MTP k=3), from 31 to 34 tok/s without MTP. deb-ai: 152-154
+tok/s, now 3.2x faster instead of 4.2-4.8x.
+
+**Next:** the MTP step's verify (~37 ms in stages 0-6 for 4 tokens, against ~22 ms for one), rejection sampling on
+the host (~5 ms), the draft loop's small ops; then the host time of stage 0 and stage 7 that is left (input preparation ~0.8-1 ms each, layer launches,
 sampling), then the per-stage device time (router top-k over 512 experts, GDN projections), and cheaper MTP (an MTP step now costs ~2.2x a plain step).
 Scripts: `experiments-ubuntu2404/gap/`.

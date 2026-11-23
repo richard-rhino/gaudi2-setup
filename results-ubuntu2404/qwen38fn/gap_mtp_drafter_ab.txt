@@ -1,0 +1,81 @@
+# PP=8, one user. mtp3 = 0026 (934d2d6e), mtp3new/plainnew = + 0027 (drafter: compile regions, host positions).
+# Before: results-ubuntu2404/qwen38fn/gap_mtp3_steps.txt (mtp3) and gap_host_tokens_ab.txt (hostB).
+#### mtp3new MTP=3 16:44:39 plugin 934d2d6e+7e4e0c76
+speed mtp3new run 0: TTFT 82.95 s, 256 tokens in 100 chunks (2.56 tok/chunk), decode 40.7 tok/s
+speed mtp3new run 1: TTFT 0.23 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 46.4 tok/s
+speed mtp3new run 2: TTFT 0.23 s, 256 tokens in 95 chunks (2.69 tok/chunk), decode 48.0 tok/s
+speed mtp3new run 0: TTFT 0.25 s, 256 tokens in 100 chunks (2.56 tok/chunk), decode 45.6 tok/s
+speed mtp3new run 1: TTFT 0.22 s, 256 tokens in 98 chunks (2.61 tok/chunk), decode 46.8 tok/s
+speed mtp3new run 2: TTFT 0.23 s, 256 tokens in 95 chunks (2.69 tok/chunk), decode 47.5 tok/s
+mtp3new vllm:spec_decode_num_drafts_total{engine="0",model_name="qwen38fn"} 679.0
+mtp3new vllm:spec_decode_num_draft_tokens_total{engine="0",model_name="qwen38fn"} 2037.0
+mtp3new vllm:spec_decode_num_accepted_tokens_total{engine="0",model_name="qwen38fn"} 1110.0
+eq3 mtp3new alone: 24 outputs, 0 tokens not top-1
+eq3 mtp3new batched: 24 outputs, 0 tokens not top-1
+eq3 mtp3new batched2: 24 outputs, 0 tokens not top-1
+errors 10 log logs/pp8ab-mtp3new-1123-1642.log
+#### plainnew  17:00:40 plugin 934d2d6e+7e4e0c76
+speed plainnew run 0: TTFT 75.88 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 33.5 tok/s
+speed plainnew run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.3 tok/s
+speed plainnew run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.1 tok/s
+speed plainnew run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.3 tok/s
+speed plainnew run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.0 tok/s
+speed plainnew run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.2 tok/s
+eq3 plainnew alone: 24 outputs, 0 tokens not top-1
+eq3 plainnew batched: 24 outputs, 0 tokens not top-1
+eq3 plainnew batched2: 24 outputs, 0 tokens not top-1
+errors 10 log logs/pp8ab-plainnew-1123-1658.log
+mtp3new HOSTTIME rank 0 adapter_forward: median 3.395 ms p10 3.321 p90 3.737
+mtp3new HOSTTIME rank 0 _execute_model_generic: median 3.514 ms p10 3.439 p90 3.869
+mtp3new HOSTTIME rank 0 execute_model: median 0.031 ms p10 0.029 p90 0.036
+mtp3new HOSTTIME rank 0 gap_between_sample_tokens: median 51.307 ms p10 50.788 p90 51.949
+mtp3new HOSTTIME rank 0 layer_forward: median 0.188 ms p10 0.140 p90 0.884
+mtp3new HOSTTIME rank 0 model_forward: median 3.048 ms p10 2.975 p90 3.363
+mtp3new HOSTTIME rank 0 _ple_prepare: median 0.623 ms p10 0.599 p90 0.671
+mtp3new HOSTTIME rank 0 pp_send: median 0.047 ms p10 0.044 p90 0.055
+mtp3new HOSTTIME rank 0 _prepare_inputs: median 1.273 ms p10 1.226 p90 1.343
+mtp3new HOSTTIME rank 0 _prepare_spec_decode_inputs: median 0.240 ms p10 0.217 p90 0.273
+mtp3new HOSTTIME rank 0 rope_prepare_cos_sin: median 0.095 ms p10 0.093 p90 0.102
+mtp3new HOSTTIME rank 0 sample_tokens: median 4.895 ms p10 4.793 p90 5.272
+mtp3new HOSTTIME rank 7 adapter_forward: median 1.274 ms p10 0.900 p90 2.875
+mtp3new HOSTTIME rank 7 drafter_propose: median 6.593 ms p10 6.197 p90 6.976
+mtp3new HOSTTIME rank 7 _execute_model_generic: median 2.644 ms p10 2.563 p90 2.792
+mtp3new HOSTTIME rank 7 execute_model: median 0.035 ms p10 0.031 p90 0.038
+mtp3new HOSTTIME rank 7 gap_between_sample_tokens: median 2.732 ms p10 2.427 p90 3.083
+mtp3new HOSTTIME rank 7 layer_forward: median 0.336 ms p10 0.189 p90 0.489
+mtp3new HOSTTIME rank 7 model_forward: median 1.900 ms p10 1.837 p90 2.034
+mtp3new HOSTTIME rank 7 _ple_prepare: median 0.009 ms p10 0.009 p90 0.012
+mtp3new HOSTTIME rank 7 _prepare_inputs: median 1.218 ms p10 1.187 p90 1.272
+mtp3new HOSTTIME rank 7 _prepare_spec_decode_inputs: median 0.216 ms p10 0.204 p90 0.234
+mtp3new HOSTTIME rank 7 propose_draft_token_ids: median 7.519 ms p10 7.107 p90 7.933
+mtp3new HOSTTIME rank 7 rejection_sampler: median 39.919 ms p10 39.521 p90 40.435
+mtp3new HOSTTIME rank 7 rope_prepare_cos_sin: median 0.116 ms p10 0.085 p90 0.146
+mtp3new HOSTTIME rank 7 sample_tokens: median 53.551 ms p10 52.968 p90 54.303
+plainnew HOSTTIME rank 0 adapter_forward: median 3.338 ms p10 3.201 p90 3.554
+plainnew HOSTTIME rank 0 _execute_model_generic: median 3.454 ms p10 3.318 p90 3.681
+plainnew HOSTTIME rank 0 execute_model: median 0.014 ms p10 0.012 p90 0.098
+plainnew HOSTTIME rank 0 gap_between_sample_tokens: median 24.942 ms p10 24.640 p90 25.376
+plainnew HOSTTIME rank 0 layer_forward: median 0.244 ms p10 0.189 p90 1.277
+plainnew HOSTTIME rank 0 model_forward: median 3.011 ms p10 2.895 p90 3.224
+plainnew HOSTTIME rank 0 _ple_prepare: median 0.611 ms p10 0.568 p90 0.638
+plainnew HOSTTIME rank 0 pp_send: median 0.047 ms p10 0.045 p90 0.054
+plainnew HOSTTIME rank 0 _prepare_inputs: median 0.758 ms p10 0.735 p90 0.788
+plainnew HOSTTIME rank 0 _prepare_spec_decode_inputs: median 0.002 ms p10 0.002 p90 0.002
+plainnew HOSTTIME rank 0 rope_prepare_cos_sin: median 0.076 ms p10 0.072 p90 0.084
+plainnew HOSTTIME rank 0 sample_tokens: median 4.300 ms p10 4.153 p90 4.538
+plainnew HOSTTIME rank 7 adapter_forward: median 1.863 ms p10 1.772 p90 2.003
+plainnew HOSTTIME rank 7 _execute_model_generic: median 2.174 ms p10 2.083 p90 2.325
+plainnew HOSTTIME rank 7 execute_model: median 0.010 ms p10 0.009 p90 0.068
+plainnew HOSTTIME rank 7 gap_between_sample_tokens: median 1.656 ms p10 1.572 p90 1.998
+plainnew HOSTTIME rank 7 layer_forward: median 0.181 ms p10 0.121 p90 0.214
+plainnew HOSTTIME rank 7 model_forward: median 1.537 ms p10 1.470 p90 1.664
+plainnew HOSTTIME rank 7 _ple_prepare: median 0.009 ms p10 0.008 p90 0.009
+plainnew HOSTTIME rank 7 _prepare_inputs: median 0.742 ms p10 0.718 p90 0.771
+plainnew HOSTTIME rank 7 _prepare_spec_decode_inputs: median 0.002 ms p10 0.002 p90 0.002
+plainnew HOSTTIME rank 7 rope_prepare_cos_sin: median 0.074 ms p10 0.072 p90 0.083
+plainnew HOSTTIME rank 7 _run_sampling: median 0.402 ms p10 0.386 p90 0.433
+plainnew HOSTTIME rank 7 sample_tokens: median 27.519 ms p10 27.274 p90 27.808
+
+# greedy equality
+mtp3:alone       vs mtp3new:alone    identical 19/24, largest flip 0.125, margin drift n=2498 median 0.000 p99 0.125 max 0.250
+hostB:alone      vs plainnew:alone   identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.062

@@ -1,0 +1,267 @@
+From 6ae8bdadc57139a55b02f9f35fe2b569be7e75cc Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Mon, 23 Nov 2026 17:09:01 +0000
+Subject: [PATCH] Spec decode: fewer launches and no host sync in the Qwen4Exp
+ MTP drafter
+
+Two costs of each draft step on HPU:
+
+- The draft model's glue around its decoder layer (input norms and projections, the
+  stream reshape and the final stream mixer) was not part of any compiled region, so
+  every op was a graph launch of its own for each draft token. Regional compilation
+  now also compiles the methods and submodules a module names in
+  `hpu_compile_regions`; the MTP predictor names its input projection and mixer, the
+  Qwen4Exp model its final mixer (last PP rank).
+- After the first draft pass the proposer read the target positions and the last
+  token indices back from the device (a host sync before the next pass could be
+  prepared). prepare_inputs keeps host copies of its indices, and the runner passes a
+  host copy of the decode positions (DecodeInputData.position_ids_cpu); the device
+  read stays as the fallback.
+
+Unit test for the compile-regions hook.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ .../test_regional_compile_regions.py          | 52 +++++++++++++++++++
+ vllm_gaudi/models/qwen4_exp.py                |  2 +
+ vllm_gaudi/models/qwen4_exp_mtp.py            | 18 +++++--
+ vllm_gaudi/v1/spec_decode/hpu_eagle.py        | 20 +++++--
+ vllm_gaudi/v1/worker/hpu_model_runner.py      | 26 ++++++++--
+ 5 files changed, 105 insertions(+), 13 deletions(-)
+ create mode 100644 tests/unit_tests/test_regional_compile_regions.py
+
+diff --git a/tests/unit_tests/test_regional_compile_regions.py b/tests/unit_tests/test_regional_compile_regions.py
+new file mode 100644
+index 00000000..e06f2bf2
+--- /dev/null
++++ b/tests/unit_tests/test_regional_compile_regions.py
+@@ -0,0 +1,52 @@
++# SPDX-License-Identifier: Apache-2.0
++"""HPUModelRunner._regional_compilation: methods and submodules named in ``hpu_compile_regions``."""
++from types import SimpleNamespace
++
++import torch
++
++from vllm_gaudi.v1.worker.hpu_model_runner import HPUModelRunner
++
++
++class Norm(torch.nn.Module):
++    pass
++
++
++class Glue(torch.nn.Module):
++    hpu_compile_regions = ("project", "mixer")
++
++    def __init__(self):
++        super().__init__()
++        self.mixer = torch.nn.Sequential(Norm(), torch.nn.Linear(2, 2))
++        self.other = torch.nn.Sequential(Norm())
++        self.layers = torch.nn.ModuleList([torch.nn.Linear(2, 2), torch.nn.Linear(2, 2)])
++
++    def project(self, x):
++        return x
++
++
++def _compiled_names(model):
++    seen = []
++    runner = SimpleNamespace(regional_compilation_layers_list=[Norm])
++    runner._compile_region = lambda parent, name, module: seen.append((type(parent).__name__, name))
++    runner._regional_compilation = lambda *a: HPUModelRunner._regional_compilation(runner, *a)
++    runner._regional_compilation(model)
++    return seen
++
++
++def test_named_regions_compiled_once_and_not_descended():
++    seen = _compiled_names(Glue())
++    assert ("Glue", "project") in seen and ("Glue", "mixer") in seen
++    # the named submodule is one region: its Norm child is not compiled again (only `other`'s Norm is)
++    assert seen.count(("Sequential", "0")) == 1
++    assert ("ModuleList", "0") in seen and ("ModuleList", "1") in seen
++
++
++def test_without_regions_unchanged():
++    m = Glue()
++    Glue.hpu_compile_regions, saved = (), Glue.hpu_compile_regions
++    try:
++        seen = _compiled_names(m)
++    finally:
++        Glue.hpu_compile_regions = saved
++    assert ("Glue", "project") not in seen and ("Glue", "mixer") not in seen
++    assert seen.count(("Sequential", "0")) == 2  # both Norms, the mixer's included
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index 4cdbfecd..edbd3d57 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -511,6 +511,8 @@ class HpuQwen4ExpDecoderLayer(nn.Module):
+ 
+ 
+ class HpuQwen4ExpModel(nn.Module):
++    # Last PP rank: compile the final stream mixer as a region of its own (HPU regional compilation)
++    hpu_compile_regions = ("hyper_connection_mixer", )
+ 
+     def __init__(self, *, vllm_config: VllmConfig, prefix: str = ""):
+         super().__init__()
+diff --git a/vllm_gaudi/models/qwen4_exp_mtp.py b/vllm_gaudi/models/qwen4_exp_mtp.py
+index caf8c192..f3c048e1 100644
+--- a/vllm_gaudi/models/qwen4_exp_mtp.py
++++ b/vllm_gaudi/models/qwen4_exp_mtp.py
+@@ -56,17 +56,25 @@ class HpuQwen4ExpPredictor(nn.Module):
+         ])
+         self.hyper_connection_mixer = GatedResidual(config, use_combine=False)
+ 
++    # Compiled as regions of their own by the HPU runner (regional compilation); eager, each of their ops would be a
++    # separate graph launch for every draft token.
++    hpu_compile_regions = ("input_streams", "hyper_connection_mixer")
++
++    def input_streams(self, embeds: torch.Tensor, hidden_states: torch.Tensor) -> torch.Tensor:
++        """Token embedding + the target's hidden streams -> the MTP layer's input streams."""
++        embeds = self.fc_embedding(self.pre_fc_norm_embedding(embeds))
++        streams = hidden_states.reshape(*embeds.shape[:-1], self.hc * self.H)  # [T] or [B, L] tokens
++        streams = self.pre_fc_norm_hidden(streams).unflatten(-1, (self.hc, self.H))
++        # The token is a residual of unit weight on every stream
++        return (self.fc_hidden(streams) + embeds.unsqueeze(-2)).flatten(-2)
++
+     def forward(self,
+                 input_ids: torch.Tensor,
+                 positions: torch.Tensor,
+                 hidden_states: torch.Tensor,
+                 inputs_embeds: torch.Tensor | None = None) -> tuple[torch.Tensor, torch.Tensor]:
+         embeds = self.embed_tokens(input_ids) if inputs_embeds is None else inputs_embeds
+-        embeds = self.fc_embedding(self.pre_fc_norm_embedding(embeds))
+-        streams = hidden_states.reshape(*embeds.shape[:-1], self.hc * self.H)  # [T] or [B, L] tokens
+-        streams = self.pre_fc_norm_hidden(streams).unflatten(-1, (self.hc, self.H))
+-        # The token is a residual of unit weight on every stream
+-        streams = (self.fc_hidden(streams) + embeds.unsqueeze(-2)).flatten(-2)
++        streams = self.input_streams(embeds, hidden_states)
+         streams = self.layers[0](streams, positions, None)
+         return self.hyper_connection_mixer(streams), streams
+ 
+diff --git a/vllm_gaudi/v1/spec_decode/hpu_eagle.py b/vllm_gaudi/v1/spec_decode/hpu_eagle.py
+index 3fb9bb9b..0cc66941 100644
+--- a/vllm_gaudi/v1/spec_decode/hpu_eagle.py
++++ b/vllm_gaudi/v1/spec_decode/hpu_eagle.py
+@@ -9,6 +9,9 @@ from vllm_gaudi.v1._vendored.spec_decode.metadata import SpecDecodeMetadata
+ 
+ 
+ class HpuEagleProposer(EagleProposer):
++    # Host copies of the indices from the last prepare_inputs call
++    hidden_states_indices_cpu = None
++    last_token_indices_cpu = None
+ 
+     def propose(
+         self,
+@@ -24,6 +27,8 @@ class HpuEagleProposer(EagleProposer):
+         # [num_seq, total_blocks]
+         block_table_cpu_tensor,
+         model_runner,
++        # [virtual_batch_size] host copy of target_positions (optional; read back from the device otherwise)
++        target_positions_cpu=None,
+     ):
+         # For decode, the virtual batch_size is batch size * num_tokens
+         # and the seq_len is always 1
+@@ -83,8 +88,12 @@ class HpuEagleProposer(EagleProposer):
+ 
+         # Positions used by prepare_attn_metadata needs to be cpu because
+         # compile only mode for warmup will not do any real computations
+-        target_positions_cpu = target_positions.cpu()
+-        positions_cpu = target_positions_cpu[last_token_indices.cpu()]
++        if target_positions_cpu is not None and self.last_token_indices_cpu is not None \
++                and self.last_token_indices_cpu.shape == last_token_indices.shape:
++            positions_cpu = target_positions_cpu.reshape(-1)[self.last_token_indices_cpu]
++        else:  # host sync: waits for the first draft pass
++            target_positions_cpu = target_positions.cpu()
++            positions_cpu = target_positions_cpu[last_token_indices.cpu()]
+ 
+         # Decode 1 token each time
+         for token_index in range(self.num_speculative_tokens - 1):
+@@ -166,8 +175,11 @@ class HpuEagleProposer(EagleProposer):
+                 else:
+                     num_picked_token_indices.append(-1)
+             starting_index += step
+-        hidden_states_indices = torch.tensor(num_picked_token_indices, device=self.device)
+-        last_token_indices = torch.tensor(last_token_indices, device=self.device)
++        # Host copies too, for the drafter's host-side positions (see propose)
++        self.hidden_states_indices_cpu = torch.tensor(num_picked_token_indices)
++        self.last_token_indices_cpu = torch.tensor(last_token_indices, dtype=torch.long)
++        hidden_states_indices = self.hidden_states_indices_cpu.to(self.device)
++        last_token_indices = self.last_token_indices_cpu.to(self.device)
+         return common_attn_metadata, hidden_states_indices, last_token_indices
+ 
+     def prepare_attn_metadata(
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index 7275f8bf..a185c39c 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -768,6 +768,7 @@ class DecodeInputData:
+     attn_metadata: Optional[HPUAttentionMetadataV1] = None
+     logits_indices: Optional[torch.Tensor] = None
+     spec_decode_metadata: Optional[SpecDecodeMetadata] = None
++    position_ids_cpu: Optional[torch.Tensor] = None  # host copy of position_ids (the drafter's attention metadata)
+ 
+ 
+ def bool_helper(value):
+@@ -3867,7 +3868,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                position_ids=positions_device,
+                                logits_indices=logits_indices_device,
+                                attn_metadata=attn_metadata,
+-                               spec_decode_metadata=spec_decode_metadata)
++                               spec_decode_metadata=spec_decode_metadata,
++                               position_ids_cpu=positions)
+ 
+     def _host_token_inputs(self, token_ids: torch.Tensor, num_decodes: int, padded_batch_size: int, context_lens,
+                            scheduler_output) -> tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
+@@ -5670,6 +5672,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         can be one of two:
+         1. Children of the nn.ModuleList
+         2. Member of regional_compilation_layers_list
++        3. Methods or submodules a module names in ``hpu_compile_regions`` (e.g. the glue around a draft model's
++           layer, which would otherwise run as many small eager ops)
+         """
+         if isinstance(module, torch.nn.ModuleList):
+             for children_name, children_module in module.named_children():
+@@ -5681,8 +5685,12 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                 module,
+             )
+         else:
++            extra = tuple(getattr(module, "hpu_compile_regions", ()))
++            for name in extra:
++                self._compile_region(module, name, getattr(module, name))
+             for children_name, children_module in module.named_children():
+-                self._regional_compilation(children_module, module, children_name)
++                if children_name not in extra:
++                    self._regional_compilation(children_module, module, children_name)
+ 
+     def _compile_region(self, model, name, module):
+         module = self._compile(module)
+@@ -7929,6 +7937,10 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                         sampled_token_ids)
+ 
+         target_token_ids = decode_sampled_token_ids_tensor.reshape(-1, 1)[hidden_states_indices]
++        # Host copy of the target positions, so the drafter need not read them back after its first pass
++        target_positions_cpu = None
++        if not self.uses_mrope and decode_data.position_ids_cpu is not None:
++            target_positions_cpu = decode_data.position_ids_cpu.reshape(-1)[self.drafter.hidden_states_indices_cpu]
+         if self.uses_mrope:
+             # The drafter derives KV slots from the positions, so they must equal the token indices
+             if any(self.requests[r].mrope_position_delta for r in self.input_batch.req_ids[:num_decodes]):
+@@ -7945,8 +7957,14 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+ 
+         if target_hidden_states.dim() == 2:
+             target_hidden_states = target_hidden_states.unsqueeze(1)
+-        draft_token_ids = self.drafter.propose(target_token_ids, target_positions, target_hidden_states,
+-                                               last_token_indices, common_attn_metadata, decode_block_table, self)
++        draft_token_ids = self.drafter.propose(target_token_ids,
++                                               target_positions,
++                                               target_hidden_states,
++                                               last_token_indices,
++                                               common_attn_metadata,
++                                               decode_block_table,
++                                               self,
++                                               target_positions_cpu=target_positions_cpu)
+ 
+         draft_token_ids = draft_token_ids[:num_decodes]
+         return draft_token_ids
+-- 
+2.43.0
+

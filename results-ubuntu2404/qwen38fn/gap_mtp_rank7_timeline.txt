@@ -1,0 +1,16 @@
+# Rank 7 device timeline, one PP=8 MTP=3 step before 0027 (second profiler session). experiments-ubuntu2404/gap/rank_timeline.py
+compileGraph events in trace: 0 | hccl: []
++    0.00 ms  idle-before   0.00  span   1.31  busy  0.01  n    44  n_aa:0.01, embedding/embedding_pt_fwd_bf16:0.01, 2/cast_bf16_to_f32:0.01, one_hot/one_hot_fwd_i32:0.00
++    1.60 ms  idle-before   0.29  span   7.95  busy  1.04  n  1356  L_self/mlp:2.29, L_self/model:2.15, L_self/self_attn:0.36, 3/mult_fwd_f32:0.19
++   10.02 ms  idle-before   0.46  span   0.00  busy  0.00  n     1  3/where_fwd_i32:0.00
++   10.55 ms  idle-before   0.53  span   0.40  busy  0.01  n     7  one_hot/one_hot_fwd_i32:0.00, n_ab:0.00, fusedTPCNode_0_0:0.00, index_select/gather_fwd_bf16:0.00
++   12.54 ms  idle-before   1.60  span   7.72  busy  1.04  n  1390  L_self/mlp:2.28, L_self/model:2.15, L_self/self_attn:0.36, 3/mult_fwd_f32:0.19
++   24.26 ms  idle-before   4.00  span   0.39  busy  0.01  n     4  4/add_i32:0.00, n_ab:0.00, 2/cast_i32_to_i64:0.00, n_aa:0.00
++   61.82 ms  idle-before  37.17  span   5.61  busy  4.87  n 21603  L_self/mlp:54.82, L_self/linear_attn:7.73, L_self/model:2.15, L_self/attn_hyper_connection:1.02
++   70.52 ms  idle-before   3.09  span   0.01  busy  0.00  n     2  n_ac:0.00, n_aa:0.00
++   71.31 ms  idle-before   0.78  span   5.32  busy  0.09  n   388  3/mult_fwd_f32:0.17, 2/cast_bf16_to_f32:0.12, n_aa:0.10, 2/cast_f32_to_bf16:0.08
++   76.87 ms  idle-before   0.25  span   3.81  busy  1.29  n  2606  L_self/mlp:9.14, L_self/model:2.15, L_self/self_attn:0.41, n_aa:0.12
++   81.64 ms  idle-before   0.96  span   0.82  busy  0.01  n     7  n_aa:0.00, 3/where_fwd_i32:0.00, 3/greater_equal_fwd_i32:0.00, 2/constant_i32:0.00
++   82.96 ms  idle-before   0.50  span   0.00  busy  0.00  n     1  n_ab:0.00
++   83.22 ms  idle-before   0.26  span   9.41  busy  1.06  n  1400  L_self/mlp:2.29, L_self/model:2.14, L_self/self_attn:0.36, 3/mult_fwd_f32:0.19
++   93.08 ms  idle-before   0.45  span   8.40  busy  1.05  n  1397  L_self/mlp:2.28, L_self/model:2.15, L_self/self_attn:0.36, 3/mult_fwd_f32:0.19
