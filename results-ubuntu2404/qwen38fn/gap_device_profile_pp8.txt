@@ -1,0 +1,19 @@
+# PP=8 device profile of 8 warm decode steps (torch profiler, first profiler session), per stage: span = first to last
+# kernel of the stage's part of a step, busy = union of kernel time. experiments-ubuntu2404/gap/devprof2.py
+## rank0.json: span 10.79 ms, busy  2.42 ms (22%), compiles in trace 273 (72.6 ms host)
+    L_self 2.73, values 0.09, fusedTPCNode_0_15_bundle_2101 0.08, fusedTPCNode_0_14_bundle_2101 0.06, n_ab 0.05, 5 0.05, fusedTPCNode_0_12_bundle_2101 0.04, fusedTPCNode_0_8_bundle_2100 0.03
+## rank1.json: span  2.61 ms, busy  2.10 ms (81%), compiles in trace 48 (8.0 ms host)
+    L_self 2.56, values 0.09, fusedTPCNode_0_15_bundle_2099 0.07, fusedTPCNode_0_14_bundle_2099 0.05, fusedTPCNode_0_12_bundle_2099 0.03, fusedTPCNode_0_8_bundle_2098 0.02, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.01
+## rank2.json: span  2.65 ms, busy  2.14 ms (81%), compiles in trace 60 (11.3 ms host)
+    L_self 2.63, values 0.09, fusedTPCNode_0_15_bundle_2099 0.08, fusedTPCNode_0_14_bundle_2099 0.06, fusedTPCNode_0_12_bundle_2099 0.04, fusedTPCNode_0_8_bundle_2098 0.03, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.02
+## rank3.json: span  2.61 ms, busy  2.10 ms (81%), compiles in trace 48 (9.7 ms host)
+    L_self 2.56, values 0.09, fusedTPCNode_0_15_bundle_2099 0.07, fusedTPCNode_0_14_bundle_2099 0.05, fusedTPCNode_0_12_bundle_2099 0.03, fusedTPCNode_0_8_bundle_2098 0.02, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.01
+## rank4.json: span  2.63 ms, busy  2.13 ms (81%), compiles in trace 60 (9.8 ms host)
+    L_self 2.63, values 0.09, fusedTPCNode_0_15_bundle_2099 0.08, fusedTPCNode_0_14_bundle_2099 0.06, fusedTPCNode_0_12_bundle_2099 0.04, fusedTPCNode_0_8_bundle_2098 0.03, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.02
+## rank5.json: span  2.61 ms, busy  2.10 ms (81%), compiles in trace 48 (8.3 ms host)
+    L_self 2.56, values 0.09, fusedTPCNode_0_15_bundle_2099 0.07, fusedTPCNode_0_14_bundle_2099 0.05, fusedTPCNode_0_12_bundle_2099 0.03, fusedTPCNode_0_8_bundle_2098 0.02, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.01
+## rank6.json: span  2.63 ms, busy  2.13 ms (81%), compiles in trace 60 (10.5 ms host)
+    L_self 2.63, values 0.09, fusedTPCNode_0_15_bundle_2099 0.08, fusedTPCNode_0_14_bundle_2099 0.06, fusedTPCNode_0_12_bundle_2099 0.04, fusedTPCNode_0_8_bundle_2098 0.03, fusedTPCNode_0_27_bundle_2101 0.02, fusedTPCNode_0_28_bundle_2101 0.02
+## rank7.json: span  3.36 ms, busy  2.77 ms (82%), compiles in trace 282 (80.5 ms host)
+    L_self 3.10, values 0.09, fusedTPCNode_0_15_bundle_2099 0.07, fusedTPCNode_0_14_bundle_2099 0.05, argmax 0.04, fusedTPCNode_0_12_bundle_2099 0.03, fusedTPCNode_0_8_bundle_2098 0.02, n_ab 0.02
+sum of stage spans 29.9 ms

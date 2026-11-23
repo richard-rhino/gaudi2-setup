@@ -1,0 +1,290 @@
+From 934d2d6e8d849f6f613770646033af171b4223a6 Mon Sep 17 00:00:00 2001
+From: richard-rhino <richard-rhino@users.noreply.github.com>
+Date: Mon, 23 Nov 2026 16:00:30 +0000
+Subject: [PATCH] Qwen4Exp: host copies of decode tokens for the PLE n-gram
+ hash
+
+The n-gram (PLE) embedding hashes token ids on the host. Every decode step it read
+the input ids and the last context tokens (stored in the GDN state slot) back from
+the device, two host syncs before the first layer could be launched, which kept the
+first pipeline stage's device idle.
+
+The runner already holds both on the host. For decode batches without async
+scheduling it now passes the flat input ids and, per row, the last k tokens of the
+request's history (k from the model's host_context_tokens, -1 before position 0 and
+on padding rows) as two optional attention-metadata fields. Qwen4Exp uses them when
+present; prefill and async scheduling keep the device-read path.
+QWEN4_PLE_HOST_TOKENS=0 restores the old path, QWEN4_PLE_HOST_CHECK=1 compares both
+every step. The H2D copies of the hashed ids are now non-blocking too.
+
+Greedy outputs are unchanged; unit test for the runner helper.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Signed-off-by: richard-rhino <richard-rhino@users.noreply.github.com>
+---
+ docs/configuration/env_variables.md          |  2 +
+ tests/unit_tests/test_host_token_inputs.py   | 44 +++++++++++++++++
+ vllm_gaudi/models/qwen4_exp.py               | 50 ++++++++++++++++++--
+ vllm_gaudi/v1/attention/backends/hpu_attn.py | 12 ++++-
+ vllm_gaudi/v1/worker/hpu_model_runner.py     | 27 ++++++++++-
+ 5 files changed, 128 insertions(+), 7 deletions(-)
+ create mode 100644 tests/unit_tests/test_host_token_inputs.py
+
+diff --git a/docs/configuration/env_variables.md b/docs/configuration/env_variables.md
+index 01fad6b7..b1b7aa3d 100644
+--- a/docs/configuration/env_variables.md
++++ b/docs/configuration/env_variables.md
+@@ -45,6 +45,8 @@ This document lists the supported diagnostic and profiling, as well as performan
+ | `VLLM_MINIMAX_M3_MOE_TOKEN_TILE` | Maximum number of tokens processed per tile by the MiniMax-M3 dense SwiGLU-OAI expert path. Non-positive values disable tiling. | `512` |
+ | `VLLM_MINIMAX_M3_MOE_DECODE_GATHER` | Enables the MiniMax-M3 routed-expert gather path for low-token decode. Set to `0` or `false` to use the dense expert path. | `true` |
+ | `VLLM_MINIMAX_M3_MOE_GATHER_MAX_TOKENS` | Maximum token count for the MiniMax-M3 routed-expert gather path. Larger batches use the dense expert path. | `16` |
++| `QWEN4_PLE_HOST_TOKENS` | Qwen4Exp n-gram (PLE) embedding, decode without async scheduling: takes the input ids and the last context tokens of each sequence from host copies the runner passes in the attention metadata, instead of reading them back from the device (two host syncs per step). The device-read path is kept for prefill and async scheduling. `0` always reads from the device. | `1` |
++| `QWEN4_PLE_HOST_CHECK` | Diagnostic for `QWEN4_PLE_HOST_TOKENS`: also reads the device copies every decode step and logs the number of mismatching rows (adds host syncs). | `0` |
+ | `VLLM_WNA16_NATIVE_INT4_MOE` | Runs compressed-tensors WNA16 (int4 weight, BF16 activation) MoE experts on the native `mixture_of_experts.int4_fused_weights` kernel instead of dequantizing every local expert to BF16 on each forward. Applies to 4-bit checkpoints without activation reordering by group (`actorder: group`, which needs `g_idx`) on an Intel Gaudi PyTorch bridge that provides the overload. Anything else falls back to the per-forward dequantization with a warning at load time. With a bridge whose overload accepts `is_gated`, non-gated squared-ReLU experts (Nemotron-H) also run natively, with half-width `w13` weights. | `false` |
+ 
+ ## Experimental: Custom FP8 MoE Gather Combine
+diff --git a/tests/unit_tests/test_host_token_inputs.py b/tests/unit_tests/test_host_token_inputs.py
+new file mode 100644
+index 00000000..417042b1
+--- /dev/null
++++ b/tests/unit_tests/test_host_token_inputs.py
+@@ -0,0 +1,44 @@
++# SPDX-License-Identifier: Apache-2.0
++"""HPUModelRunner._host_token_inputs: host copies of a decode batch's ids and of each row's last tokens."""
++from types import SimpleNamespace
++
++import numpy as np
++import pytest
++import torch
++
++from vllm_gaudi.v1.worker.hpu_model_runner import HPUModelRunner
++
++
++def _runner(k: int, async_scheduling: bool = False):
++    hist = np.zeros((4, 16), dtype=np.int32)
++    hist[0, :5] = [11, 12, 13, 14, 15]
++    hist[1, :2] = [21, 22]
++    r = SimpleNamespace(use_async_scheduling=async_scheduling,
++                        input_batch=SimpleNamespace(token_ids_cpu=hist),
++                        get_model=lambda: SimpleNamespace(host_context_tokens=k))
++    return r
++
++
++def _call(r, token_ids, num_decodes, padded, context_lens, sched=object()):
++    return HPUModelRunner._host_token_inputs(r, token_ids, num_decodes, padded, np.array(context_lens), sched)
++
++
++def test_last_tokens_and_padding():
++    ids = torch.tensor([[15], [22], [0]], dtype=torch.int32)
++    flat, prev = _call(_runner(3), ids, 2, 3, [4, 1])
++    assert flat.tolist() == [15, 22, 0]
++    # row 0: tokens before position 4 -> [12, 13, 14]; row 1: one token, left-padded; row 2: padding row
++    assert prev.tolist() == [[12, 13, 14], [-1, -1, 21], [-1, -1, -1]]
++
++
++def test_spec_decode_rows_are_per_sequence():
++    ids = torch.tensor([[14], [15], [21], [22]], dtype=torch.int32)  # 2 sequences x 2 tokens, flattened
++    flat, prev = _call(_runner(2), ids, 2, 2, [3, 1])
++    assert flat.tolist() == [14, 15, 21, 22]
++    assert prev.tolist() == [[12, 13], [-1, 21]]
++
++
++@pytest.mark.parametrize("k,async_scheduling,sched", [(0, False, object()), (3, True, object()), (3, False, None)])
++def test_disabled(k, async_scheduling, sched):
++    ids = torch.tensor([[15]], dtype=torch.int32)
++    assert _call(_runner(k, async_scheduling), ids, 1, 1, [4], sched) == (None, None)
+diff --git a/vllm_gaudi/models/qwen4_exp.py b/vllm_gaudi/models/qwen4_exp.py
+index 0a61704f..4cdbfecd 100644
+--- a/vllm_gaudi/models/qwen4_exp.py
++++ b/vllm_gaudi/models/qwen4_exp.py
+@@ -147,6 +147,10 @@ from vllm_gaudi.extension.logger import logger as _init_gaudi_logger
+ 
+ logger = _init_gaudi_logger()
+ _PLE_TIMING = os.getenv("VLLM_PP_STAGE_TIMING", "0") == "1"
++# Decode: take the input ids and the context tokens from the runner's host copies (metadata host_input_ids /
++# host_prev_tokens) instead of reading them back from the device, which costs two host syncs per step.
++_PLE_HOST_TOKENS = os.getenv("QWEN4_PLE_HOST_TOKENS", "1") == "1"
++_PLE_HOST_CHECK = os.getenv("QWEN4_PLE_HOST_CHECK", "0") == "1"  # also read the device copies and compare
+ _LAYER_TIMING = os.getenv("QWEN4_LAYER_TIMING", "0") == "1"  # per-layer device events (adds ~0.4 ms per layer)
+ _ple_tacc: dict = {}
+ 
+@@ -536,7 +540,8 @@ class HpuQwen4ExpModel(nn.Module):
+     def _ple_prepare(self, input_ids: torch.Tensor) -> Optional[PLEStepInputs]:
+         """Once per forward (eager): read the context tokens from the first PLE layer's state slot (all PLE layers
+         store the same tokens), hash on the CPU for every PLE layer at once and ship the ids to the device.
+-        Two host syncs per step in total instead of ~3 per PLE layer."""
++        Two host syncs per step in total instead of ~3 per PLE layer; none for decode when the runner passes host
++        copies of the input ids and of each row's last tokens (HPUModelRunner._host_token_inputs)."""
+         if self.ple_hasher is None:
+             return None
+         hs, p0 = self.ple_hasher, self.ple_layers[0]
+@@ -556,6 +561,16 @@ class HpuQwen4ExpModel(nn.Module):
+             load = p0._slots(md, "load_indices_tensor")
+             n = int(load.numel())
+             L = T // n
++            host_prev = getattr(md, "host_prev_tokens", None) if _PLE_HOST_TOKENS and not is_prompt else None
++            host_ids = getattr(md, "host_input_ids", None)
++            if host_prev is not None and host_ids is not None and host_prev.shape == (n, hs.ctx) \
++                    and host_ids.numel() == T:
++                ctx_host = torch.where(host_prev < 0, torch.full_like(host_prev, hs.eos), host_prev)
++                ids_host = host_ids.reshape(-1).long()
++                if _PLE_HOST_CHECK:
++                    self._ple_host_check(md, p0, load, ids_flat, ctx_host, ids_host, host_prev)
++                every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
++                return self._ple_finish(ids_host, ctx_host, [L] * n, n, T, every_token, None, dev, t_start, t)
+             state = p0.kv_cache[1].view(p0.kv_cache[1].shape[0], -1)
+             tok = state.index_select(0, load.long())[:, p0.hist_f32:p0.state_numel]
+             keep = (load.reshape(-1) != 0)
+@@ -575,10 +590,30 @@ class HpuQwen4ExpModel(nn.Module):
+                 every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
+         if _PLE_TIMING:
+             t = _ple_tick("state_to_cpu", t)
+-        L = T // n
+         ids_cpu = ids_flat.cpu().long()
+         if _PLE_TIMING:
+             t = _ple_tick("ids_to_cpu", t)
++        return self._ple_finish(ids_cpu, ctx_cpu, lens, n, T, every_token, valid, dev, t_start, t)
++
++    def _ple_host_check(self, md, p0, load, ids_flat, ctx_host, ids_host, host_prev):
++        """QWEN4_PLE_HOST_CHECK=1: compare the host copies with the device state / ids (rows with a history only,
++        padding rows differ by design); log the running mismatch count every 100 steps."""
++        state = p0.kv_cache[1].view(p0.kv_cache[1].shape[0], -1)
++        tok = state.index_select(0, load.long())[:, p0.hist_f32:p0.state_numel].cpu().round().long()
++        real = (host_prev >= 0).any(-1)
++        bad_ctx = int((tok[real] != ctx_host[real]).any(-1).sum())
++        bad_ids = int((ids_flat.cpu().long() != ids_host).sum())
++        acc = self.__dict__.setdefault("_host_check", [0, 0, 0])
++        acc[0] += 1
++        acc[1] += bad_ctx
++        acc[2] += bad_ids
++        if bad_ctx or bad_ids or acc[0] % 100 == 0:
++            logger.info("PLE host tokens check: %d steps, rows with a context mismatch %d, id mismatches %d", *acc)
++
++    def _ple_finish(self, ids_cpu, ctx_cpu, lens, n: int, T: int, every_token: bool, valid, dev, t_start, t):
++        """Hash all PLE layers' n-gram ids on the host and ship them (and the new context tokens) to the device."""
++        hs = self.ple_hasher
++        L = T // n
+         all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
+         new_tok = torch.empty(n * L if every_token else n, hs.ctx, dtype=torch.float32)
+         for i in range(n):
+@@ -599,8 +634,9 @@ class HpuQwen4ExpModel(nn.Module):
+                                for j, p in enumerate(self.ple_layers)]).to(dev, non_blocking=True)
+         if _PLE_TIMING:
+             t = _ple_tick("gather_h2d", t)
+-        out = PLEStepInputs(all_ids.to(dev, non_blocking=True), torch.tensor(lens, dtype=torch.long).to(dev),
+-                            new_tok.to(dev), valid, emb)
++        out = PLEStepInputs(all_ids.to(dev, non_blocking=True),
++                            torch.tensor(lens, dtype=torch.long).to(dev, non_blocking=True),
++                            new_tok.to(dev, non_blocking=True), valid, emb)
+         if _PLE_TIMING:
+             _ple_tick("other_h2d", t)
+             _ple_tick("total", t_start)
+@@ -690,6 +726,12 @@ class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, Su
+     def forward(self, input_ids, positions, intermediate_tensors=None, inputs_embeds=None, **kwargs):
+         return self.model(input_ids, positions, inputs_embeds, intermediate_tensors)
+ 
++    @property
++    def host_context_tokens(self) -> int:
++        """Context tokens the runner should pass on the host for decode (0: none), see _ple_prepare."""
++        hs = getattr(self.model, "ple_hasher", None)
++        return hs.ctx if (_PLE_HOST_TOKENS and hs is not None) else 0
++
+     def compute_logits(self, hidden_states: torch.Tensor) -> torch.Tensor | None:
+         return self.logits_processor(self.lm_head, hidden_states)
+ 
+diff --git a/vllm_gaudi/v1/attention/backends/hpu_attn.py b/vllm_gaudi/v1/attention/backends/hpu_attn.py
+index cb560489..1b083586 100644
+--- a/vllm_gaudi/v1/attention/backends/hpu_attn.py
++++ b/vllm_gaudi/v1/attention/backends/hpu_attn.py
+@@ -76,6 +76,10 @@ class HPUAttentionMetadataV1(HPUAttentionMetadata):
+     window_block_list: Optional[torch.Tensor] = None
+     image_seg_ids: Optional[torch.Tensor] = None
+     indexer_block_index: Optional[torch.Tensor] = None
++    # Decode only, host copies for models that hash tokens on the CPU (see HPUModelRunner._host_token_inputs):
++    # the flat input ids, and the last tokens of each row's history before its first input token (-1 = none).
++    host_input_ids: Optional[torch.Tensor] = None
++    host_prev_tokens: Optional[torch.Tensor] = None
+ 
+     def seq_len(self):
+         return self.slot_mapping.size(-1)
+@@ -149,7 +153,9 @@ class HPUAttentionMetadataV1(HPUAttentionMetadata):
+                              store_indices_tensor=None,
+                              query_start_loc=None,
+                              seq_lens_tensor=None,
+-                             indexer_block_index=None):
++                             indexer_block_index=None,
++                             host_input_ids=None,
++                             host_prev_tokens=None):
+         return cls(is_prompt=False,
+                    block_mapping=None,
+                    alibi_blocks=None,
+@@ -173,4 +179,6 @@ class HPUAttentionMetadataV1(HPUAttentionMetadata):
+                    store_indices_tensor=store_indices_tensor,
+                    query_start_loc=query_start_loc,
+                    query_start_loc_p=query_start_loc,
+-                   indexer_block_index=indexer_block_index)
++                   indexer_block_index=indexer_block_index,
++                   host_input_ids=host_input_ids,
++                   host_prev_tokens=host_prev_tokens)
+diff --git a/vllm_gaudi/v1/worker/hpu_model_runner.py b/vllm_gaudi/v1/worker/hpu_model_runner.py
+index cb8f25fd..7275f8bf 100644
+--- a/vllm_gaudi/v1/worker/hpu_model_runner.py
++++ b/vllm_gaudi/v1/worker/hpu_model_runner.py
+@@ -1373,7 +1373,8 @@ def trim_attn_metadata(metadata: HPUAttentionMetadataV1) -> object:
+         'chunked_block_list', 'chunked_block_usage', 'chunked_block_groups', 'prep_initial_states',
+         'has_initial_states_p', 'last_chunk_indices_p', 'load_indices_tensor', 'store_indices_tensor',
+         'query_start_loc', 'query_start_loc_p', 'padding_mask_flat', 'blocks_caching_range',
+-        'mamba_chunks_to_block_mapping', 'seqlens_offsets_for_blocks', 'image_seg_ids', 'indexer_block_index'
++        'mamba_chunks_to_block_mapping', 'seqlens_offsets_for_blocks', 'image_seg_ids', 'indexer_block_index',
++        'host_input_ids', 'host_prev_tokens'
+     ])
+     return attention_metadata
+ 
+@@ -3835,6 +3836,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+         else:
+             spec_decode_metadata = None
+         logits_indices_device = async_h2d_copy(logits_indices, device=self.device)
++        host_input_ids, host_prev_tokens = self._host_token_inputs(token_ids, num_decodes, padded_batch_size,
++                                                                   context_lens, scheduler_output)
+ 
+         attn_metadata = HPUAttentionMetadataV1.make_decode_metadata(
+             block_list=block_list_device,
+@@ -3855,6 +3858,8 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+             query_start_loc=query_start_loc_p,
+             indexer_block_index=async_h2d_copy(indexer_block_index, device=self.device)
+             if indexer_block_index is not None else None,
++            host_input_ids=host_input_ids,
++            host_prev_tokens=host_prev_tokens,
+         )
+ 
+         return DecodeInputData(num_decodes=num_decodes,
+@@ -3864,6 +3869,26 @@ class HPUModelRunner(HpuKVConnectorModelRunnerMixin):
+                                attn_metadata=attn_metadata,
+                                spec_decode_metadata=spec_decode_metadata)
+ 
++    def _host_token_inputs(self, token_ids: torch.Tensor, num_decodes: int, padded_batch_size: int, context_lens,
++                           scheduler_output) -> tuple[Optional[torch.Tensor], Optional[torch.Tensor]]:
++        """Host copies of a decode batch's tokens, for models that hash tokens on the CPU (``host_context_tokens``
++        > 0, e.g. Qwen4Exp's n-gram embedding), so they need not read them back from the device. Returns the flat
++        input ids and, per row, the last ``k`` tokens before its first input token (-1 before position 0 and on
++        padding rows). Not under async scheduling, where the host ids of the newest tokens lag the device."""
++        k = self.__dict__.get("_host_ctx_k")
++        if k is None:
++            k = self._host_ctx_k = int(getattr(self.get_model(), "host_context_tokens", 0) or 0)
++        if k <= 0 or scheduler_output is None or self.use_async_scheduling:
++            return None, None
++        prev = torch.full((padded_batch_size, k), -1, dtype=torch.int64)
++        rows = self.input_batch.token_ids_cpu
++        for i in range(num_decodes):
++            c = int(context_lens[i])
++            lo = max(0, c - k)
++            if c > lo:
++                prev[i, k - (c - lo):] = torch.from_numpy(rows[i, lo:c])
++        return token_ids.reshape(-1), prev
++
+     def _prepare_decode_inputs(self,
+                                num_decodes,
+                                num_scheduled_tokens,
+-- 
+2.43.0
+

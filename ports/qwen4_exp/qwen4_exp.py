@@ -147,6 +147,10 @@ from vllm_gaudi.extension.logger import logger as _init_gaudi_logger
 
 logger = _init_gaudi_logger()
 _PLE_TIMING = os.getenv("VLLM_PP_STAGE_TIMING", "0") == "1"
+# Decode: take the input ids and the context tokens from the runner's host copies (metadata host_input_ids /
+# host_prev_tokens) instead of reading them back from the device, which costs two host syncs per step.
+_PLE_HOST_TOKENS = os.getenv("QWEN4_PLE_HOST_TOKENS", "1") == "1"
+_PLE_HOST_CHECK = os.getenv("QWEN4_PLE_HOST_CHECK", "0") == "1"  # also read the device copies and compare
 _LAYER_TIMING = os.getenv("QWEN4_LAYER_TIMING", "0") == "1"  # per-layer device events (adds ~0.4 ms per layer)
 _ple_tacc: dict = {}
 
@@ -536,7 +540,8 @@ class HpuQwen4ExpModel(nn.Module):
     def _ple_prepare(self, input_ids: torch.Tensor) -> Optional[PLEStepInputs]:
         """Once per forward (eager): read the context tokens from the first PLE layer's state slot (all PLE layers
         store the same tokens), hash on the CPU for every PLE layer at once and ship the ids to the device.
-        Two host syncs per step in total instead of ~3 per PLE layer."""
+        Two host syncs per step in total instead of ~3 per PLE layer; none for decode when the runner passes host
+        copies of the input ids and of each row's last tokens (HPUModelRunner._host_token_inputs)."""
         if self.ple_hasher is None:
             return None
         hs, p0 = self.ple_hasher, self.ple_layers[0]
@@ -556,6 +561,16 @@ class HpuQwen4ExpModel(nn.Module):
             load = p0._slots(md, "load_indices_tensor")
             n = int(load.numel())
             L = T // n
+            host_prev = getattr(md, "host_prev_tokens", None) if _PLE_HOST_TOKENS and not is_prompt else None
+            host_ids = getattr(md, "host_input_ids", None)
+            if host_prev is not None and host_ids is not None and host_prev.shape == (n, hs.ctx) \
+                    and host_ids.numel() == T:
+                ctx_host = torch.where(host_prev < 0, torch.full_like(host_prev, hs.eos), host_prev)
+                ids_host = host_ids.reshape(-1).long()
+                if _PLE_HOST_CHECK:
+                    self._ple_host_check(md, p0, load, ids_flat, ctx_host, ids_host, host_prev)
+                every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
+                return self._ple_finish(ids_host, ctx_host, [L] * n, n, T, every_token, None, dev, t_start, t)
             state = p0.kv_cache[1].view(p0.kv_cache[1].shape[0], -1)
             tok = state.index_select(0, load.long())[:, p0.hist_f32:p0.state_numel]
             keep = (load.reshape(-1) != 0)
@@ -575,10 +590,30 @@ class HpuQwen4ExpModel(nn.Module):
                 every_token = _saves_every_token(p0._slots(md, "store_indices_tensor"), n, L)
         if _PLE_TIMING:
             t = _ple_tick("state_to_cpu", t)
-        L = T // n
         ids_cpu = ids_flat.cpu().long()
         if _PLE_TIMING:
             t = _ple_tick("ids_to_cpu", t)
+        return self._ple_finish(ids_cpu, ctx_cpu, lens, n, T, every_token, valid, dev, t_start, t)
+
+    def _ple_host_check(self, md, p0, load, ids_flat, ctx_host, ids_host, host_prev):
+        """QWEN4_PLE_HOST_CHECK=1: compare the host copies with the device state / ids (rows with a history only,
+        padding rows differ by design); log the running mismatch count every 100 steps."""
+        state = p0.kv_cache[1].view(p0.kv_cache[1].shape[0], -1)
+        tok = state.index_select(0, load.long())[:, p0.hist_f32:p0.state_numel].cpu().round().long()
+        real = (host_prev >= 0).any(-1)
+        bad_ctx = int((tok[real] != ctx_host[real]).any(-1).sum())
+        bad_ids = int((ids_flat.cpu().long() != ids_host).sum())
+        acc = self.__dict__.setdefault("_host_check", [0, 0, 0])
+        acc[0] += 1
+        acc[1] += bad_ctx
+        acc[2] += bad_ids
+        if bad_ctx or bad_ids or acc[0] % 100 == 0:
+            logger.info("PLE host tokens check: %d steps, rows with a context mismatch %d, id mismatches %d", *acc)
+
+    def _ple_finish(self, ids_cpu, ctx_cpu, lens, n: int, T: int, every_token: bool, valid, dev, t_start, t):
+        """Hash all PLE layers' n-gram ids on the host and ship them (and the new context tokens) to the device."""
+        hs = self.ple_hasher
+        L = T // n
         all_ids = torch.zeros(len(self.ple_layers), T, hs.num_heads, dtype=torch.int32)
         new_tok = torch.empty(n * L if every_token else n, hs.ctx, dtype=torch.float32)
         for i in range(n):
@@ -599,8 +634,9 @@ class HpuQwen4ExpModel(nn.Module):
                                for j, p in enumerate(self.ple_layers)]).to(dev, non_blocking=True)
         if _PLE_TIMING:
             t = _ple_tick("gather_h2d", t)
-        out = PLEStepInputs(all_ids.to(dev, non_blocking=True), torch.tensor(lens, dtype=torch.long).to(dev),
-                            new_tok.to(dev), valid, emb)
+        out = PLEStepInputs(all_ids.to(dev, non_blocking=True),
+                            torch.tensor(lens, dtype=torch.long).to(dev, non_blocking=True),
+                            new_tok.to(dev, non_blocking=True), valid, emb)
         if _PLE_TIMING:
             _ple_tick("other_h2d", t)
             _ple_tick("total", t_start)
@@ -689,6 +725,12 @@ class HpuQwen4ExpForConditionalGeneration(nn.Module, HasInnerState, IsHybrid, Su
 
     def forward(self, input_ids, positions, intermediate_tensors=None, inputs_embeds=None, **kwargs):
         return self.model(input_ids, positions, inputs_embeds, intermediate_tensors)
+
+    @property
+    def host_context_tokens(self) -> int:
+        """Context tokens the runner should pass on the host for decode (0: none), see _ple_prepare."""
+        hs = getattr(self.model, "ple_hasher", None)
+        return hs.ctx if (_PLE_HOST_TOKENS and hs is not None) else 0
 
     def compute_logits(self, hidden_states: torch.Tensor) -> torch.Tensor | None:
         return self.logits_processor(self.lm_head, hidden_states)

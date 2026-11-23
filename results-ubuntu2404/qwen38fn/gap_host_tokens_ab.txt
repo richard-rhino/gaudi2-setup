@@ -1,0 +1,103 @@
+# PP=8, no MTP, one user. A = QWEN4_PLE_HOST_TOKENS=0 (old path), B = 1 (patch 0026), chk = B + QWEN4_PLE_HOST_CHECK=1.
+# Same plugin build (1294c210 + the 0026 diff) for all three; one launch each; HOSTTIME = host wall ms per step (hook).
+#### hostchk QWEN4_PLE_HOST_TOKENS=1 QWEN4_PLE_HOST_CHECK=1 15:31:02 plugin 1294c210+43fc2dc7
+speed hostchk run 0: TTFT 81.50 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.0 tok/s
+speed hostchk run 1: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.7 tok/s
+speed hostchk run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.5 tok/s
+speed hostchk run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.3 tok/s
+speed hostchk run 1: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.3 tok/s
+speed hostchk run 2: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 32.3 tok/s
+eq3 hostchk alone: 24 outputs, 0 tokens not top-1
+eq3 hostchk batched: 24 outputs, 0 tokens not top-1
+eq3 hostchk batched2: 24 outputs, 0 tokens not top-1
+hostchk HOSTTIME rank 0 adapter_forward: median 13.671 ms p10 10.133 p90 17.349
+hostchk HOSTTIME rank 0 _execute_model_generic: median 13.814 ms p10 10.244 p90 17.485
+hostchk HOSTTIME rank 0 gap_between_sample_tokens: median 0.355 ms p10 0.264 p90 97.018
+hostchk HOSTTIME rank 0 layer_forward: median 0.234 ms p10 0.140 p90 0.981
+hostchk HOSTTIME rank 0 model_forward: median 13.337 ms p10 9.786 p90 16.950
+hostchk HOSTTIME rank 0 _ple_prepare: median 10.842 ms p10 6.699 p90 14.167
+hostchk HOSTTIME rank 0 pp_send: median 0.048 ms p10 0.041 p90 0.056
+hostchk HOSTTIME rank 0 _prepare_inputs: median 0.978 ms p10 0.739 p90 1.662
+hostchk HOSTTIME rank 0 rope_prepare_cos_sin: median 0.093 ms p10 0.066 p90 0.123
+hostchk HOSTTIME rank 0 sample_tokens: median 14.938 ms p10 11.997 p90 18.628
+hostchk HOSTTIME rank 7 adapter_forward: median 3.157 ms p10 2.742 p90 3.844
+hostchk HOSTTIME rank 7 _execute_model_generic: median 3.584 ms p10 3.133 p90 4.281
+hostchk HOSTTIME rank 7 gap_between_sample_tokens: median 0.675 ms p10 0.599 p90 1.251
+hostchk HOSTTIME rank 7 layer_forward: median 0.281 ms p10 0.177 p90 0.452
+hostchk HOSTTIME rank 7 model_forward: median 2.701 ms p10 2.349 p90 3.362
+hostchk HOSTTIME rank 7 _ple_prepare: median 0.011 ms p10 0.011 p90 0.012
+hostchk HOSTTIME rank 7 _prepare_inputs: median 0.981 ms p10 0.949 p90 1.609
+hostchk HOSTTIME rank 7 rope_prepare_cos_sin: median 0.117 ms p10 0.098 p90 0.140
+hostchk HOSTTIME rank 7 _run_sampling: median 0.598 ms p10 0.544 p90 0.685
+hostchk HOSTTIME rank 7 sample_tokens: median 9.089 ms p10 8.302 p90 125.619
+hostchk INFO 11-23 15:38:32 [qwen4_exp.py:611] PLE host tokens check: 6600 steps, rows with a context mismatch 0, id mismatches 0
+hostchk INFO 11-23 15:38:36 [qwen4_exp.py:611] PLE host tokens check: 6700 steps, rows with a context mismatch 0, id mismatches 0
+errors 10 log logs/pp8ab-hostchk-1123-1528.log
+#### hostB QWEN4_PLE_HOST_TOKENS=1 15:41:15 plugin 1294c210+43fc2dc7
+speed hostB run 0: TTFT 80.27 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 33.5 tok/s
+speed hostB run 1: TTFT 0.22 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 33.1 tok/s
+speed hostB run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.3 tok/s
+speed hostB run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.7 tok/s
+speed hostB run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 33.8 tok/s
+speed hostB run 2: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 34.0 tok/s
+eq3 hostB alone: 24 outputs, 0 tokens not top-1
+eq3 hostB batched: 24 outputs, 0 tokens not top-1
+eq3 hostB batched2: 24 outputs, 0 tokens not top-1
+hostB HOSTTIME rank 0 adapter_forward: median 3.418 ms p10 2.980 p90 8.202
+hostB HOSTTIME rank 0 _execute_model_generic: median 3.528 ms p10 3.091 p90 8.313
+hostB HOSTTIME rank 0 gap_between_sample_tokens: median 4.395 ms p10 0.280 p90 108.656
+hostB HOSTTIME rank 0 layer_forward: median 0.206 ms p10 0.138 p90 0.970
+hostB HOSTTIME rank 0 model_forward: median 3.098 ms p10 2.696 p90 7.853
+hostB HOSTTIME rank 0 _ple_prepare: median 0.557 ms p10 0.530 p90 4.793
+hostB HOSTTIME rank 0 pp_send: median 0.043 ms p10 0.042 p90 0.048
+hostB HOSTTIME rank 0 _prepare_inputs: median 0.755 ms p10 0.725 p90 1.156
+hostB HOSTTIME rank 0 rope_prepare_cos_sin: median 0.083 ms p10 0.070 p90 0.098
+hostB HOSTTIME rank 0 sample_tokens: median 4.344 ms p10 3.909 p90 9.622
+hostB HOSTTIME rank 7 adapter_forward: median 2.923 ms p10 2.632 p90 3.775
+hostB HOSTTIME rank 7 _execute_model_generic: median 3.319 ms p10 3.006 p90 4.206
+hostB HOSTTIME rank 7 gap_between_sample_tokens: median 0.671 ms p10 0.579 p90 0.841
+hostB HOSTTIME rank 7 layer_forward: median 0.270 ms p10 0.160 p90 0.439
+hostB HOSTTIME rank 7 model_forward: median 2.495 ms p10 2.251 p90 3.293
+hostB HOSTTIME rank 7 _ple_prepare: median 0.011 ms p10 0.010 p90 0.012
+hostB HOSTTIME rank 7 _prepare_inputs: median 0.931 ms p10 0.911 p90 1.585
+hostB HOSTTIME rank 7 rope_prepare_cos_sin: median 0.109 ms p10 0.092 p90 0.138
+hostB HOSTTIME rank 7 _run_sampling: median 0.549 ms p10 0.515 p90 0.678
+hostB HOSTTIME rank 7 sample_tokens: median 8.458 ms p10 7.890 p90 112.159
+errors 10 log logs/pp8ab-hostB-1123-1539.log
+#### hostA QWEN4_PLE_HOST_TOKENS=0 15:51:18 plugin 1294c210+43fc2dc7
+speed hostA run 0: TTFT 79.84 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.7 tok/s
+speed hostA run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.0 tok/s
+speed hostA run 2: TTFT 0.20 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.9 tok/s
+speed hostA run 0: TTFT 0.24 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.9 tok/s
+speed hostA run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.2 tok/s
+speed hostA run 2: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.2 tok/s
+eq3 hostA alone: 24 outputs, 0 tokens not top-1
+eq3 hostA batched: 24 outputs, 0 tokens not top-1
+eq3 hostA batched2: 24 outputs, 0 tokens not top-1
+hostA HOSTTIME rank 0 adapter_forward: median 13.887 ms p10 10.955 p90 18.357
+hostA HOSTTIME rank 0 _execute_model_generic: median 13.997 ms p10 11.076 p90 18.480
+hostA HOSTTIME rank 0 gap_between_sample_tokens: median 0.362 ms p10 0.335 p90 95.506
+hostA HOSTTIME rank 0 layer_forward: median 0.238 ms p10 0.149 p90 1.115
+hostA HOSTTIME rank 0 model_forward: median 13.585 ms p10 10.580 p90 17.997
+hostA HOSTTIME rank 0 _ple_prepare: median 11.225 ms p10 7.394 p90 15.073
+hostA HOSTTIME rank 0 pp_send: median 0.047 ms p10 0.043 p90 0.053
+hostA HOSTTIME rank 0 _prepare_inputs: median 0.760 ms p10 0.734 p90 1.145
+hostA HOSTTIME rank 0 rope_prepare_cos_sin: median 0.096 ms p10 0.073 p90 0.118
+hostA HOSTTIME rank 0 sample_tokens: median 14.673 ms p10 12.369 p90 19.301
+hostA HOSTTIME rank 7 adapter_forward: median 3.099 ms p10 2.701 p90 3.778
+hostA HOSTTIME rank 7 _execute_model_generic: median 3.516 ms p10 3.092 p90 4.216
+hostA HOSTTIME rank 7 gap_between_sample_tokens: median 0.798 ms p10 0.751 p90 0.884
+hostA HOSTTIME rank 7 layer_forward: median 0.265 ms p10 0.161 p90 0.455
+hostA HOSTTIME rank 7 model_forward: median 2.633 ms p10 2.308 p90 3.294
+hostA HOSTTIME rank 7 _ple_prepare: median 0.011 ms p10 0.010 p90 0.012
+hostA HOSTTIME rank 7 _prepare_inputs: median 0.947 ms p10 0.927 p90 1.578
+hostA HOSTTIME rank 7 rope_prepare_cos_sin: median 0.117 ms p10 0.096 p90 0.136
+hostA HOSTTIME rank 7 _run_sampling: median 0.579 ms p10 0.540 p90 0.677
+hostA HOSTTIME rank 7 sample_tokens: median 9.371 ms p10 8.213 p90 122.799
+errors 10 log logs/pp8ab-hostA-1123-1549.log
+
+# greedy equality (24 prompts x 128 tokens, one user), vs the saved PP=8 baseline p8a (plugin e3b40ad1)
+p8a:alone        vs hostchk:alone    identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+p8a:alone        vs hostB:alone      identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+p8a:alone        vs hostA:alone      identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000
+hostA:alone      vs hostB:alone      identical 24/24, largest flip 0.000, margin drift n=3072 median 0.000 p99 0.000 max 0.000

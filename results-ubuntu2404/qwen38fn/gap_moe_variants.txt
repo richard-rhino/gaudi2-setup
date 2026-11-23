@@ -1,0 +1,7 @@
+# One card, Qwen expert shapes (512 experts, H 2560, I 640), 1 token, top-10, 6 layers of distinct weights, wall per layer
+# ref = current gather (index_select) + bmm; others avoid the weight copy. experiments-ubuntu2404/gap/moe_bench.py
+ref         0.211 ms/layer (wall, incl. launch)  rel err vs ref 1.47e-06
+tpc         1.492 ms/layer (wall, incl. launch)  rel err vs ref 5.94e-03
+tpc_bf16    1.798 ms/layer (wall, incl. launch)  rel err vs ref 7.12e-03
+flat_mm     1.354 ms/layer (wall, incl. launch)  rel err vs ref 1.47e-06
+xT_bmm      1.545 ms/layer (wall, incl. launch)  rel err vs ref 1.47e-06

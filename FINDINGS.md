@@ -708,7 +708,7 @@ tests on those hosts, so there is no multi-user ratio.
 
 | Model, one user | Nvidia server | Gaudi2 (this box), best so far | Gaudi slower by |
 |---|---|---|---|
-| Qwen3.8-Flash-Next | deb-ai: **152-154 tok/s** (MTP k=3) | **32 tok/s** PP=8; 35.4-36 with MTP k=3 (greedy) | **4.2-4.8x** |
+| Qwen3.8-Flash-Next | deb-ai: **152-154 tok/s** (MTP k=3) | **32 tok/s** PP=8 (34 with patch 0026, section 23); 35.4-36 with MTP k=3 (greedy) | **4.2-4.8x** |
 | DeepSeek-V4.1-Flash | rack-n03: **90-91 tok/s** (no spec decode) | **1.29 tok/s**, 4 cards, DeepSeek's reference code (not vLLM) | ~70x |
 | TTFT, short prompt | 0.12-0.19 s | ~0.25 s (Qwen) | |
 
@@ -733,3 +733,49 @@ Qwen at 16 users on Gaudi: 110 tok/s aggregate without MTP, 182 with (PP=8, sect
 - The ports use plain PyTorch ops where the Nvidia path has fused kernels (attention, MoE, norms), and QSA attention
   runs dense.
 - DeepSeek on Gaudi is DeepSeek's reference script with torch stand-ins for its kernels, on 4 of the 8 cards, not vLLM.
+
+## 23. Closing the one-user gap, Qwen at PP=8 (2026-11-23, in progress)
+Question: how much of the 4.2-4.8x gap to deb-ai (section 22) is software we can fix.
+
+**Floor.** A decode token reads ~14.2 GB: the 10 routed experts of each layer (4.7 GB), attention / GDN / shared
+experts / norms (~8.2 GB) and the LM head (1.3 GB). The 102 GB n-gram tables and the embeddings are lookups. At
+2.45 TB/s that is ~5.8 ms per token when the 8 stages run one after another (~170 tok/s ceiling). We were at ~31-32 ms.
+
+**Where the 32 ms went** (`results-ubuntu2404/qwen38fn/gap_device_profile_pp8.txt`, plus host timers without the
+profiler):
+
+| Part of one token | ms |
+|---|---|
+| Stage 0 (rank 0): host work before and while launching its layers; its device was busy only ~2.4 ms | ~9.6 |
+| Stages 1-6: device time, 81% busy (MoE expert gather + bmm ~1 ms, router softmax/top-k ~0.25, GDN projections ~0.3, rest small) | 6 x ~2.6 |
+| Stage 7: device time, then logits and sampling on the host | ~4.5 |
+| Scheduler / IPC between steps | ~1.75 |
+
+**Profiler caveat.** The torch profiler's first session makes every eager op compile on every call, even warm ones
+(one-card test: an op warm from before compiled on each of 4 calls inside the first session, never in later
+sessions). A trace from a first session therefore shows ~25 "compileGraph" events per step that do not happen in
+normal serving. Device-side kernel times in the same trace are fine; host-side times are not.
+
+**Fix 1: PLE context tokens from the host (patch 0026).** Before its first layer, stage 0 hashed the n-gram ids on
+the CPU and for that read two things back from the device: the input ids and the last context tokens (kept in the
+GDN state slot), two blocking syncs, ~2.4 ms, during which nothing else could be launched. The runner already has
+both on the host, so for decode it now passes them in the attention metadata; prefill and async scheduling keep the
+old path. `QWEN4_PLE_HOST_CHECK=1` reads both copies and compares: 0 mismatches in 6,700 steps.
+
+| PP=8, one user, greedy, 256 tokens | warm decode tok/s (6 runs) | greedy outputs vs PP=8 baseline |
+|---|---|---|
+| A: `QWEN4_PLE_HOST_TOKENS=0` | 30.7-31.2 | identical 24/24 |
+| B: patch 0026 (default) | **33.1-34.7** | identical 24/24 |
+
++9%; stage 0's host time per step went from ~14 to ~4.3 ms
+(`results-ubuntu2404/qwen38fn/gap_host_tokens_ab.txt`).
+
+**Tried, no gain: MoE without the weight copy.** The gather MoE copies the 10 routed experts' weights
+(`index_select`) before the bmm, so they cross memory three times. On one card, with the real shapes: the
+copy + bmm costs 0.21 ms per layer; doing the gather inside an elementwise multiply-reduce (TPC), a single flat
+matmul, or a transposed bmm costs 1.35-1.8 ms. The copy stays
+(`results-ubuntu2404/qwen38fn/gap_moe_variants.txt`, `experiments-ubuntu2404/gap/moe_bench.py`).
+
+**Next:** the host time of stage 0 and stage 7 that is left (input preparation ~0.8-1 ms each, layer launches,
+sampling), then the per-stage device time (router top-k over 512 experts, GDN projections), cheaper MTP, and TP=2 x PP=4.
+Scripts: `experiments-ubuntu2404/gap/`.
