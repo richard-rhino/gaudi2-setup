@@ -16,6 +16,7 @@ echo "#### $lab $* $(date +%H:%M:%S) plugin $(git -C ~/src/vllm-gaudi rev-parse 
 curl -s -m 1500 localhost:8000/v1/completions -H 'Content-Type: application/json' -o /dev/null -w "warmup %{time_total} s\n" \
   -d '{"model":"qwen38fn","prompt":"Write a long story about a lighthouse keeper.\n","max_tokens":256,"temperature":0,"ignore_eos":true}'
 for r in 1 2; do timeout 2400 python3 experiments-ubuntu2404/single_user_speed.py http://localhost:8000 qwen38fn 2>&1 | tail -3 | sed "s/^/speed $lab /" | tee -a $OUT; done
+curl -s localhost:8000/metrics | grep -E '^vllm:spec_decode_num_(drafts|draft_tokens|accepted_tokens)_total' | sed "s/^/$lab /" | tee -a $OUT
 timeout 2400 python3 $S/pp8_eq3.py run $lab 2>&1 | tee -a $OUT
 grep -E 'HOSTTIME rank (0|7) ' $L | sed 's/^.*HOSTTIME/HOSTTIME/' | grep -vE 'execute_model:|gap_between_sample_tokens: median 2[0-9]' \
   | awk '{k=$3" "$4; last[k]=$0} END{for(k in last) print last[k]}' | sort | sed "s/^/$lab /" | tee -a $OUT

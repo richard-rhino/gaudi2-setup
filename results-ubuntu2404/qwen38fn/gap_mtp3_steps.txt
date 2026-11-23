@@ -1,0 +1,41 @@
+# PP=8 MTP=3, one user, plugin with 0026 (934d2d6e). HOSTTIME = host wall ms per step, a block from the single-user phase.
+#### mtp3 MTP=3 16:15:28 plugin 934d2d6e+d41d8cd9
+speed mtp3 run 0: TTFT 84.87 s, 256 tokens in 103 chunks (2.49 tok/chunk), decode 32.3 tok/s
+speed mtp3 run 1: TTFT 0.24 s, 256 tokens in 97 chunks (2.64 tok/chunk), decode 36.8 tok/s
+speed mtp3 run 2: TTFT 0.24 s, 256 tokens in 97 chunks (2.64 tok/chunk), decode 37.2 tok/s
+speed mtp3 run 0: TTFT 0.25 s, 256 tokens in 103 chunks (2.49 tok/chunk), decode 35.8 tok/s
+speed mtp3 run 1: TTFT 0.22 s, 256 tokens in 97 chunks (2.64 tok/chunk), decode 37.6 tok/s
+speed mtp3 run 2: TTFT 0.23 s, 256 tokens in 97 chunks (2.64 tok/chunk), decode 37.7 tok/s
+mtp3 vllm:spec_decode_num_drafts_total{engine="0",model_name="qwen38fn"} 687.0
+mtp3 vllm:spec_decode_num_draft_tokens_total{engine="0",model_name="qwen38fn"} 2061.0
+mtp3 vllm:spec_decode_num_accepted_tokens_total{engine="0",model_name="qwen38fn"} 1102.0
+eq3 mtp3 alone: 24 outputs, 0 tokens not top-1
+eq3 mtp3 batched: 24 outputs, 0 tokens not top-1
+eq3 mtp3 batched2: 24 outputs, 0 tokens not top-1
+errors 10 log logs/pp8ab-mtp3-1123-1613.log
+HOSTTIME rank 0 adapter_forward: median 3.397 ms p10 3.281 p90 3.711
+HOSTTIME rank 0 _execute_model_generic: median 3.514 ms p10 3.396 p90 3.837
+HOSTTIME rank 0 execute_model: median 0.031 ms p10 0.029 p90 0.033
+HOSTTIME rank 0 gap_between_sample_tokens: median 65.190 ms p10 64.568 p90 66.270
+HOSTTIME rank 0 layer_forward: median 0.221 ms p10 0.167 p90 1.068
+HOSTTIME rank 0 model_forward: median 3.035 ms p10 2.934 p90 3.368
+HOSTTIME rank 0 _ple_prepare: median 0.621 ms p10 0.594 p90 0.667
+HOSTTIME rank 0 pp_send: median 0.046 ms p10 0.044 p90 0.055
+HOSTTIME rank 0 _prepare_inputs: median 1.218 ms p10 1.174 p90 1.289
+HOSTTIME rank 0 _prepare_spec_decode_inputs: median 0.214 ms p10 0.197 p90 0.243
+HOSTTIME rank 0 rope_prepare_cos_sin: median 0.095 ms p10 0.091 p90 0.127
+HOSTTIME rank 0 sample_tokens: median 4.828 ms p10 4.676 p90 5.189
+HOSTTIME rank 7 adapter_forward: median 2.129 ms p10 1.794 p90 3.878
+HOSTTIME rank 7 drafter_propose: median 14.050 ms p10 13.640 p90 14.590
+HOSTTIME rank 7 _execute_model_generic: median 3.955 ms p10 3.822 p90 4.276
+HOSTTIME rank 7 execute_model: median 0.043 ms p10 0.041 p90 0.049
+HOSTTIME rank 7 gap_between_sample_tokens: median 9.088 ms p10 8.708 p90 9.703
+HOSTTIME rank 7 layer_forward: median 0.325 ms p10 0.214 p90 0.492
+HOSTTIME rank 7 model_forward: median 2.972 ms p10 2.869 p90 3.236
+HOSTTIME rank 7 _ple_prepare: median 0.012 ms p10 0.011 p90 0.013
+HOSTTIME rank 7 _prepare_inputs: median 1.827 ms p10 1.751 p90 1.944
+HOSTTIME rank 7 _prepare_spec_decode_inputs: median 0.309 ms p10 0.285 p90 0.353
+HOSTTIME rank 7 propose_draft_token_ids: median 15.151 ms p10 14.665 p90 15.713
+HOSTTIME rank 7 rejection_sampler: median 36.214 ms p10 35.714 p90 36.621
+HOSTTIME rank 7 rope_prepare_cos_sin: median 0.115 ms p10 0.086 p90 0.167
+HOSTTIME rank 7 sample_tokens: median 60.998 ms p10 60.452 p90 61.790

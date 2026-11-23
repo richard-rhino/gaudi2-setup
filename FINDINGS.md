@@ -776,6 +776,11 @@ copy + bmm costs 0.21 ms per layer; doing the gather inside an elementwise multi
 matmul, or a transposed bmm costs 1.35-1.8 ms. The copy stays
 (`results-ubuntu2404/qwen38fn/gap_moe_variants.txt`, `experiments-ubuntu2404/gap/moe_bench.py`).
 
+**Tried, slower: TP=2 x PP=4** (with 0026): 30.7-31.5 tok/s against 33.1-34.7 for PP=8. Each stage now has 12
+layers and their 2-card all-reduces; stage 0's host time per step is ~7 ms again and the all-reduces cost about what
+halving each card's reads saves. Greedy outputs differ from PP=8 in 22 of 24 prompts (other reduction order) and
+every token is still the argmax of its own logprobs (`results-ubuntu2404/qwen38fn/gap_tp2pp4.txt`). PP=8 stays.
+
 **Next:** the host time of stage 0 and stage 7 that is left (input preparation ~0.8-1 ms each, layer launches,
-sampling), then the per-stage device time (router top-k over 512 experts, GDN projections), cheaper MTP, and TP=2 x PP=4.
+sampling), then the per-stage device time (router top-k over 512 experts, GDN projections), and cheaper MTP (an MTP step now costs ~2.2x a plain step).
 Scripts: `experiments-ubuntu2404/gap/`.

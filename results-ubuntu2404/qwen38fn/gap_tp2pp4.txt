@@ -1,0 +1,33 @@
+# TP=2 x PP=4, no MTP, one user, plugin with 0026 (934d2d6e). Same script as gap_host_tokens_ab.txt.
+#### tp2pp4 TP=2 PP=4 16:04:33 plugin 934d2d6e+d41d8cd9
+speed tp2pp4 run 0: TTFT 78.97 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.0 tok/s
+speed tp2pp4 run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 30.7 tok/s
+speed tp2pp4 run 2: TTFT 0.20 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.3 tok/s
+speed tp2pp4 run 0: TTFT 0.23 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.4 tok/s
+speed tp2pp4 run 1: TTFT 0.21 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.5 tok/s
+speed tp2pp4 run 2: TTFT 0.20 s, 256 tokens in 256 chunks (1.00 tok/chunk), decode 31.4 tok/s
+eq3 tp2pp4 alone: 24 outputs, 0 tokens not top-1
+eq3 tp2pp4 batched: 24 outputs, 0 tokens not top-1
+eq3 tp2pp4 batched2: 24 outputs, 0 tokens not top-1
+tp2pp4 HOSTTIME rank 0 adapter_forward: median 12.688 ms p10 10.561 p90 16.415
+tp2pp4 HOSTTIME rank 0 _execute_model_generic: median 12.845 ms p10 10.729 p90 16.572
+tp2pp4 HOSTTIME rank 0 gap_between_sample_tokens: median 16.677 ms p10 2.338 p90 29.133
+tp2pp4 HOSTTIME rank 0 layer_forward: median 0.407 ms p10 0.357 p90 0.584
+tp2pp4 HOSTTIME rank 0 model_forward: median 12.232 ms p10 10.048 p90 15.945
+tp2pp4 HOSTTIME rank 0 _ple_prepare: median 4.930 ms p10 1.091 p90 6.549
+tp2pp4 HOSTTIME rank 0 pp_send: median 0.054 ms p10 0.044 p90 0.071
+tp2pp4 HOSTTIME rank 0 _prepare_inputs: median 1.108 ms p10 0.957 p90 1.362
+tp2pp4 HOSTTIME rank 0 rope_prepare_cos_sin: median 0.128 ms p10 0.106 p90 0.152
+tp2pp4 HOSTTIME rank 0 sample_tokens: median 11.938 ms p10 9.412 p90 14.276
+tp2pp4 HOSTTIME rank 7 adapter_forward: median 6.822 ms p10 6.590 p90 8.362
+tp2pp4 HOSTTIME rank 7 _execute_model_generic: median 7.335 ms p10 7.064 p90 8.967
+tp2pp4 HOSTTIME rank 7 gap_between_sample_tokens: median 0.494 ms p10 0.402 p90 0.548
+tp2pp4 HOSTTIME rank 7 layer_forward: median 0.418 ms p10 0.370 p90 0.501
+tp2pp4 HOSTTIME rank 7 model_forward: median 6.413 ms p10 6.182 p90 7.827
+tp2pp4 HOSTTIME rank 7 _ple_prepare: median 0.012 ms p10 0.011 p90 0.014
+tp2pp4 HOSTTIME rank 7 _prepare_inputs: median 1.225 ms p10 1.085 p90 1.295
+tp2pp4 HOSTTIME rank 7 rope_prepare_cos_sin: median 0.110 ms p10 0.104 p90 0.134
+tp2pp4 HOSTTIME rank 7 _run_sampling: median 0.605 ms p10 0.533 p90 0.655
+tp2pp4 HOSTTIME rank 7 sample_tokens: median 27.096 ms p10 16.472 p90 39.548
+errors 10 log logs/pp8ab-tp2pp4-1123-1602.log
+p8a:alone        vs tp2pp4:alone     identical  2/24, largest flip 0.500, margin drift n=945 median 0.125 p99 0.750 max 1.125

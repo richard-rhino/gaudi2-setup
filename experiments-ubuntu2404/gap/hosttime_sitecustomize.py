@@ -41,7 +41,11 @@ HOOKS = {
         wrap(m.HPUModelRunner, "_execute_model_generic", "_execute_model_generic"),
         wrap(m.HPUModelRunner, "_run_sampling", "_run_sampling"),
         wrap(m.HpuModelAdapter, "forward", "adapter_forward"),
+        wrap(m.HPUModelRunner, "propose_draft_token_ids", "propose_draft_token_ids"),
+        wrap(m.HPUModelRunner, "_prepare_spec_decode_inputs", "_prepare_spec_decode_inputs"),
     ],
+    "vllm_gaudi.v1.spec_decode.hpu_eagle": lambda m: [wrap(m.HpuEagleProposer, "propose", "drafter_propose")],
+    "vllm_gaudi.v1._vendored.sample.rejection_sampler": lambda m: [wrap(m.RejectionSampler, "forward", "rejection_sampler")],
     "vllm.distributed.parallel_state": lambda m: [wrap(m.GroupCoordinator, "send", "pp_send")],
     "vllm_gaudi.ops.hpu_rotary_embedding": lambda m: [
         wrap(c, "prepare_cos_sin", "rope_prepare_cos_sin") for c in vars(m).values()
