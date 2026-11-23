@@ -391,6 +391,31 @@ The commit message of 3328934 ("runs correctly") and the file name `*first-corre
 
 Speed of that first eager run: 0.14 tok/s.
 
+### Compiled decode and agreement with rack-n03, 2026-11-23
+Modules 0-3, model parallel 4, greedy (`dsv41-compiled-vs-rack-n03.txt`; scripts `compare_modes.py`, `forced_vs_rack.py`).
+
+| Mode | Decode tok/s | Top-1 = rack-n03's token (forced, 132 steps) |
+|---|---|---|
+| reference (eager, per-expert loop) | 0.25-0.29 | not run |
+| stacked experts, eager | 0.37-0.45 | 127 |
+| compiled (`install_compile`) | **1.29** | **130** |
+| compiled + static-shape attention (`DSV41_ATTN_STATIC=1`) | 1.39 | 128 |
+
+- **Agreement with the reference is now measured:** 96-98.5% of rack-n03's greedy tokens are Gaudi's top-1, and every
+  difference is a near tie on at least one side (rack-n03's own top-2 margin 0-0.5 logprob, one at 1.5 where Gaudi's
+  margin is 0.07). The prompt tokens are identical. Limit: 3 prompts, up to 64 tokens, short contexts.
+- Against the eager reference all modes move the same way (mean |dlogprob| 0.04, 1-3 flips in 72 steps at margins up to
+  0.83), so compiling does not cost accuracy beyond bf16 rounding.
+- **The static-shape attention (`attn_static.py`) is opt-in.** It is exact against the reference code on CPU, but on the
+  cards it is only ~8% faster in real generation (716 vs 778 ms per token), and it differs from rack-n03 at 4 vs 2 steps.
+  That sample is too small to call it worse, and too small to make it the default. The per-module timing harness had
+  shown 2.4x (1043 vs 2840 ms): its synchronization after every module inflates attention, so it ranks pieces but
+  does not predict tok/s.
+- **Gaudi 1.24 compiler issue found on the way:** compiling the static path's `attend` piece (key concat, sparse
+  attention, inverse RoPE) as one graph makes a later compiled graph fail with `offset_ 0 is not matching with the offset
+  of new tensor` (bisected over 9 runs, `logs/dsv41-attn-bisect-*`). It stays eager; its `sparse_attn` is compiled alone.
+- Cold compile: the first compiled decode step took 15-21 s; afterwards the cold and warm runs are identical.
+
 ### TP=8 re-test after the port 8 fix (section 17), 2026-11-22
 Qwen3.8-Flash-Next, TP=8 PP=1, gather MoE, single user, 256 tokens: **27.7-29.7 tok/s on 9 of 9 warm runs** (median
 28.1), TTFT 0.22-0.31 s, 0 port 9 link-downs. Raw: `results-ubuntu2404/qwen38fn/single_user_tp8_port8fix_gather.txt`.
@@ -670,8 +695,8 @@ To-do, in working order:
   - Start at TP=8 (no pipeline to thread the hidden states through), then try PP=8.
   - Done when: greedy output and logprobs agree with the non-MTP run, with acceptance rate and tok/s reported for
     single and 16 users.
-- [ ] **DeepSeek-V4.1-Flash** (section 20): run `compare_modes.py` with the static-shape attention (speed, and whether
-      each speed-up changes the output), then compare logprobs with rack-n03.
+- [x] **DeepSeek-V4.1-Flash** (section 20): compiled decode 1.29 tok/s on 4 cards, 96-98.5% top-1 agreement with
+      rack-n03 (near ties only). Static-shape attention opt-in. Next: all 8 cards, longer contexts, serving through vLLM.
 - [ ] Qwen: warm up the common prefill shapes (a new prompt length compiles for 1-4 minutes); keep the PLE context
       tokens on the host.
 - [ ] Check the port 8 fix across a reboot.

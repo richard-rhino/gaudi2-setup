@@ -1,0 +1,52 @@
+# DeepSeek-V4.1-Flash, modules 0-3 (model parallel 4), greedy. compare_modes: against the eager per-expert reference.
+# forced_vs_rack: rack-n03's greedy tokens fed to Gaudi; does Gaudi's top-1 match each one (132 steps, 3 prompts).
+#### dsv41-compare-modes-1122-2333.log
+{"mode": "reference", "prompt": 0, "prefill_s": 15.45, "decode_ms_p50": 3853.3, "decode_ms_max": 4155.3, "decode_tok_s": 0.257} 'The capital of Japan is Tokyo.<｜end▁of▁sentence｜>'
+{"mode": "reference", "prompt": 1, "prefill_s": 11.19, "decode_ms_p50": 4000.2, "decode_ms_max": 4391.2, "decode_tok_s": 0.253} '# Fibonacci Function in Python\n\nHere are several implementations, from simple to optimized:\n\n## 1. Iterative (Recommended)\n\n```python\ndef fibonacci(n:'
+{"mode": "reference", "prompt": 2, "prefill_s": 9.95, "decode_ms_p50": 3507.9, "decode_ms_max": 3735.6, "decode_tok_s": 0.286} 'The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue light) much more strongly than longer wavelengths (red light) — a process called Rayleigh scattering'
+{"prompt": 0, "mode": "stacked", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0001, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 18.3, "decode_ms_p50": 2268.4, "decode_ms_max": 2405.7, "decode_tok_s": 0.437}
+{"prompt": 1, "mode": "stacked", "steps": 32, "dlp_mean": 0.0379, "dlp_max": 0.2408, "top1_differs_at": [31], "reference_margin_there": [0.461], "prefill_s": 10.81, "decode_ms_p50": 2213.1, "decode_ms_max": 2348.7, "decode_tok_s": 0.451}
+{"prompt": 2, "mode": "stacked", "steps": 32, "dlp_mean": 0.0403, "dlp_max": 0.3308, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 10.31, "decode_ms_p50": 2706.9, "decode_ms_max": 2991.1, "decode_tok_s": 0.373}
+{"prompt": 0, "mode": "compiled-cold", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 21.99, "decode_ms_p50": 715.1, "decode_ms_max": 21260.4, "decode_tok_s": 0.274}
+{"prompt": 1, "mode": "compiled-cold", "steps": 32, "dlp_mean": 0.0406, "dlp_max": 0.733, "top1_differs_at": [2, 20], "reference_margin_there": [0.834, 0.152], "prefill_s": 9.67, "decode_ms_p50": 717.8, "decode_ms_max": 748.7, "decode_tok_s": 1.391}
+{"prompt": 2, "mode": "compiled-cold", "steps": 32, "dlp_mean": 0.0436, "dlp_max": 0.4315, "top1_differs_at": [28], "reference_margin_there": [0.746], "prefill_s": 21.21, "decode_ms_p50": 716.5, "decode_ms_max": 743.5, "decode_tok_s": 1.394}
+{"prompt": 0, "mode": "compiled-warm", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 9.38, "decode_ms_p50": 715.6, "decode_ms_max": 744.5, "decode_tok_s": 1.39}
+{"prompt": 1, "mode": "compiled-warm", "steps": 32, "dlp_mean": 0.0406, "dlp_max": 0.733, "top1_differs_at": [2, 20], "reference_margin_there": [0.834, 0.152], "prefill_s": 9.56, "decode_ms_p50": 715.9, "decode_ms_max": 769.8, "decode_tok_s": 1.393}
+{"prompt": 2, "mode": "compiled-warm", "steps": 32, "dlp_mean": 0.0436, "dlp_max": 0.4315, "top1_differs_at": [28], "reference_margin_there": [0.746], "prefill_s": 8.96, "decode_ms_p50": 716.3, "decode_ms_max": 750.7, "decode_tok_s": 1.394}
+{"mode": "compiled-free", "prompt": 0, "prefill_s": 9.4, "decode_ms_p50": 716.1, "decode_ms_max": 743.1, "decode_tok_s": 1.39} 'The capital of Japan is Tokyo.<｜end▁of▁sentence｜>'
+{"mode": "compiled-free", "prompt": 1, "prefill_s": 9.55, "decode_ms_p50": 720.2, "decode_ms_max": 739.8, "decode_tok_s": 1.387} '# Fibonacci Number Function\n\nHere are several implementations, from simple to optimized:\n\n## 1. Iterative (Recommended)\n\n```python\ndef fibonacci(n: int) -> int:\n    """Return the n-th Fibonacci number (0-indexed'
+{"mode": "compiled-free", "prompt": 2, "prefill_s": 9.08, "decode_ms_p50": 719.6, "decode_ms_max": 749.0, "decode_tok_s": 1.388} 'The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue light) much more strongly than longer wavelengths (red light) — a phenomenon called Rayleigh scattering. When you look at the sky away from the sun, you see this scattered'
+#### dsv41-compare-modes-static0-1122-2352.log
+{"mode": "reference", "prompt": 0, "prefill_s": 24.07, "decode_ms_p50": 4000.4, "decode_ms_max": 4220.1, "decode_tok_s": 0.249} 'The capital of Japan is Tokyo.<｜end▁of▁sentence｜>'
+{"mode": "reference", "prompt": 1, "prefill_s": 11.04, "decode_ms_p50": 3925.1, "decode_ms_max": 4128.9, "decode_tok_s": 0.255} '# Fibonacci Function in Python\n\nHere are several implementations, from simple to optimized:\n\n## 1. Iterative (Recommended)\n\n```python\ndef fibonacci(n:'
+{"mode": "reference", "prompt": 2, "prefill_s": 10.28, "decode_ms_p50": 3892.3, "decode_ms_max": 4155.4, "decode_tok_s": 0.258} 'The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue light) much more strongly than longer wavelengths (red light) — a process called Rayleigh scattering'
+{"prompt": 0, "mode": "stacked", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0001, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 19.52, "decode_ms_p50": 2271.5, "decode_ms_max": 2343.2, "decode_tok_s": 0.438}
+{"prompt": 1, "mode": "stacked", "steps": 32, "dlp_mean": 0.0379, "dlp_max": 0.2408, "top1_differs_at": [31], "reference_margin_there": [0.461], "prefill_s": 10.71, "decode_ms_p50": 2231.8, "decode_ms_max": 2450.0, "decode_tok_s": 0.445}
+{"prompt": 2, "mode": "stacked", "steps": 32, "dlp_mean": 0.0403, "dlp_max": 0.3308, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 10.02, "decode_ms_p50": 2172.0, "decode_ms_max": 2307.4, "decode_tok_s": 0.457}
+{"prompt": 0, "mode": "compiled-cold", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 21.44, "decode_ms_p50": 2544.1, "decode_ms_max": 15258.8, "decode_tok_s": 0.248}
+{"prompt": 1, "mode": "compiled-cold", "steps": 32, "dlp_mean": 0.0461, "dlp_max": 0.6787, "top1_differs_at": [2], "reference_margin_there": [0.834], "prefill_s": 9.54, "decode_ms_p50": 1669.8, "decode_ms_max": 2537.7, "decode_tok_s": 0.61}
+{"prompt": 2, "mode": "compiled-cold", "steps": 32, "dlp_mean": 0.0438, "dlp_max": 0.4687, "top1_differs_at": [14], "reference_margin_there": [0.398], "prefill_s": 21.21, "decode_ms_p50": 772.6, "decode_ms_max": 1689.3, "decode_tok_s": 1.248}
+{"prompt": 0, "mode": "compiled-warm", "steps": 8, "dlp_mean": 0.0, "dlp_max": 0.0, "top1_differs_at": [], "reference_margin_there": [], "prefill_s": 9.29, "decode_ms_p50": 807.5, "decode_ms_max": 840.0, "decode_tok_s": 1.235}
+{"prompt": 1, "mode": "compiled-warm", "steps": 32, "dlp_mean": 0.0461, "dlp_max": 0.6787, "top1_differs_at": [2], "reference_margin_there": [0.834], "prefill_s": 9.54, "decode_ms_p50": 774.0, "decode_ms_max": 834.2, "decode_tok_s": 1.291}
+{"prompt": 2, "mode": "compiled-warm", "steps": 32, "dlp_mean": 0.0438, "dlp_max": 0.4687, "top1_differs_at": [14], "reference_margin_there": [0.398], "prefill_s": 8.94, "decode_ms_p50": 778.6, "decode_ms_max": 846.6, "decode_tok_s": 1.286}
+{"mode": "compiled-free", "prompt": 0, "prefill_s": 9.35, "decode_ms_p50": 778.8, "decode_ms_max": 865.7, "decode_tok_s": 1.27} 'The capital of Japan is Tokyo.<｜end▁of▁sentence｜>'
+{"mode": "compiled-free", "prompt": 1, "prefill_s": 9.61, "decode_ms_p50": 776.0, "decode_ms_max": 1778.9, "decode_tok_s": 0.931} '# Fibonacci Number Function\n\nHere are several implementations, each with different trade-offs:\n\n## 1. Iterative (Recommended)\n\nBest balance of simplicity and performance — **O(n)** time, **O(1)** space.\n\n```python\n'
+{"mode": "compiled-free", "prompt": 2, "prefill_s": 9.04, "decode_ms_p50": 777.0, "decode_ms_max": 910.5, "decode_tok_s": 1.281} 'The sky appears blue because air molecules scatter shorter wavelengths of sunlight (blue) much more strongly than longer wavelengths (red) — a process called Rayleigh scattering. When you look at the sky away from the sun, you see this scattered blue light'
+#### dsv41-forced-rack-static1-1123-0010.log
+prompt tokens equal to the server's: True (16 vs 16)
+prompt tokens equal to the server's: True (14 vs 14)
+{"prompt": 0, "mode": "stacked", "steps": 8, "top1_agree": 8, "flips": []}
+{"prompt": 1, "mode": "stacked", "steps": 64, "top1_agree": 61, "flips": [{"step": 2, "gaudi_margin": 0.268, "server_margin": 0.25}, {"step": 10, "gaudi_margin": 0.106, "server_margin": 0.25}, {"step": 25, "gaudi_margin": 0.533, "server_margin": 0.0}]}
+{"prompt": 2, "mode": "stacked", "steps": 60, "top1_agree": 58, "flips": [{"step": 14, "gaudi_margin": 0.879, "server_margin": 0.5}, {"step": 17, "gaudi_margin": 0.069, "server_margin": 1.5}]}
+{"prompt": 0, "mode": "compiled", "steps": 8, "top1_agree": 8, "flips": []}
+{"prompt": 1, "mode": "compiled", "steps": 64, "top1_agree": 61, "flips": [{"step": 10, "gaudi_margin": 0.071, "server_margin": 0.25}, {"step": 25, "gaudi_margin": 0.329, "server_margin": 0.0}, {"step": 49, "gaudi_margin": 0.395, "server_margin": 0.25}]}
+{"prompt": 2, "mode": "compiled", "steps": 60, "top1_agree": 59, "flips": [{"step": 14, "gaudi_margin": 0.35, "server_margin": 0.5}]}
+#### dsv41-forced-rack-static0-1123-0034.log
+prompt tokens equal to the server's: True (16 vs 16)
+prompt tokens equal to the server's: True (14 vs 14)
+{"prompt": 0, "mode": "stacked", "steps": 8, "top1_agree": 8, "flips": []}
+{"prompt": 1, "mode": "stacked", "steps": 64, "top1_agree": 61, "flips": [{"step": 2, "gaudi_margin": 0.268, "server_margin": 0.25}, {"step": 10, "gaudi_margin": 0.106, "server_margin": 0.25}, {"step": 25, "gaudi_margin": 0.533, "server_margin": 0.0}]}
+{"prompt": 2, "mode": "stacked", "steps": 60, "top1_agree": 58, "flips": [{"step": 14, "gaudi_margin": 0.879, "server_margin": 0.5}, {"step": 17, "gaudi_margin": 0.069, "server_margin": 1.5}]}
+{"prompt": 0, "mode": "compiled", "steps": 8, "top1_agree": 8, "flips": []}
+{"prompt": 1, "mode": "compiled", "steps": 64, "top1_agree": 62, "flips": [{"step": 25, "gaudi_margin": 0.281, "server_margin": 0.0}, {"step": 49, "gaudi_margin": 0.323, "server_margin": 0.25}]}
+{"prompt": 2, "mode": "compiled", "steps": 60, "top1_agree": 60, "flips": []}

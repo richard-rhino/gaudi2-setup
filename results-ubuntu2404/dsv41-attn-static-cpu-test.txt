@@ -1,0 +1,4 @@
+seed 0 prompt 1: worst rel err so far 0, argmax equal 200/200
+seed 1 prompt 7: worst rel err so far 0, argmax equal 394/394
+seed 2 prompt 37: worst rel err so far 0, argmax equal 558/558
+seed 3 prompt 100: worst rel err so far 0, argmax equal 659/659

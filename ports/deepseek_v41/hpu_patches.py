@@ -308,13 +308,34 @@ _COMPILED: dict = {}
 _orig_moe_forward = None
 
 
+_OFFSET_SEEN = set()
+
+
+def _offset_safe(fn, name):
+    """A compiled HPU graph keeps the storage offset of each input it was recorded with, and a later call with a view
+    at another offset fails ("offset_ 0 is not matching with the offset of new tensor"). Give it offset-0 copies;
+    report each function the first time, with the size, so the cost of the copies is visible."""
+    def run(*args, **kwargs):
+        out = []
+        for i, t in enumerate(args):
+            if isinstance(t, torch.Tensor) and t.device.type == "hpu" and t.storage_offset() != 0:
+                if (name, i) not in _OFFSET_SEEN:
+                    _OFFSET_SEEN.add((name, i))
+                    print(f"[offset_safe] {name} arg {i}: view at offset {t.storage_offset()}, shape {tuple(t.shape)}, "
+                          f"{t.numel() * t.element_size() / 2**20:.2f} MiB copied", flush=True)
+                t = t.clone()
+            out.append(t)
+        return fn(*out, **kwargs)
+    return run
+
+
 def install_compile():
     """DSV41_COMPILE=1: torch.compile (hpu_backend, static shapes) the pieces whose shapes do not depend on the
     position: hyper-connection mixes/Sinkhorn, RMSNorm, the quantized linear, sparse attention, the MoE gather."""
     import torch._dynamo
     torch._dynamo.config.cache_size_limit = 1024
     torch._dynamo.config.accumulated_cache_size_limit = 8192
-    c = lambda f: torch.compile(f, backend="hpu_backend", dynamic=False)
+    c = lambda f: _offset_safe(torch.compile(f, backend="hpu_backend", dynamic=False), f.__qualname__)
     M.Block.hc_mixes = c(M.Block.hc_mixes)
     M.Block.hc_pre = c(M.Block.hc_pre)
     M.Block.hc_post = c(M.Block.hc_post)
@@ -322,6 +343,10 @@ def install_compile():
     M.linear = c(_linear)
     M.sparse_attn = c(KT.sparse_attn)
     _COMPILED["moe_gather"] = c(_moe_gather)
+    # Opt-in: ~8% faster decode, but 4 vs 2 of 132 top-1 differences from rack-n03 (FINDINGS 20); too few to rank.
+    if os.getenv("DSV41_ATTN_STATIC", "0") == "1":
+        import attn_static  # decode-time attention with bucketed shapes (checked by test_attn_static.py)
+        attn_static.install(compile_pieces=True)
 
 
 def install_moe():
